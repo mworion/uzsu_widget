@@ -1,6 +1,6 @@
 #UZSU Widget
 
-#JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
+###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
 Version 1.0, (C) Michael Würtenberger 2014
 
 Hallo,
