@@ -1,9 +1,8 @@
-UZSU Widget
-(C) Michael Würtenberger 2014
+### UZSU Widget
 
-Version 1.0
- 
-JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
+##JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
+
+#Version 1.0, (C) Michael Würtenberger 2014
 
 Hallo,
 
@@ -17,17 +16,21 @@ Absprungbasis ist das installierte (und in Eurer smarthome.py funktionierende) U
 
 3. Einbinden des Widgets in Eure Seite mit
 
+<pre>
 	{% import "widget_uzsu.html" as uzsu %}
+</pre>
 
 das packt ihr am besten unter die Zeilen
 
+<pre>
 	{% extends "rooms.html" %}
 	{% block content %}
-	
+</pre>
+
 4. Anlegen eines UZSU Symbols, ich habe da mein Standardtestbeispiel genommen.
-
+<pre>
 	{{ uzsu.uzsu_icon('eg.ez.decke.01', 'eg.ez.decke.uzsu', 'Esszimmerlampe') }}
-
+</pre>
 5. Die Parametrierung des Widgets findet Ihr ebenfalls in der widget_uzsu.html Datei. Einfach mal reinschauen.
 
 6. Anschliessen Reload der Seite im Browser, dann sollte das Popup kommen.
