@@ -1,6 +1,8 @@
-uzsu_widget
-===========
+UZSU Widget
+(C) Michael Würtenberger 2014
 
+Version 1.0
+ 
 JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
 
 Hallo,
