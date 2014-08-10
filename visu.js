@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release 1.0 - First Realease
+// Release 1.1 - beta
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -171,7 +171,7 @@ function uzsuBuildTableFooter(){
 		template += "<div data-role = 'button' id = 'uzsuAddTableRow'> Add Entry <\/div>";
 		template += "<div data-role = 'button' id = 'uzsuSaveEntry'> Save Data <\/div>";
 		template += "<div data-role = 'button' id = 'uzsuQuit'> Quit UZSU<\/div> <\/td>";
-	template += "<td style = 'text-align: right'><h6> v1.0 <\/h6><\/td><\/div><\/tr><\/table>";
+	template += "<td style = 'text-align: right'><h6> v1.1beta <\/h6><\/td><\/div><\/tr><\/table>";
 	// abschlus des gesamten span container
 	template += "<\/span>";
     // und der abschluss des popup divs
