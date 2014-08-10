@@ -1,4 +1,4 @@
-//
+// 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
 // Release 1.0 - First Realease
