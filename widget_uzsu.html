@@ -1,0 +1,37 @@
+/**
+* Widget for usage of uzsu plugin
+* (c) Michael Würtenberger 2014
+* läuft zusammen mit dem js v1.0
+*
+* @param unique id for this widget
+* @param a gad/item
+* @param headline for popup (optional), default UZSZ
+* @param customizing popup interface (optional), default = '0', 
+*												 expert mode = '1'  (value, time, rrule direct input)
+*												 mixed mode = '2' features of '0' design of 1
+* @param pic on (optional), default = clock
+* @param pic off (optional), default = clock
+* @param customType (optional), default = bool, supported types are 'bool','num'
+* @param customTextTrue (optional), default = On  any text possible, should be short
+* @param customTextFalse (optional), default = Off any text possible, should be short
+*/
+
+{% macro uzsu_icon(id, gad_uzsu, gad_headline, gad_customFormat, pic_on, pic_off, gad_customType, gad_customTextTrue, gad_customTextFalse) %}
+
+
+	<span 
+		id="{{ uid(page, id) }}" 
+		data-widget="uzsu.uzsu_icon" 
+		data-item="{{ gad_uzsu }}" 
+		data-headline="{{ gad_headline|default('UZSU') }}" 
+		data-customFormat="{{ gad_customFormat | default('0') }}"
+        data-pic-on="{{ pic_on|default(icon1~'time_clock.png') }}" 
+        data-pic-off="{{ pic_off|default(icon0~'time_clock.png') }}"
+        data-customType="{{ gad_customType|default('bool') }}"
+        data-customTextTrue="{{ gad_customTextTrue|default('On') }}"
+        data-customtextFalse="{{ gad_customTextFalse|default('Off') }}"
+        class="switch"><a><img class="icon" src="{{ pic_off|default(icon0~'time_clock.png') }}" /></a>
+    </span>
+	
+{% endmacro %}
+
