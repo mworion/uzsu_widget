@@ -28,7 +28,7 @@ function uzsuBuildTableHeader(headline, customFormat){
 	
 	var template = "";
 	// hier kommt der popup container mit der beschreibung ein eigenschaften
-	template += "<div data-role='popup' class='messagePopup' id='uzsuPopupContent' data-dismissible = 'false'>" 
+	template += "<div data-role='popup' data-overlay-theme='b' data-theme='a' class='messagePopup' id='uzsuPopupContent' data-dismissible = 'false'>" 
 	// Schliessen Button rechts oben
 	template += "<a href='#' data-rel='back' data-role='button' data-icon='delete' data-iconpos='notext' class='ui-btn-right'>Schließen<\/a>"	
 	// jetzt der inhalt geklammert mit span
