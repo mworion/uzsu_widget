@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release 1.1 - beta
+// Release 1.1 - beta 2
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -169,9 +169,9 @@ function uzsuBuildTableFooter(){
 	// jetzt kommen noch die buttons in der basisleiste mit rein
 	template += "<td> <div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>"; 
 		template += "<div data-role = 'button' id = 'uzsuAddTableRow'> Add Entry <\/div>";
-		template += "<div data-role = 'button' id = 'uzsuSaveEntry'> Save Data <\/div>";
-		template += "<div data-role = 'button' id = 'uzsuQuit'> Quit UZSU<\/div> <\/td>";
-	template += "<td style = 'text-align: right'><h6> v1.1beta <\/h6><\/td><\/div><\/tr><\/table>";
+		template += "<div data-role = 'button' id = 'uzsuSaveQuit'> Save&Quit<\/div>";
+		template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel <\/div> <\/td>";
+	template += "<td style = 'text-align: right'><h6> v1.1beta2 <\/h6><\/td><\/div><\/tr><\/table>";
 	// abschlus des gesamten span container
 	template += "<\/span>";
     // und der abschluss des popup divs
@@ -355,14 +355,16 @@ function runtimeUzsuPopup(response, headline, customFormat, item) {
 	// dann die werte eintragen.
 	uzsuFillTable(response, customFormat);
 	// Popup schliessen mit quit
-	$.mobile.activePage.find("#uzsuQuit").bind("tap", function (e) {
-		// wenn keine Änderungen gemacht werden sollen (quit), dann auch im cache die alten werte
+	$.mobile.activePage.find("#uzsuCancel").bind("tap", function (e) {
+		// wenn keine Änderungen gemacht werden sollen (cancel), dann auch im cache die alten werte
 		$.mobile.activePage.find(".messagePopup").popup("close");
 	});
 	// speichern mit quit save
-	$.mobile.activePage.find("#uzsuSaveEntry").bind("tap", function (e) {
+	$.mobile.activePage.find("#uzsuSaveQuit").bind("tap", function (e) {
 		// jetzt wird die Kopie auf das original kopiert
+		// und geschlossen
 		uzsuSaveTable(item, response, customFormat, true);
+		$.mobile.activePage.find(".messagePopup").popup("close");
 	});
 	// eintrag hinzufügen mit add
 	$.mobile.activePage.find("#uzsuAddTableRow").bind("tap", function (e) {
