@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release 1.1 - beta 2
+// Release 1.1 - beta 3
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -30,7 +30,7 @@ function uzsuBuildTableHeader(headline, customFormat){
 	// hier kommt der popup container mit der beschreibung ein eigenschaften
 	template += "<div data-role='popup' data-overlay-theme='b' data-theme='a' class='messagePopup' id='uzsuPopupContent' data-dismissible = 'false'>" 
 	// Schliessen Button rechts oben
-	template += "<a href='#' data-rel='back' data-role='button' data-icon='delete' data-iconpos='notext' class='ui-btn-right'>Schließen<\/a>"	
+	template += "<div data-rel='back' data-role='button' data-icon='delete' data-iconpos='notext' class='ui-btn-right' id='uzsuCancel'><\/div>"	
 	// jetzt der inhalt geklammert mit span
 	template += " <span> <div style='text-align:center'><h1>" + headline + "<\/h1><\/div>";
 	// und dann der aufbau mit einer tabelle. Hier muss im 2. schritt dir formatierung über span laufen
@@ -171,7 +171,7 @@ function uzsuBuildTableFooter(){
 		template += "<div data-role = 'button' id = 'uzsuAddTableRow'> Add Entry <\/div>";
 		template += "<div data-role = 'button' id = 'uzsuSaveQuit'> Save&Quit<\/div>";
 		template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel <\/div> <\/td>";
-	template += "<td style = 'text-align: right'><h6> v1.1beta2 <\/h6><\/td><\/div><\/tr><\/table>";
+	template += "<td style = 'text-align: right'><h6> v1.1beta3 <\/h6><\/td><\/div><\/tr><\/table>";
 	// abschlus des gesamten span container
 	template += "<\/span>";
     // und der abschluss des popup divs
@@ -357,14 +357,14 @@ function runtimeUzsuPopup(response, headline, customFormat, item) {
 	// Popup schliessen mit quit
 	$.mobile.activePage.find("#uzsuCancel").bind("tap", function (e) {
 		// wenn keine Änderungen gemacht werden sollen (cancel), dann auch im cache die alten werte
-		$.mobile.activePage.find(".messagePopup").popup("close");
+		$.mobile.activePage.find("#uzsuPopupContent").popup("close");
 	});
 	// speichern mit quit save
 	$.mobile.activePage.find("#uzsuSaveQuit").bind("tap", function (e) {
 		// jetzt wird die Kopie auf das original kopiert
 		// und geschlossen
 		uzsuSaveTable(item, response, customFormat, true);
-		$.mobile.activePage.find(".messagePopup").popup("close");
+		$.mobile.activePage.find("#uzsuPopupContent").popup("close");
 	});
 	// eintrag hinzufügen mit add
 	$.mobile.activePage.find("#uzsuAddTableRow").bind("tap", function (e) {
@@ -379,7 +379,7 @@ function runtimeUzsuPopup(response, headline, customFormat, item) {
 	// hier wir die aktuelle seite danach durchsucht, wo das popup ist
 	// und im folgenden das popup initialisiert, geöffnet und die schliessen
 	// funktion daran gebunden. diese entfern wieder das popup aus dem baum
-	$.mobile.activePage.find(".messagePopup").popup("open").bind({
+	$.mobile.activePage.find("#uzsuPopupContent").popup("open").bind({
 		popupafterclose: function () {
 			$(this).remove();
 		}
