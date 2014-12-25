@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release 1.1 - beta 3
+// Release 1.1 - beta 4
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -28,9 +28,9 @@ function uzsuBuildTableHeader(headline, customFormat){
 	
 	var template = "";
 	// hier kommt der popup container mit der beschreibung ein eigenschaften
-	template += "<div data-role='popup' data-overlay-theme='b' data-theme='a' class='messagePopup' id='uzsuPopupContent' data-dismissible = 'false'>" 
+	template += "<div data-role='popup' data-overlay-theme='b' data-theme='a' class='messagePopup' id='uzsuPopupContent' data-dismissible = 'false'>"; 
 	// Schliessen Button rechts oben
-	template += "<div data-rel='back' data-role='button' data-icon='delete' data-iconpos='notext' class='ui-btn-right' id='uzsuCancel'><\/div>"	
+	template += "<div data-rel='back' data-role='button' data-icon='delete' data-iconpos='notext' class='ui-btn-right' id='uzsuCancel'><\/div>";	
 	// jetzt der inhalt geklammert mit span
 	template += " <span> <div style='text-align:center'><h1>" + headline + "<\/h1><\/div>";
 	// und dann der aufbau mit einer tabelle. Hier muss im 2. schritt dir formatierung über span laufen
@@ -86,7 +86,7 @@ function uzsuBuildTableRow(numberOfRow, customFormat){
 				// rrule
 				// wichtig: es findet keine prüfung statt ! wenn zu beginn das überschreiben akzeptiert wird, dann kommt das standard
 				// format des widgets zur anwendung !
-				template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>"
+				template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
 				for(numberOfDay = 0; numberOfDay < 7; numberOfDay ++){
 					template += "<input type='checkbox' id='checkbox" + numberOfDay + "-" + numberOfRow + "'> <label for='checkbox" + numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "<\/label>";
 				}	
@@ -137,7 +137,7 @@ function uzsuBuildTableRow(numberOfRow, customFormat){
 			// time
 			template += "<td><input type='time' data-clear-btn='false' id='uzsuEntryTime" + numberOfRow +"'>";
 			// rrule
-			template += "<form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>"
+			template += "<form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
 			for(numberOfDay = 0; numberOfDay < 7; numberOfDay ++){
 				template += "<input type='checkbox' id='checkbox" + numberOfDay + "-" + numberOfRow + "'> <label for='checkbox" + numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "<\/label>";
 			}	
@@ -234,7 +234,7 @@ function uzsuFillTable(response, customFormat){
 						$('#checkbox'+ numberOfDay + '-' + numberOfRow).prop('checked',days.indexOf(weekDays[numberOfDay])>0).checkboxradio("refresh");	
 					}	
 				}
-			};
+			}
 			break;	
 		}
 		case '1':{
@@ -244,7 +244,7 @@ function uzsuFillTable(response, customFormat){
 				$('#uzsuEntryActive'+numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");	
 				$('#uzsuEntryTime'+numberOfRow).val(response.list[numberOfRow].time);	
 				$('#uzsuEntryRrule'+numberOfRow).val(response.list[numberOfRow].rrule);	
-			};
+			}
 			break;
 		}
 	}
@@ -327,7 +327,7 @@ function uzsuSaveTable(item, response, customFormat, saveSmarthome){
 					}	
 				}	
 				response.list[numberOfRow].rrule = rrule;
-			};
+			}
 			break;
 		}
 		case '1':{
@@ -337,7 +337,7 @@ function uzsuSaveTable(item, response, customFormat, saveSmarthome){
 				response.list[numberOfRow].active = $('#uzsuEntryActive'+numberOfRow).is(':checked');	
 				response.list[numberOfRow].time = $('#uzsuEntryTime'+numberOfRow).val();	
 				response.list[numberOfRow].rrule = $('#uzsuEntryRrule'+numberOfRow).val();	
-			};
+			}
 			break;
 		}
 	}
@@ -394,7 +394,7 @@ $(document).on("update",'[data-widget="uzsu.uzsu_icon"]', function(event, respon
     $('#' + this.id + ' img').attr('src', (active ? $(this).attr('data-pic-on') : $(this).attr('data-pic-off')));
     // wenn keine Daten vorhanden, dann ist kein item mit den eigenschaften hinterlegt
     // und es wird nichts gemacht
-    if (response.length == 0)
+    if (response.length === 0)
         return;
     // Wenn ein Update erfolgt, dann werden die Daten erneut in die Variable uzsu geladen
     // damit sind die UZSU objekte auch in der click funktion verfügbar
