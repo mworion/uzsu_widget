@@ -1,11 +1,11 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release 1.1 - beta 4
+// Release 1.2 beta
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
-// (c) Michael Würtenberger 2014
+// (c) Michael Würtenberger 2014,2015
 // 
 //
 // Basis der Idee des dynamischen Popups übernommen von John Chacko
