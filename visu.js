@@ -86,7 +86,7 @@ function uzsuBuildTableRow(numberOfRow, customFormat){
 				// zusätzlichen elementen, die dann die eingabebreite effektiv reduzieren. ich haben keine möglichkeit gefunden
 				// dieses verhalten zu umgehen / disablen. wers braucht, kann mit der erhöhung der breite im style dieses so anpassen
 				// dass eine gut sichtbare lösung entsteht (zu lasten der gesamtbreite= werte um width = 80px schenen ganz gut zu sein.
-				template += "<td><input type='time' data-clear-btn='false' style='width:40px' id='uzsuEntryTime" + numberOfRow +"'><\/td>";
+				template += "<td><input type='time' data-clear-btn='false' style='width:65px' id='uzsuEntryTime" + numberOfRow +"'><\/td>";
 				// rrule
 				// wichtig: es findet keine prüfung statt ! wenn zu beginn das überschreiben akzeptiert wird, dann kommt das standard
 				// format des widgets zur anwendung !
