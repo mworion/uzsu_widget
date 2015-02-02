@@ -1,12 +1,13 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release 1.2 beta
+// Release 1.3 - beta
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
 // (c) Michael Würtenberger 2014,2015
 // 
+//  APL 2.0 Lizenz
 //
 // Basis der Idee des dynamischen Popups übernommen von John Chacko
 // 		jQuery Mobile runtime popup
@@ -77,6 +78,9 @@ function uzsuBuildTableRow(numberOfRow, customFormat){
 				else if(customFormat[1]=='num'){
 					template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 				}
+				else if(customFormat[1]=='text'){
+						template += "<td><input type='text' data-clear-btn='false' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
+				}
 				// time
 				// bei der darstellung der time als HTML5 format ist besonders beim chrome browser die darstellung mit
 				// zusätzlichen elementen, die dann die eingabebreite effektiv reduzieren. ich haben keine möglichkeit gefunden
@@ -107,7 +111,15 @@ function uzsuBuildTableRow(numberOfRow, customFormat){
 				
 				template += "<tr id='uzsuNumberOfRow" + numberOfRow + "'>";
 				// jetzt beginnen die spalten in der reihenfolge value, time /rrule, active, delete button
-				template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
+				if(customFormat[1]=='bool'){
+					template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + customFormat[3]+ "<\/option> <option value='1'> " + customFormat[2]+ " <\/option><\/select><\/td>";
+				}
+				else if(customFormat[1]=='num'){
+					template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
+				}
+				else if(customFormat[1]=='text'){
+						template += "<td><input type='text' data-clear-btn='false' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
+				}
 				// time
 				template += "<td><input type='time' data-clear-btn='true' style = 'width:350px' id='uzsuEntryTime" + numberOfRow +"'>";
 				// rrule
@@ -133,6 +145,9 @@ function uzsuBuildTableRow(numberOfRow, customFormat){
 			}
 			else if(customFormat[1]=='num'){
 				template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
+			}
+			else if(customFormat[1]=='text'){
+				template += "<td><input type='text' data-clear-btn='false' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 			}
 			// time
 			template += "<td><input type='time' data-clear-btn='false' id='uzsuEntryTime" + numberOfRow +"'>";
@@ -171,7 +186,7 @@ function uzsuBuildTableFooter(){
 		template += "<div data-role = 'button' id = 'uzsuAddTableRow'> Add Entry <\/div>";
 		template += "<div data-role = 'button' id = 'uzsuSaveQuit'> Save&Quit<\/div>";
 		template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel <\/div> <\/td>";
-	template += "<td style = 'text-align: right'><h6> v1.1beta3 <\/h6><\/td><\/div><\/tr><\/table>";
+	template += "<td style = 'text-align: right'><h6> v1.2beta <\/h6><\/td><\/div><\/tr><\/table>";
 	// abschlus des gesamten span container
 	template += "<\/span>";
     // und der abschluss des popup divs
@@ -186,7 +201,7 @@ function uzsuBuildTable(response, headline, customFormat){
 	var numberOfEntrys = response.list.length;
 	// erst den header, dann die zeilen, dann den footer
 	template = uzsuBuildTableHeader(headline, customFormat);
-	for(var numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
+	for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
 		template += uzsuBuildTableRow(numberOfRow, customFormat);
 	}
 	template += uzsuBuildTableFooter();
@@ -207,14 +222,14 @@ function uzsuFillTable(response, customFormat){
 		case '0':
 		case '2':{
 			// dann die werte der tabelle
-			for(var numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
+			for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
 				// beim schreiben der Daten unterscheidung, da sonst das element falsch genutzt wird
 				// mit flipswitch für die bool variante
 				if(customFormat[1]=='bool'){
 					$('#uzsuEntryValue'+numberOfRow).val(response.list[numberOfRow].value).slider("refresh");
 				}
 				// mit int value für die num variante
-				else if(customFormat[1]=='num'){
+				else if ((customFormat[1]=='num') || (customFormat[1]=='text')){
 					$('#uzsuEntryValue'+numberOfRow).val(response.list[numberOfRow].value);
 				}	
 				$('#uzsuEntryActive'+numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");	
@@ -239,7 +254,7 @@ function uzsuFillTable(response, customFormat){
 		}
 		case '1':{
 			// dann die werte der tabelle
-			for(var numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
+			for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
 				$('#uzsuEntryValue'+numberOfRow).val(response.list[numberOfRow].value);	
 				$('#uzsuEntryActive'+numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");	
 				$('#uzsuEntryTime'+numberOfRow).val(response.list[numberOfRow].time);	
@@ -305,9 +320,14 @@ function uzsuSaveTable(item, response, customFormat, saveSmarthome){
 		case '0':
 		case '2':{
 		 	// einzeleinträge
-			for(var numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
+			for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
 				// beim zurücklesen keine beachtung des typs, da smarthome bei bool auch 0 bzw. 1 akzeptiert
-				response.list[numberOfRow].value = parseInt($('#uzsuEntryValue'+numberOfRow).val());
+				if (customFormat[1] == 'text') {
+					response.list[numberOfRow].value = $('#uzsuEntryValue'+numberOfRow).val();
+				}
+				else {
+					response.list[numberOfRow].value = parseInt($('#uzsuEntryValue'+numberOfRow).val());
+				}
 				response.list[numberOfRow].active = $('#uzsuEntryActive'+numberOfRow).is(':checked');	
 				response.list[numberOfRow].time = $('#uzsuEntryTime'+numberOfRow).val();	
 				// in der tabelle die werte der rrule, dabei gehe ich von dem standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU
@@ -332,8 +352,13 @@ function uzsuSaveTable(item, response, customFormat, saveSmarthome){
 		}
 		case '1':{
 		 	// einzeleinträge
-			for(var numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
-				response.list[numberOfRow].value = parseInt($('#uzsuEntryValue'+numberOfRow).val());
+			for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
+				if (customFormat[1] == 'text') {
+					response.list[numberOfRow].value = $('#uzsuEntryValue'+numberOfRow).val();
+				}
+				else {
+					response.list[numberOfRow].value = parseInt($('#uzsuEntryValue'+numberOfRow).val());
+				}
 				response.list[numberOfRow].active = $('#uzsuEntryActive'+numberOfRow).is(':checked');	
 				response.list[numberOfRow].time = $('#uzsuEntryTime'+numberOfRow).val();	
 				response.list[numberOfRow].rrule = $('#uzsuEntryRrule'+numberOfRow).val();	
@@ -359,7 +384,7 @@ function runtimeUzsuPopup(response, headline, customFormat, item) {
 		// wenn keine Änderungen gemacht werden sollen (cancel), dann auch im cache die alten werte
 		$.mobile.activePage.find("#uzsuPopupContent").popup("close");
 	});
-	// speichern mit quit save
+	// speichern mit SaveQuit
 	$.mobile.activePage.find("#uzsuSaveQuit").bind("tap", function (e) {
 		// jetzt wird die Kopie auf das original kopiert
 		// und geschlossen
@@ -431,7 +456,7 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]', function(event) {
     	alert('Fehlerhafter Parameter: "'+customFormat[0]+'" im Feld customFormat bei Item ' + item);
     	popupOk = false;
     }
-    if ((customFormat[1]!=='bool') && (customFormat[1]!=='num')){
+    if ((customFormat[1]!=='bool') && (customFormat[1]!=='num') && (customFormat[1]!=='text')){
 		alert('Fehlerhafter Parameter: "'+customFormat[1]+'" im Feld customType bei Item ' + item);
 		popupOk = false;
     }
