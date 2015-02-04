@@ -42,7 +42,7 @@ function uzsuBuildTableHeader(headline, customFormat){
 	switch(customFormat[0]){
 		// format 0 ist der default, macht wochentage, eine konfigurierbar eingabe des wertes und die aktivierungen
 		case '0':{
- 			template += "<tr> <td>Value<\/td><td>Time<\/td><td>Weekdays<\/td><td>Active<\/td><td>Remove<\/td> <\/tr>";
+ 			template += "<tr> <td>Value<\/td><td>Sun<\/td><td>Time<\/td><td>Weekdays<\/td><td>Active<\/td><td>Remove<\/td> <\/tr>";
  			break;
 		}
 		// format 1 ist der expertenmodus, hier kann man in einem textstring de facto alles auswerten
@@ -79,14 +79,16 @@ function uzsuBuildTableRow(numberOfRow, customFormat){
 					template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 				}
 				else if(customFormat[1]=='text'){
-						template += "<td><input type='text' data-clear-btn='false' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
+						template += "<td><input type='text' data-clear-btn='false' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 				}
+				//sunrise und sundown selector
+				template += "<td><select ' name='uzsuEntrySun" + numberOfRow +"' id='uzsuEntrySun" + numberOfRow +"' data-mini='true'><option value='-'>--</option><option value='SA+'>SA+</option><option value='SA-'>SA-</option><option value='SU+'>SU+</option><option value='SU-'>SU-</option></select><\/td>";
 				// time
 				// bei der darstellung der time als HTML5 format ist besonders beim chrome browser die darstellung mit
 				// zusätzlichen elementen, die dann die eingabebreite effektiv reduzieren. ich haben keine möglichkeit gefunden
 				// dieses verhalten zu umgehen / disablen. wers braucht, kann mit der erhöhung der breite im style dieses so anpassen
 				// dass eine gut sichtbare lösung entsteht (zu lasten der gesamtbreite= werte um width = 80px schenen ganz gut zu sein.
-				template += "<td><input type='time' data-clear-btn='false' style='width:40px' id='uzsuEntryTime" + numberOfRow +"'><\/td>";
+				template += "<td><input type='time' data-clear-btn='false' class='uzsu_txt_input' id='uzsuEntryTime" + numberOfRow +"'><\/td>";
 				// rrule
 				// wichtig: es findet keine prüfung statt ! wenn zu beginn das überschreiben akzeptiert wird, dann kommt das standard
 				// format des widgets zur anwendung !
@@ -232,7 +234,8 @@ function uzsuFillTable(response, customFormat){
 				else if ((customFormat[1]=='num') || (customFormat[1]=='text')){
 					$('#uzsuEntryValue'+numberOfRow).val(response.list[numberOfRow].value);
 				}	
-				$('#uzsuEntryActive'+numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");	
+				$('#uzsuEntryActive'+numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");
+				$('#uzsuEntrySun'+numberOfRow).val(response.list[numberOfRow].sun).selectmenu("refresh", true);
 				$('#uzsuEntryTime'+numberOfRow).val(response.list[numberOfRow].time);	
 				// in der tabelle die werte der rrule, dabei gehe ich von dem standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU
 				// aus und setze für jeden eintrag den button.
@@ -273,7 +276,7 @@ function uzsuAddTableRow(response, customFormat){
 	// wird er vor dem umbau wieder in die variable response zurückgespeichert.
 	uzsuSaveTable(1, response, customFormat, false);
 	// ich hänge immer an die letzte Zeile dran ! erst einmal das array erweitern
-	response.list.push({active : false, rrule : '', time : '00:00', value : 0});
+	response.list.push({active : false, rrule : '', time : '00:00', sun : '--', value : 0});
 	// dann eine neue HTML Zeile genenrieren
 	template = uzsuBuildTableRow(numberOfNewRow, customFormat);
 	// zeile in die Tabelle einbauen
@@ -329,6 +332,7 @@ function uzsuSaveTable(item, response, customFormat, saveSmarthome){
 					response.list[numberOfRow].value = parseInt($('#uzsuEntryValue'+numberOfRow).val());
 				}
 				response.list[numberOfRow].active = $('#uzsuEntryActive'+numberOfRow).is(':checked');	
+				response.list[numberOfRow].sun = $('#uzsuEntrySun'+numberOfRow).val();	
 				response.list[numberOfRow].time = $('#uzsuEntryTime'+numberOfRow).val();	
 				// in der tabelle die werte der rrule, dabei gehe ich von dem standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU
 				// aus und setze für jeden eintrag den button.
@@ -487,5 +491,3 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]', function(event) {
     	runtimeUzsuPopup(response, headline, customFormat, item);
     }
 });
-
- 
