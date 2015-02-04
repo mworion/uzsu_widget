@@ -3,8 +3,8 @@
 ###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
 (C) Michael Würtenberger 2014,2015
 
-Aktuelle Development: 1.3beta
+Aktuelle Development: 1.4
 
-changelog: umsetzung type = text
+changelog: fehlerbehebung cancel und darstellung
 
 wunschliste: switch zwischen den Formats direkt aus dem Popup

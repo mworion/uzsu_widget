@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release 1.3 - beta
+// Release 1.4
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -31,7 +31,7 @@ function uzsuBuildTableHeader(headline, customFormat){
 	// hier kommt der popup container mit der beschreibung ein eigenschaften
 	template += "<div data-role='popup' data-overlay-theme='b' data-theme='a' class='messagePopup' id='uzsuPopupContent' data-dismissible = 'false'>"; 
 	// Schliessen Button rechts oben
-	template += "<div data-rel='back' data-role='button' data-icon='delete' data-iconpos='notext' class='ui-btn-right' id='uzsuCancel'><\/div>";	
+	template += "<div data-rel='back' data-role='button' data-icon='delete' data-iconpos='notext' class='ui-btn-right' id='uzsuClose'><\/div>";	
 	// jetzt der inhalt geklammert mit span
 	template += " <span> <div style='text-align:center'><h1>" + headline + "<\/h1><\/div>";
 	// und dann der aufbau mit einer tabelle. Hier muss im 2. schritt dir formatierung über span laufen
@@ -186,7 +186,7 @@ function uzsuBuildTableFooter(){
 		template += "<div data-role = 'button' id = 'uzsuAddTableRow'> Add Entry <\/div>";
 		template += "<div data-role = 'button' id = 'uzsuSaveQuit'> Save&Quit<\/div>";
 		template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel <\/div> <\/td>";
-	template += "<td style = 'text-align: right'><h6> v1.2beta <\/h6><\/td><\/div><\/tr><\/table>";
+	template += "<td style = 'text-align: right'><h6> v1.4 <\/h6><\/td><\/div><\/tr><\/table>";
 	// abschlus des gesamten span container
 	template += "<\/span>";
     // und der abschluss des popup divs
@@ -375,11 +375,18 @@ function uzsuSaveTable(item, response, customFormat, saveSmarthome){
 function runtimeUzsuPopup(response, headline, customFormat, item) {
 	// erst einmal wird der leeranteil angelegt
 	var template = uzsuBuildTable(response, headline, customFormat);
+	// dann speichern wir uns für cancel die ursprünglichen werte ab
+	var responseCancel = jQuery.extend(true, {},response);
 	// dann hängen wir das an die aktuelle Seite
 	$.mobile.activePage.append(template).trigger("pagecreate");
 	// dann die werte eintragen.
 	uzsuFillTable(response, customFormat);
-	// Popup schliessen mit quit
+	// Popup schliessen mit close rechts oben in der box
+	$.mobile.activePage.find("#uzsuClose").bind("tap", function (e) {
+		// wenn keine Änderungen gemacht werden sollen (cancel), dann auch im cache die alten werte
+		$.mobile.activePage.find("#uzsuPopupContent").popup("close");
+	});
+	// Popup schliessen mit Cancel in der Leiste
 	$.mobile.activePage.find("#uzsuCancel").bind("tap", function (e) {
 		// wenn keine Änderungen gemacht werden sollen (cancel), dann auch im cache die alten werte
 		$.mobile.activePage.find("#uzsuPopupContent").popup("close");
@@ -436,7 +443,9 @@ $(document).on("update",'[data-widget="uzsu.uzsu_icon"]', function(event, respon
 $(document).on("click",'[data-widget="uzsu.uzsu_icon"]', function(event) {
 	// hier werden die parameter aus den attributen herausgenommen
 	// und beim öffnen mit .open(....) an das popup objekt übergeben
-    var response = $(this).data('uzsu');
+	// und zwar mit deep copy
+    var response = jQuery.extend(true, {},$(this).data('uzsu'));
+
     var headline = $(this).attr('data-headline');
     var customFormat = ['0','bool','On','Off'];
     // übergabe im array, damit nicht zu viele parameter in der liste
