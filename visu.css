@@ -9,3 +9,7 @@
 html[data-useragent*!='Chrome'] .uzsuTimeInput{
 	width:70px !important;
 }
+
+html[data-useragent*!='Chrome'] .uzsuTextInput{
+	width:120px !important;
+}
