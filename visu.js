@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release 1.4
+// Release 1.5
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -73,13 +73,23 @@ function uzsuBuildTableRow(numberOfRow, customFormat){
 				// mit flipswitch (bessere erkennbarkeit, die Texte können über das widget gesetzt werden
 				// unterscheidung nur ob bool oder num, wobei num int ist !
 				if(customFormat[1]=='bool'){
-					template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + customFormat[3]+ "<\/option> <option value='1'> " + customFormat[2]+ " <\/option><\/select><\/td>";
+					template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + customFormat[2][1]+ "<\/option> <option value='1'> " + customFormat[2][0]+ " <\/option><\/select><\/td>";
 				}
 				else if(customFormat[1]=='num'){
 					template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 				}
 				else if(customFormat[1]=='text'){
-						template += "<td><input type='text' data-clear-btn='false' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
+					template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
+				}
+				else if(customFormat[1]=='list'){
+					// das listenformat mit select ist sehr trickreich. ich weiss nicht, wie ich automatisch die richtige höhe bekomme
+					// ich musste die explizi auf die 34 px setzen. ohne das ist die zeilehähe deutlich zu hoch
+					template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
+					template += "<select name='uzsuEntryValue'" + numberOfRow + "' id='uzsuEntryValue" + numberOfRow + "' data-mini='true'>";
+					for(numberOfListEntry = 0; numberOfListEntry < customFormat[2].length; numberOfListEntry ++){
+						template += "<option data-theme='b' data-overlay-theme='a' value='" + customFormat[2][numberOfListEntry] + "'>" + customFormat[2][numberOfListEntry] + "<\/option>";
+					}
+					template += "<\/select><\/div><\/form><\/td>";
 				}
 				// time
 				// bei der darstellung der time als HTML5 format ist besonders beim chrome browser die darstellung mit
@@ -112,13 +122,21 @@ function uzsuBuildTableRow(numberOfRow, customFormat){
 				template += "<tr id='uzsuNumberOfRow" + numberOfRow + "'>";
 				// jetzt beginnen die spalten in der reihenfolge value, time /rrule, active, delete button
 				if(customFormat[1]=='bool'){
-					template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + customFormat[3]+ "<\/option> <option value='1'> " + customFormat[2]+ " <\/option><\/select><\/td>";
+					template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + customFormat[2][1]+ "<\/option> <option value='1'> " + customFormat[2][0]+ " <\/option><\/select><\/td>";
 				}
 				else if(customFormat[1]=='num'){
 					template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 				}
 				else if(customFormat[1]=='text'){
-						template += "<td><input type='text' data-clear-btn='false' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
+						template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
+				}
+				else if(customFormat[1]=='list'){
+					template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
+					template += "<select name='uzsuEntryValue'" + numberOfRow + "' id='uzsuEntryValue" + numberOfRow + "' data-mini='true'>";
+					for(numberOfListEntry = 0; numberOfListEntry < customFormat[2].length; numberOfListEntry ++){
+						template += "<option value='" + customFormat[2][numberOfListEntry] + "'>" + customFormat[2][numberOfListEntry] + "<\/option>";
+					}
+					template += "<\/select><\/div><\/form><\/td>";
 				}
 				// time
 				template += "<td><input type='time' data-clear-btn='true' style = 'width:350px' id='uzsuEntryTime" + numberOfRow +"'>";
@@ -141,13 +159,21 @@ function uzsuBuildTableRow(numberOfRow, customFormat){
 			// mit flipswitch (bessere erkennbarkeit, die Texte können über das widget gesetzt werden
 			// unterscheidung nur ob bool oder num, wobei num int ist !
 			if(customFormat[1]=='bool'){
-				template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + customFormat[3]+ "<\/option> <option value='1'> " + customFormat[2]+ " <\/option><\/select><\/td>";
+				template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + customFormat[2][1]+ "<\/option> <option value='1'> " + customFormat[2][0]+ " <\/option><\/select><\/td>";
 			}
 			else if(customFormat[1]=='num'){
 				template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 			}
 			else if(customFormat[1]=='text'){
-				template += "<td><input type='text' data-clear-btn='false' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
+				template += "<td><input type='text' data-clear-btn='false' style = 'width:60px' class='uzsuTextInput' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
+			}
+			else if(customFormat[1]=='list'){
+				template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
+				template += "<select name='uzsuEntryValue'" + numberOfRow + "' id='uzsuEntryValue" + numberOfRow + "' data-mini='true'>";
+				for(numberOfListEntry = 0; numberOfListEntry < customFormat[2].length; numberOfListEntry ++){
+					template += "<option value='" + customFormat[2][numberOfListEntry] + "'>" + customFormat[2][numberOfListEntry] + "<\/option>";
+				}
+				template += "<\/select><\/div><\/form><\/td>";
 			}
 			// time
 			template += "<td><input type='time' data-clear-btn='false' id='uzsuEntryTime" + numberOfRow +"'>";
@@ -186,7 +212,7 @@ function uzsuBuildTableFooter(){
 		template += "<div data-role = 'button' id = 'uzsuAddTableRow'> Add Entry <\/div>";
 		template += "<div data-role = 'button' id = 'uzsuSaveQuit'> Save&Quit<\/div>";
 		template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel <\/div> <\/td>";
-	template += "<td style = 'text-align: right'><h6> v1.4 <\/h6><\/td><\/div><\/tr><\/table>";
+	template += "<td style = 'text-align: right'><h6> v1.5 <\/h6><\/td><\/div><\/tr><\/table>";
 	// abschlus des gesamten span container
 	template += "<\/span>";
     // und der abschluss des popup divs
@@ -232,6 +258,17 @@ function uzsuFillTable(response, customFormat){
 				else if ((customFormat[1]=='num') || (customFormat[1]=='text')){
 					$('#uzsuEntryValue'+numberOfRow).val(response.list[numberOfRow].value);
 				}	
+				else if (customFormat[1]=='list'){
+					// hier ist es etwas schwieriger, denn ich muß den wert mit der liste vergleichen und dann setzen
+					for(numberOfListEntry = 0; numberOfListEntry < customFormat[2].length; numberOfListEntry ++){
+						// wenn ich den eintrag gefunden haben, dann setze ich den eintrag auf die richtige stelle
+						// ansonsten wird einfach der erste eintrag genommen
+						if (response.list[numberOfRow].value == customFormat[2][numberOfListEntry]) {
+							$("#uzsuEntryValue"+numberOfRow).val(customFormat[2][numberOfListEntry]).attr('selected', true).siblings('option').removeAttr('selected');
+							$("#uzsuEntryValue"+numberOfRow).selectmenu('refresh', true);
+						}
+					}
+				}	
 				$('#uzsuEntryActive'+numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");	
 				$('#uzsuEntryTime'+numberOfRow).val(response.list[numberOfRow].time);	
 				// in der tabelle die werte der rrule, dabei gehe ich von dem standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU
@@ -255,7 +292,20 @@ function uzsuFillTable(response, customFormat){
 		case '1':{
 			// dann die werte der tabelle
 			for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
-				$('#uzsuEntryValue'+numberOfRow).val(response.list[numberOfRow].value);	
+				// bei der listendarstellung anders
+				if (customFormat[1]=='list'){
+					// hier ist es etwas schwieriger, denn ich muß den wert mit der liste vergleichen und dann setzen
+					for(numberOfListEntry = 0; numberOfListEntry < customFormat[2].length; numberOfListEntry ++){
+						// wenn ich den eintrag gefunden haben, dann setze ich den eintrag auf die richtige stelle
+						if (response.list[numberOfRow].value == customFormat[2][numberOfListEntry]) {
+							$("#uzsuEntryValue"+numberOfRow).val(customFormat[2][numberOfListEntry]).attr('selected', true).siblings('option').removeAttr('selected');
+							$("#uzsuEntryValue"+numberOfRow).selectmenu('refresh', true);
+						}
+					}
+				}
+				else{
+					$('#uzsuEntryValue'+numberOfRow).val(response.list[numberOfRow].value);	
+				}
 				$('#uzsuEntryActive'+numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");	
 				$('#uzsuEntryTime'+numberOfRow).val(response.list[numberOfRow].time);	
 				$('#uzsuEntryRrule'+numberOfRow).val(response.list[numberOfRow].rrule);	
@@ -322,7 +372,7 @@ function uzsuSaveTable(item, response, customFormat, saveSmarthome){
 		 	// einzeleinträge
 			for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
 				// beim zurücklesen keine beachtung des typs, da smarthome bei bool auch 0 bzw. 1 akzeptiert
-				if (customFormat[1] == 'text') {
+				if ((customFormat[1] == 'text') || (customFormat[1] == 'list')){
 					response.list[numberOfRow].value = $('#uzsuEntryValue'+numberOfRow).val();
 				}
 				else {
@@ -353,7 +403,7 @@ function uzsuSaveTable(item, response, customFormat, saveSmarthome){
 		case '1':{
 		 	// einzeleinträge
 			for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
-				if (customFormat[1] == 'text') {
+				if ((customFormat[1] == 'text') || (customFormat[1] == 'list')){
 					response.list[numberOfRow].value = $('#uzsuEntryValue'+numberOfRow).val();
 				}
 				else {
@@ -445,14 +495,18 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]', function(event) {
 	// und beim öffnen mit .open(....) an das popup objekt übergeben
 	// und zwar mit deep copy
     var response = jQuery.extend(true, {},$(this).data('uzsu'));
+    var customFormat = [];
 
     var headline = $(this).attr('data-headline');
-    var customFormat = ['0','bool','On','Off'];
     // übergabe im array, damit nicht zu viele parameter in der liste
     customFormat[0] = $(this).attr('data-customFormat');
     customFormat[1] = $(this).attr('data-customType');
-    customFormat[2] = $(this).attr('data-customTextTrue');
-    customFormat[3] = $(this).attr('data-customTextFalse');
+    // hier wird die komplette liste übergeben
+    customFormat[2] = $(this).attr('data-customTextList').split(",");
+    // jetzt noch der trim der strings, weil das durch collaps durcheinander kommt
+	for(numberOfListEntry = 0; numberOfListEntry < customFormat[2].length; numberOfListEntry ++){
+		customFormat[2][numberOfListEntry] = customFormat[2][numberOfListEntry].trim();
+	}
     // data-item ist der sh.py item, in dem alle attribute lagern, die für die steuerung notwendig ist
     // ist ja vom typ dict. das item, was tatsächlich per schaltuhr verwendet wird ist nur als attribut (child)
     // enthalten und wird ausschliesslich vom plugin verwendet.
@@ -465,7 +519,7 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]', function(event) {
     	alert('Fehlerhafter Parameter: "'+customFormat[0]+'" im Feld customFormat bei Item ' + item);
     	popupOk = false;
     }
-    if ((customFormat[1]!=='bool') && (customFormat[1]!=='num') && (customFormat[1]!=='text')){
+    if ((customFormat[1]!=='bool') && (customFormat[1]!=='num') && (customFormat[1]!=='text') && (customFormat[1]!=='list')){
 		alert('Fehlerhafter Parameter: "'+customFormat[1]+'" im Feld customType bei Item ' + item);
 		popupOk = false;
     }

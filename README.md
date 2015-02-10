@@ -3,8 +3,11 @@
 ###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
 (C) Michael Würtenberger 2014,2015
 
-Aktuelle Development: 1.4
+Aktuelle Development: 1.5
 
-changelog: fehlerbehebung cancel und darstellung
+changelog: aufnahme des customFormat 'text' und 'list'
 
-wunschliste: switch zwischen den Formats direkt aus dem Popup
+## wichtig !!!
+Das Format der Parameter hat sich für die Texte On / Off geändert. 
+Beide Parameter werden nicht mehr als einzelstring übergeben, sondern als Liste.
+Das ist notwendig, um für die Dasrtellung Liste auch längere Listen zu übergeben.
