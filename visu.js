@@ -1,3 +1,9 @@
+// ----- set browser and platform identification variables -----------------------------------------------------
+var b = document.documentElement;
+              b.setAttribute('data-useragent',  navigator.userAgent);
+              b.setAttribute('data-platform', navigator.platform );
+              b.className += ((!!('ontouchstart' in window) || !!('onmsgesturechange' in window))?' touch':'');
+
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
