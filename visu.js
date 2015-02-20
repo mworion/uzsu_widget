@@ -1,13 +1,7 @@
-// ----- set browser and platform identification variables -----------------------------------------------------
-var b = document.documentElement;
-              b.setAttribute('data-useragent',  navigator.userAgent);
-              b.setAttribute('data-platform', navigator.platform );
-              b.className += ((!!('ontouchstart' in window) || !!('onmsgesturechange' in window))?' touch':'');
-
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release 1.5
+// Release 1.6
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -31,7 +25,7 @@ var b = document.documentElement;
 // 
 
 // Kopf und überschrift des Popups
-function uzsuBuildTableHeader(headline, customFormat){
+function uzsuBuildTableHeader(headline, designType, valueType, textSelectList){
 	
 	var template = "";
 	// hier kommt der popup container mit der beschreibung ein eigenschaften
@@ -45,7 +39,7 @@ function uzsuBuildTableHeader(headline, customFormat){
  	template += "<table id='uzsuTable' style = 'border: 1px solid;padding-right: 3px;padding-left: 3px'> ";
  	// generell gibt es dann dispatcher für die einzelnen formate. ich fasse sie zusammen, wo immer es geht. 
  	// hier kann man auch die formate für sich selbst erweitern und anpassen. 
-	switch(customFormat[0]){
+	switch(designType){
 		// format 0 ist der default, macht wochentage, eine konfigurierbar eingabe des wertes und die aktivierungen
 		case '0':{
  			template += "<tr> <td>Value<\/td><td>Time<\/td><td>Weekdays<\/td><td>Active<\/td><td>Remove<\/td> <\/tr>";
@@ -66,34 +60,34 @@ function uzsuBuildTableHeader(headline, customFormat){
     return template;
 }
 // Tabelleneinträge
-function uzsuBuildTableRow(numberOfRow, customFormat){
+function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList){
 
 	var template = "";
 	// liste für die wochentage, damit ich später per index darauf zugreifen kann
 	var weekDays =['MO','TU','WE','TH','FR','SA','SU'];
 	// auch hier wieder der dispatcher für die formate
-	switch(customFormat[0]){
+	switch(designType){
 		case '0':{
 				template += "<tr id='uzsuNumberOfRow" + numberOfRow + "'>";
 				// jetzt beginnen die spalten in der reihenfolge value, time / rrule, active, delete button
 				// mit flipswitch (bessere erkennbarkeit, die Texte können über das widget gesetzt werden
 				// unterscheidung nur ob bool oder num, wobei num int ist !
-				if(customFormat[1]=='bool'){
-					template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + customFormat[2][1]+ "<\/option> <option value='1'> " + customFormat[2][0]+ " <\/option><\/select><\/td>";
+				if(valueType=='bool'){
+					template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + textSelectList[1]+ "<\/option> <option value='1'> " + textSelectList[0]+ " <\/option><\/select><\/td>";
 				}
-				else if(customFormat[1]=='num'){
+				else if(valueType=='num'){
 					template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 				}
-				else if(customFormat[1]=='text'){
+				else if(valueType=='text'){
 					template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 				}
-				else if(customFormat[1]=='list'){
+				else if(valueType=='list'){
 					// das listenformat mit select ist sehr trickreich. ich weiss nicht, wie ich automatisch die richtige höhe bekomme
 					// ich musste die explizi auf die 34 px setzen. ohne das ist die zeilehähe deutlich zu hoch
 					template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
 					template += "<select name='uzsuEntryValue'" + numberOfRow + "' id='uzsuEntryValue" + numberOfRow + "' data-mini='true'>";
-					for(numberOfListEntry = 0; numberOfListEntry < customFormat[2].length; numberOfListEntry ++){
-						template += "<option data-theme='b' data-overlay-theme='a' value='" + customFormat[2][numberOfListEntry] + "'>" + customFormat[2][numberOfListEntry] + "<\/option>";
+					for(numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry ++){
+						template += "<option data-theme='b' data-overlay-theme='a' value='" + textSelectList[numberOfListEntry] + "'>" + textSelectList[numberOfListEntry] + "<\/option>";
 					}
 					template += "<\/select><\/div><\/form><\/td>";
 				}
@@ -127,20 +121,20 @@ function uzsuBuildTableRow(numberOfRow, customFormat){
 				
 				template += "<tr id='uzsuNumberOfRow" + numberOfRow + "'>";
 				// jetzt beginnen die spalten in der reihenfolge value, time /rrule, active, delete button
-				if(customFormat[1]=='bool'){
-					template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + customFormat[2][1]+ "<\/option> <option value='1'> " + customFormat[2][0]+ " <\/option><\/select><\/td>";
+				if(valueType=='bool'){
+					template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + textSelectList[1]+ "<\/option> <option value='1'> " + textSelectList[0]+ " <\/option><\/select><\/td>";
 				}
-				else if(customFormat[1]=='num'){
+				else if(valueType=='num'){
 					template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 				}
-				else if(customFormat[1]=='text'){
+				else if(valueType=='text'){
 						template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 				}
-				else if(customFormat[1]=='list'){
+				else if(valueType=='list'){
 					template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
 					template += "<select name='uzsuEntryValue'" + numberOfRow + "' id='uzsuEntryValue" + numberOfRow + "' data-mini='true'>";
-					for(numberOfListEntry = 0; numberOfListEntry < customFormat[2].length; numberOfListEntry ++){
-						template += "<option value='" + customFormat[2][numberOfListEntry] + "'>" + customFormat[2][numberOfListEntry] + "<\/option>";
+					for(numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry ++){
+						template += "<option value='" + textSelectList[numberOfListEntry] + "'>" + textSelectList[numberOfListEntry] + "<\/option>";
 					}
 					template += "<\/select><\/div><\/form><\/td>";
 				}
@@ -164,20 +158,20 @@ function uzsuBuildTableRow(numberOfRow, customFormat){
 			// jetzt beginnen die spalten in der reihenfolge value, time / rrule, active, delete button
 			// mit flipswitch (bessere erkennbarkeit, die Texte können über das widget gesetzt werden
 			// unterscheidung nur ob bool oder num, wobei num int ist !
-			if(customFormat[1]=='bool'){
-				template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + customFormat[2][1]+ "<\/option> <option value='1'> " + customFormat[2][0]+ " <\/option><\/select><\/td>";
+			if(valueType=='bool'){
+				template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + textSelectList[1]+ "<\/option> <option value='1'> " + textSelectList[0]+ " <\/option><\/select><\/td>";
 			}
-			else if(customFormat[1]=='num'){
+			else if(valueType=='num'){
 				template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 			}
-			else if(customFormat[1]=='text'){
+			else if(valueType=='text'){
 				template += "<td><input type='text' data-clear-btn='false' style = 'width:60px' class='uzsuTextInput' id='uzsuEntryValue" + numberOfRow + "'<\/td>";
 			}
-			else if(customFormat[1]=='list'){
+			else if(valueType=='list'){
 				template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
 				template += "<select name='uzsuEntryValue'" + numberOfRow + "' id='uzsuEntryValue" + numberOfRow + "' data-mini='true'>";
-				for(numberOfListEntry = 0; numberOfListEntry < customFormat[2].length; numberOfListEntry ++){
-					template += "<option value='" + customFormat[2][numberOfListEntry] + "'>" + customFormat[2][numberOfListEntry] + "<\/option>";
+				for(numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry ++){
+					template += "<option value='" + textSelectList[numberOfListEntry] + "'>" + textSelectList[numberOfListEntry] + "<\/option>";
 				}
 				template += "<\/select><\/div><\/form><\/td>";
 			}
@@ -218,7 +212,7 @@ function uzsuBuildTableFooter(){
 		template += "<div data-role = 'button' id = 'uzsuAddTableRow'> Add Entry <\/div>";
 		template += "<div data-role = 'button' id = 'uzsuSaveQuit'> Save&Quit<\/div>";
 		template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel <\/div> <\/td>";
-	template += "<td style = 'text-align: right'><h6> v1.5 <\/h6><\/td><\/div><\/tr><\/table>";
+	template += "<td style = 'text-align: right'><h6> v1.6 <\/h6><\/td><\/div><\/tr><\/table>";
 	// abschlus des gesamten span container
 	template += "<\/span>";
     // und der abschluss des popup divs
@@ -227,14 +221,14 @@ function uzsuBuildTableFooter(){
 }
 // hier wird das template zusammengestellt, die tabellenzeilen separat, weil ich die bei einer
 // ergänzung der tabelle wieder verwenden kann
-function uzsuBuildTable(response, headline, customFormat){
+function uzsuBuildTable(response, headline, designType, valueType, textSelectList){
 
 	var template = "";
 	var numberOfEntrys = response.list.length;
 	// erst den header, dann die zeilen, dann den footer
-	template = uzsuBuildTableHeader(headline, customFormat);
+	template = uzsuBuildTableHeader(headline, designType, valueType, textSelectList);
 	for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
-		template += uzsuBuildTableRow(numberOfRow, customFormat);
+		template += uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList);
 	}
 	template += uzsuBuildTableFooter();
 	return template;
@@ -242,7 +236,7 @@ function uzsuBuildTable(response, headline, customFormat){
 // tabelle füllen
 // es werden die daten aus der variablen response gelesen und in den status / darstellung der widgetblöcke zugewiesen.
 // der aktuelle status in dann in der darstellung enthalten !
-function uzsuFillTable(response, customFormat){
+function uzsuFillTable(response, designType, valueType, textSelectList){
 
 	var numberOfEntrys = response.list.length;
 	var weekDays =['MO','TU','WE','TH','FR','SA','SU'];
@@ -250,27 +244,27 @@ function uzsuFillTable(response, customFormat){
 	// allgemeiner Status, bitte nich mit attr, sondern mit prop, siehe https://github.com/jquery/jquery-mobile/issues/5587
 	$('#uzsuGeneralActive').prop('checked',response.active).checkboxradio("refresh");	
 	// auswahl format
-	switch(customFormat[0]){
+	switch(designType){
 		case '0':
 		case '2':{
 			// dann die werte der tabelle
 			for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
 				// beim schreiben der Daten unterscheidung, da sonst das element falsch genutzt wird
 				// mit flipswitch für die bool variante
-				if(customFormat[1]=='bool'){
+				if(valueType=='bool'){
 					$('#uzsuEntryValue'+numberOfRow).val(response.list[numberOfRow].value).slider("refresh");
 				}
 				// mit int value für die num variante
-				else if ((customFormat[1]=='num') || (customFormat[1]=='text')){
+				else if ((valueType=='num') || (valueType=='text')){
 					$('#uzsuEntryValue'+numberOfRow).val(response.list[numberOfRow].value);
 				}	
-				else if (customFormat[1]=='list'){
+				else if (valueType=='list'){
 					// hier ist es etwas schwieriger, denn ich muß den wert mit der liste vergleichen und dann setzen
-					for(numberOfListEntry = 0; numberOfListEntry < customFormat[2].length; numberOfListEntry ++){
+					for(numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry ++){
 						// wenn ich den eintrag gefunden haben, dann setze ich den eintrag auf die richtige stelle
 						// ansonsten wird einfach der erste eintrag genommen
-						if (response.list[numberOfRow].value == customFormat[2][numberOfListEntry]) {
-							$("#uzsuEntryValue"+numberOfRow).val(customFormat[2][numberOfListEntry]).attr('selected', true).siblings('option').removeAttr('selected');
+						if (response.list[numberOfRow].value == textSelectList[numberOfListEntry]) {
+							$("#uzsuEntryValue"+numberOfRow).val(textSelectList[numberOfListEntry]).attr('selected', true).siblings('option').removeAttr('selected');
 							$("#uzsuEntryValue"+numberOfRow).selectmenu('refresh', true);
 						}
 					}
@@ -299,12 +293,12 @@ function uzsuFillTable(response, customFormat){
 			// dann die werte der tabelle
 			for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
 				// bei der listendarstellung anders
-				if (customFormat[1]=='list'){
+				if (valueType=='list'){
 					// hier ist es etwas schwieriger, denn ich muß den wert mit der liste vergleichen und dann setzen
-					for(numberOfListEntry = 0; numberOfListEntry < customFormat[2].length; numberOfListEntry ++){
+					for(numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry ++){
 						// wenn ich den eintrag gefunden haben, dann setze ich den eintrag auf die richtige stelle
-						if (response.list[numberOfRow].value == customFormat[2][numberOfListEntry]) {
-							$("#uzsuEntryValue"+numberOfRow).val(customFormat[2][numberOfListEntry]).attr('selected', true).siblings('option').removeAttr('selected');
+						if (response.list[numberOfRow].value == textSelectList[numberOfListEntry]) {
+							$("#uzsuEntryValue"+numberOfRow).val(textSelectList[numberOfListEntry]).attr('selected', true).siblings('option').removeAttr('selected');
 							$("#uzsuEntryValue"+numberOfRow).selectmenu('refresh', true);
 						}
 					}
@@ -320,50 +314,8 @@ function uzsuFillTable(response, customFormat){
 		}
 	}
 }
-// tabellenzeile einfügen
-function uzsuAddTableRow(response, customFormat){
-	
-	var numberOfNewRow = response.list.length;
-	var template = '';
-	// alten zustand mal in die Liste rein. da der aktuelle zustand ja nur im widget selbst enthalten ist,
-	// wird er vor dem umbau wieder in die variable response zurückgespeichert.
-	uzsuSaveTable(1, response, customFormat, false);
-	// ich hänge immer an die letzte Zeile dran ! erst einmal das array erweitern
-	response.list.push({active : false, rrule : '', time : '00:00', value : 0});
-	// dann eine neue HTML Zeile genenrieren
-	template = uzsuBuildTableRow(numberOfNewRow, customFormat);
-	// zeile in die Tabelle einbauen
-	$('#uzsuTable').append(template);
-	// hier wichtig: damit die optimierung jquerymobile auf tabelle wirkt
-	$.mobile.activePage.trigger('pagecreate');
-	// den delete handler für die neue Zeile einhängen
-	$.mobile.activePage.find("#uzsuDelTableRow" + numberOfNewRow).bind("tap", function (e) {
-		uzsuDelTableRow(response, customFormat, e);
-	});
-	// und daten ausfüllen. hier werdne die zeile wieder mit dem status beschrieben. status ist dann wieder im widget
-	uzsuFillTable(response, customFormat);
-}
-// tabellenzeile löschen
-function uzsuDelTableRow(response, customFormat, e){
-
-	var numberOfEntrys = response.list.length;
-	// wenn überhaupt einträge vorhanden sind
-	// sollte nicht passieren, weil eigentlich auch kein button dann da ist, aber...
-	if(numberOfEntrys > 0){
-		// index heraussuchen, in welcher Zeile gelöscht wurde
-		var uzsuTableRowToDelete = parseInt(e.currentTarget.id.substr(15));
-		// zwischenspeichern vor dem löschen
-		uzsuSaveTable(1, response, customFormat, false);
-		//erst mal das array entsprechen kürzen
-		response.list.splice(uzsuTableRowToDelete,1);
-		// jetzt die Tabelle kürzen im Popup
-		$('#uzsuNumberOfRow'+(numberOfEntrys-1)).remove();	
-		// und daten wieder ausfüllen
-		uzsuFillTable(response, customFormat);
-	}
-}
 // tabelle auslesen und speichern
-function uzsuSaveTable(item, response, customFormat, saveSmarthome){
+function uzsuSaveTable(item, response, designType, valueType, textSelectList, saveSmarthome){
 	
 	var numberOfEntrys = response.list.length;
 	var weekDays =['MO','TU','WE','TH','FR','SA','SU'];
@@ -372,13 +324,13 @@ function uzsuSaveTable(item, response, customFormat, saveSmarthome){
 	// gesamthafte aktivierung
  	response.active = $('#uzsuGeneralActive').is(':checked');
  	// dispatcher für format
-	switch(customFormat[0]){
+	switch(designType){
 		case '0':
 		case '2':{
 		 	// einzeleinträge
 			for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
 				// beim zurücklesen keine beachtung des typs, da smarthome bei bool auch 0 bzw. 1 akzeptiert
-				if ((customFormat[1] == 'text') || (customFormat[1] == 'list')){
+				if ((valueType == 'text') || (valueType == 'list')){
 					response.list[numberOfRow].value = $('#uzsuEntryValue'+numberOfRow).val();
 				}
 				else {
@@ -409,7 +361,7 @@ function uzsuSaveTable(item, response, customFormat, saveSmarthome){
 		case '1':{
 		 	// einzeleinträge
 			for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
-				if ((customFormat[1] == 'text') || (customFormat[1] == 'list')){
+				if ((valueType == 'text') || (valueType == 'list')){
 					response.list[numberOfRow].value = $('#uzsuEntryValue'+numberOfRow).val();
 				}
 				else {
@@ -427,16 +379,58 @@ function uzsuSaveTable(item, response, customFormat, saveSmarthome){
 		io.write(item, {active : response.active, list : response.list });
 	}
 }
+// tabellenzeile einfügen
+function uzsuAddTableRow(response, designType, valueType, textSelectList){
+	
+	var numberOfNewRow = response.list.length;
+	var template = '';
+	// alten zustand mal in die Liste rein. da der aktuelle zustand ja nur im widget selbst enthalten ist,
+	// wird er vor dem umbau wieder in die variable response zurückgespeichert.
+	uzsuSaveTable(1, response, designType, valueType, textSelectList, false);
+	// ich hänge immer an die letzte Zeile dran ! erst einmal das array erweitern
+	response.list.push({active : false, rrule : '', time : '00:00', value : 0});
+	// dann eine neue HTML Zeile genenrieren
+	template = uzsuBuildTableRow(numberOfNewRow, designType, valueType, textSelectList);
+	// zeile in die Tabelle einbauen
+	$('#uzsuTable').append(template);
+	// hier wichtig: damit die optimierung jquerymobile auf tabelle wirkt
+	$.mobile.activePage.trigger('pagecreate');
+	// den delete handler für die neue Zeile einhängen
+	$.mobile.activePage.find("#uzsuDelTableRow" + numberOfNewRow).bind("tap", function (e) {
+		uzsuDelTableRow(response, designType, valueType, textSelectList, e);
+	});
+	// und daten ausfüllen. hier werdne die zeile wieder mit dem status beschrieben. status ist dann wieder im widget
+	uzsuFillTable(response, designType, valueType, textSelectList);
+}
+// tabellenzeile löschen
+function uzsuDelTableRow(response, designType, valueType, textSelectList, e){
+
+	var numberOfEntrys = response.list.length;
+	// wenn überhaupt einträge vorhanden sind
+	// sollte nicht passieren, weil eigentlich auch kein button dann da ist, aber...
+	if(numberOfEntrys > 0){
+		// index heraussuchen, in welcher Zeile gelöscht wurde
+		var uzsuTableRowToDelete = parseInt(e.currentTarget.id.substr(15));
+		// zwischenspeichern vor dem löschen
+		uzsuSaveTable(1, response, designType, valueType, textSelectList, false);
+		//erst mal das array entsprechen kürzen
+		response.list.splice(uzsuTableRowToDelete,1);
+		// jetzt die Tabelle kürzen im Popup
+		$('#uzsuNumberOfRow'+(numberOfEntrys-1)).remove();	
+		// und daten wieder ausfüllen
+		uzsuFillTable(response, designType, valueType, textSelectList);
+	}
+}
 // steuerung des Popups
-function runtimeUzsuPopup(response, headline, customFormat, item) {
+function runtimeUzsuPopup(response, headline, designType, valueType, textSelectList, item) {
 	// erst einmal wird der leeranteil angelegt
-	var template = uzsuBuildTable(response, headline, customFormat);
+	var template = uzsuBuildTable(response, headline, designType, valueType, textSelectList);
 	// dann speichern wir uns für cancel die ursprünglichen werte ab
 	var responseCancel = jQuery.extend(true, {},response);
 	// dann hängen wir das an die aktuelle Seite
 	$.mobile.activePage.append(template).trigger("pagecreate");
 	// dann die werte eintragen.
-	uzsuFillTable(response, customFormat);
+	uzsuFillTable(response, designType, valueType, textSelectList);
 	// Popup schliessen mit close rechts oben in der box
 	$.mobile.activePage.find("#uzsuClose").bind("tap", function (e) {
 		// wenn keine Änderungen gemacht werden sollen (cancel), dann auch im cache die alten werte
@@ -451,17 +445,17 @@ function runtimeUzsuPopup(response, headline, customFormat, item) {
 	$.mobile.activePage.find("#uzsuSaveQuit").bind("tap", function (e) {
 		// jetzt wird die Kopie auf das original kopiert
 		// und geschlossen
-		uzsuSaveTable(item, response, customFormat, true);
+		uzsuSaveTable(item, response, designType, valueType, textSelectList, true);
 		$.mobile.activePage.find("#uzsuPopupContent").popup("close");
 	});
 	// eintrag hinzufügen mit add
 	$.mobile.activePage.find("#uzsuAddTableRow").bind("tap", function (e) {
-		uzsuAddTableRow(response, customFormat);
+		uzsuAddTableRow(response, designType, valueType, textSelectList);
 	});
-	// löschen mit del
+	// löschen mit del als callback eintragen
 	for(var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow ++){
 		$.mobile.activePage.find("#uzsuDelTableRow" + numberOfRow).bind("tap", function (e) {
-			uzsuDelTableRow(response, customFormat, e);
+			uzsuDelTableRow(response, designType, valueType, textSelectList, e);
 		});
 	}
 	// hier wir die aktuelle seite danach durchsucht, wo das popup ist
@@ -473,6 +467,7 @@ function runtimeUzsuPopup(response, headline, customFormat, item) {
 		}
 	});
 }
+
 // initialisierung
 $(document).on("update",'[data-widget="uzsu.uzsu_icon"]', function(event, response) {
     // zunächst wird festgestellt, ob Item mit Eigenschaft vorhanden. Wenn nicht: active = false
@@ -486,7 +481,6 @@ $(document).on("update",'[data-widget="uzsu.uzsu_icon"]', function(event, respon
         return;
     // Wenn ein Update erfolgt, dann werden die Daten erneut in die Variable uzsu geladen
     // damit sind die UZSU objekte auch in der click funktion verfügbar
-    // warum das nicht mit function (event, response) wie bei update funktioniert, weiß ich nicht.
     if (response[0].list instanceof Array) {
         $(this).data('uzsu', response[0]);
     } 
@@ -499,42 +493,36 @@ $(document).on("update",'[data-widget="uzsu.uzsu_icon"]', function(event, respon
 $(document).on("click",'[data-widget="uzsu.uzsu_icon"]', function(event) {
 	// hier werden die parameter aus den attributen herausgenommen
 	// und beim öffnen mit .open(....) an das popup objekt übergeben
-	// und zwar mit deep copy
-    var response = jQuery.extend(true, {},$(this).data('uzsu'));
-    var customFormat = [];
-
+	// und zwar mit deep copy, damit ich bei cancel die ursprünglichen werte nicht überschrieben habe
+    var response = jQuery.extend(true, {}, $(this).data('uzsu'));
+    // auswertung der übergabeparameter 
     var headline = $(this).attr('data-headline');
-    // übergabe im array, damit nicht zu viele parameter in der liste
-    customFormat[0] = $(this).attr('data-customFormat');
-    customFormat[1] = $(this).attr('data-customType');
-    // hier wird die komplette liste übergeben
-    customFormat[2] = $(this).attr('data-customTextList').split(",");
-    // jetzt noch der trim der strings, weil das durch collaps durcheinander kommt
-	for(numberOfListEntry = 0; numberOfListEntry < customFormat[2].length; numberOfListEntry ++){
-		customFormat[2][numberOfListEntry] = customFormat[2][numberOfListEntry].trim();
-	}
+    var designType = $(this).attr('data-designType');
+    var valueType = $(this).attr('data-valueType');
+    // hier wird die komplette liste übergeben. widget.explode kehr das implode au der webseite wieder um
+    var textSelectList = widget.explode($(this).attr('data-textSelectList'));
     // data-item ist der sh.py item, in dem alle attribute lagern, die für die steuerung notwendig ist
     // ist ja vom typ dict. das item, was tatsächlich per schaltuhr verwendet wird ist nur als attribut (child)
     // enthalten und wird ausschliesslich vom plugin verwendet.
     // wird für das rückschreiben der Daten an smarthome.py benötigt
     var item = $(this).attr('data-item');
-    // jetzt kommt noch eie liste von prüfungen, damit hinterher keine fehler passieren
+    // jetzt kommt noch die liste von prüfungen, damit hinterher keine fehler passieren
     // zunächst erst einmal popup wird angezeigt
     var popupOk = true;
-    if ((customFormat[0]!=='0') && (customFormat[0]!=='1') && (customFormat[0]!=='2')){
-    	alert('Fehlerhafter Parameter: "'+customFormat[0]+'" im Feld customFormat bei Item ' + item);
+    if ((designType!=='0') && (designType!=='1') && (designType!=='2')){
+    	alert('Fehlerhafter Parameter: "'+designType+'" im Feld designType bei Item ' + item);
     	popupOk = false;
     }
-    if ((customFormat[1]!=='bool') && (customFormat[1]!=='num') && (customFormat[1]!=='text') && (customFormat[1]!=='list')){
-		alert('Fehlerhafter Parameter: "'+customFormat[1]+'" im Feld customType bei Item ' + item);
+    if ((valueType!=='bool') && (valueType!=='num') && (valueType!=='text') && (valueType!=='list')){
+    	alert('Fehlerhafter Parameter: "'+valueType+'" im Feld valueType bei Item ' + item);
 		popupOk = false;
     }
-    if ((customFormat[0]=='0')||(customFormat[0]=='2')){
+    if ((designType=='0')||(designType=='2')){
     	var numberOfEntrys = response.list.length;
     	for(var numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
     		// test, ob die RRULE fehlerhaft ist
     		if ((response.list[numberOfRow].rrule.indexOf('FREQ=WEEKLY;BYDAY=')!==0) && (response.list[numberOfRow].rrule.length > 0)){
-    			if(!confirm('Fehler: Parameter customType ist "0", aber gespeicherte RRULE String in UZSU "' + response.list[numberOfRow].rrule + '" entspricht nicht default Format FREQ=WEEKLY;BYDAY=MO... bei Item ' + item + '. Soll dieser Eintrag überschrieben werden ?')){
+    			if(!Confirm('Fehler: Parameter designType ist "0", aber gespeicherte RRULE String in UZSU "' + response.list[numberOfRow].rrule + '" entspricht nicht default Format FREQ=WEEKLY;BYDAY=MO... bei Item ' + item + '. Soll dieser Eintrag überschrieben werden ?')){
         			// direkter abbruch bei der entscheidung !
         			numberOfRow = numberOfEntrys;
         			popupOk = false;
@@ -544,7 +532,7 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]', function(event) {
     }
     if (popupOk){
     	// öffnen des popups bei clicken des icons und ausführung der eingabefunktion
-    	runtimeUzsuPopup(response, headline, customFormat, item);
+    	runtimeUzsuPopup(response, headline, designType, valueType, textSelectList, item);
     }
 });
 
