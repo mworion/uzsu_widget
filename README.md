@@ -3,7 +3,7 @@
 ###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
 (C) Michael Würtenberger 2014,2015
 
-Aktuelle Development: 1.6
+Aktuelle Development: 1.7
 
 changelog: code cleanup in visu.js und widget_uzsu.html 
 

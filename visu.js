@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release 1.6
+// Release 1.7
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -24,9 +24,8 @@
 // überarbeitung schreiben ohne auf die basis zu verzichten. einfach ein typ kopieren und anpassen
 // 
 
-// Kopf und überschrift des Popups
 function uzsuBuildTableHeader(headline, designType, valueType, textSelectList){
-	
+	// Kopf und überschrift des Popups
 	var template = "";
 	// hier kommt der popup container mit der beschreibung ein eigenschaften
 	template += "<div data-role='popup' data-overlay-theme='b' data-theme='a' class='messagePopup' id='uzsuPopupContent' data-dismissible = 'false'>"; 
@@ -59,9 +58,9 @@ function uzsuBuildTableHeader(headline, designType, valueType, textSelectList){
 	}
     return template;
 }
-// Tabelleneinträge
-function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList){
 
+function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList){
+	// Tabelleneinträge
 	var template = "";
 	// liste für die wochentage, damit ich später per index darauf zugreifen kann
 	var weekDays =['MO','TU','WE','TH','FR','SA','SU'];
@@ -197,9 +196,9 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList){
 	}
 	return template;
 }
-// Anteil der Button zur steuerung des Popups
-function uzsuBuildTableFooter(){
 
+function uzsuBuildTableFooter(designType){
+	// Anteil der Button zur steuerung des Popups
 	var template = "";
 	// tabelle der zeileneinträge abschliessen
 	template += "<\/table>";
@@ -211,18 +210,21 @@ function uzsuBuildTableFooter(){
 	template += "<td> <div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>"; 
 		template += "<div data-role = 'button' id = 'uzsuAddTableRow'> Add Entry <\/div>";
 		template += "<div data-role = 'button' id = 'uzsuSaveQuit'> Save&Quit<\/div>";
+		if (designType == '0'){
+			template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times<\/div>";
+		}
 		template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel <\/div> <\/td>";
-	template += "<td style = 'text-align: right'><h6> v1.6 <\/h6><\/td><\/div><\/tr><\/table>";
+	template += "<td style = 'text-align: right'><h6> v1.7 <\/h6><\/td><\/div><\/tr><\/table>";
 	// abschlus des gesamten span container
 	template += "<\/span>";
     // und der abschluss des popup divs
     template += "<\/div>";
     return template;
 }
-// hier wird das template zusammengestellt, die tabellenzeilen separat, weil ich die bei einer
-// ergänzung der tabelle wieder verwenden kann
-function uzsuBuildTable(response, headline, designType, valueType, textSelectList){
 
+function uzsuBuildTable(response, headline, designType, valueType, textSelectList){
+	// hier wird das template zusammengestellt, die tabellenzeilen separat, weil ich die bei einer
+	// ergänzung der tabelle wieder verwenden kann
 	var template = "";
 	var numberOfEntrys = response.list.length;
 	// erst den header, dann die zeilen, dann den footer
@@ -230,18 +232,18 @@ function uzsuBuildTable(response, headline, designType, valueType, textSelectLis
 	for(numberOfRow = 0; numberOfRow < numberOfEntrys; numberOfRow ++){
 		template += uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList);
 	}
-	template += uzsuBuildTableFooter();
+	template += uzsuBuildTableFooter(designType);
 	return template;
 }
-// tabelle füllen
-// es werden die daten aus der variablen response gelesen und in den status / darstellung der widgetblöcke zugewiesen.
-// der aktuelle status in dann in der darstellung enthalten !
-function uzsuFillTable(response, designType, valueType, textSelectList){
 
+function uzsuFillTable(response, designType, valueType, textSelectList){
+	// tabelle füllen
+	// es werden die daten aus der variablen response gelesen und in den status / darstellung der widgetblöcke zugewiesen.
+	// der aktuelle status in dann in der darstellung enthalten !
 	var numberOfEntrys = response.list.length;
 	var weekDays =['MO','TU','WE','TH','FR','SA','SU'];
 	// jetzt wird die tabelle befüllt
-	// allgemeiner Status, bitte nich mit attr, sondern mit prop, siehe https://github.com/jquery/jquery-mobile/issues/5587
+	// allgemeiner Status, bitte nicht mit attr, sondern mit prop, siehe https://github.com/jquery/jquery-mobile/issues/5587
 	$('#uzsuGeneralActive').prop('checked',response.active).checkboxradio("refresh");	
 	// auswahl format
 	switch(designType){
@@ -314,9 +316,9 @@ function uzsuFillTable(response, designType, valueType, textSelectList){
 		}
 	}
 }
-// tabelle auslesen und speichern
+
 function uzsuSaveTable(item, response, designType, valueType, textSelectList, saveSmarthome){
-	
+	// tabelle auslesen und speichern
 	var numberOfEntrys = response.list.length;
 	var weekDays =['MO','TU','WE','TH','FR','SA','SU'];
 	// hier werden die daten aus der tabelle wieder in die items im backend zurückgespielt
@@ -379,9 +381,9 @@ function uzsuSaveTable(item, response, designType, valueType, textSelectList, sa
 		io.write(item, {active : response.active, list : response.list });
 	}
 }
-// tabellenzeile einfügen
+
 function uzsuAddTableRow(response, designType, valueType, textSelectList){
-	
+	// tabellenzeile einfügen
 	var numberOfNewRow = response.list.length;
 	var template = '';
 	// alten zustand mal in die Liste rein. da der aktuelle zustand ja nur im widget selbst enthalten ist,
@@ -402,9 +404,9 @@ function uzsuAddTableRow(response, designType, valueType, textSelectList){
 	// und daten ausfüllen. hier werdne die zeile wieder mit dem status beschrieben. status ist dann wieder im widget
 	uzsuFillTable(response, designType, valueType, textSelectList);
 }
-// tabellenzeile löschen
-function uzsuDelTableRow(response, designType, valueType, textSelectList, e){
 
+function uzsuDelTableRow(response, designType, valueType, textSelectList, e){
+	// tabellenzeile löschen
 	var numberOfEntrys = response.list.length;
 	// wenn überhaupt einträge vorhanden sind
 	// sollte nicht passieren, weil eigentlich auch kein button dann da ist, aber...
@@ -421,8 +423,21 @@ function uzsuDelTableRow(response, designType, valueType, textSelectList, e){
 		uzsuFillTable(response, designType, valueType, textSelectList);
 	}
 }
-// steuerung des Popups
+
+function uzsuSortFunction(a,b){
+	// sort funktion, wirklich vereinfacht für den speziellen fall
+	return (a.time.replace(':','') - b.time.replace(':',''));	
+}
+
+function uzsuSortTime(response, designType, valueType, textSelectList, e){
+	// sortieren der listeneinträge nach zeit
+	response.list.sort(uzsuSortFunction);
+	// jetzt noch die einträge wieder schreiben
+	uzsuFillTable(response, designType, valueType, textSelectList);
+}
+
 function runtimeUzsuPopup(response, headline, designType, valueType, textSelectList, item) {
+	// steuerung des Popups
 	// erst einmal wird der leeranteil angelegt
 	var template = uzsuBuildTable(response, headline, designType, valueType, textSelectList);
 	// dann speichern wir uns für cancel die ursprünglichen werte ab
@@ -452,6 +467,10 @@ function runtimeUzsuPopup(response, headline, designType, valueType, textSelectL
 	$.mobile.activePage.find("#uzsuAddTableRow").bind("tap", function (e) {
 		uzsuAddTableRow(response, designType, valueType, textSelectList);
 	});
+	// eintrag sortieren nach zeit
+	$.mobile.activePage.find("#uzsuSortTime").bind("tap", function (e) {
+		uzsuSortTime(response, designType, valueType, textSelectList);
+	});
 	// löschen mit del als callback eintragen
 	for(var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow ++){
 		$.mobile.activePage.find("#uzsuDelTableRow" + numberOfRow).bind("tap", function (e) {
@@ -468,8 +487,8 @@ function runtimeUzsuPopup(response, headline, designType, valueType, textSelectL
 	});
 }
 
-// initialisierung
 $(document).on("update",'[data-widget="uzsu.uzsu_icon"]', function(event, response) {
+	// initialisierung
     // zunächst wird festgestellt, ob Item mit Eigenschaft vorhanden. Wenn nicht: active = false
     // ansonsten ist der Status von active gleich dem gesetzten Status
     var active = response.length > 0 ? response[0].active : false;
