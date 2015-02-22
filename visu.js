@@ -23,6 +23,11 @@
 // durch den dispatcher für die customFormat kann man sich auch selbst eine anpassung oder
 // überarbeitung schreiben ohne auf die basis zu verzichten. einfach ein typ kopieren und anpassen
 // 
+// ----- set browser and platform identification variables -----------------------------------------------------
+var b = document.documentElement;
+              b.setAttribute('data-useragent',  navigator.userAgent);
+              b.setAttribute('data-platform', navigator.platform );
+              b.className += ((!!('ontouchstart' in window) || !!('onmsgesturechange' in window))?' touch':'');
 
 function uzsuBuildTableHeader(headline, designType, valueType, textSelectList){
 	// Kopf und überschrift des Popups

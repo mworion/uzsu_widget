@@ -3,9 +3,46 @@
 ###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
 (C) Michael Würtenberger 2014,2015
 
-Aktuelle Development: 1.7
+Aktuell develop v1.7
 
 changelog: code cleanup in visu.js und widget_uzsu.html 
+
+develop v1.6
+changelog:
+- code cleanup
+- naming parameter (sprechend)
+- angleichen widget_uzsu.html und visu.js
+-> bitte beide updaten.
+- bug fixes.
+- add browser identifiction variables
+
+develop v1.5
+changelog:
+- umsetzung valueType = 'list'
+- umsetzung valueType = 'text'
+- es wurden 2 Klassen explizit gesetzt, damit man über .css die Breite des Zeit und des Value Feldes verändern kann.
+- Die Erweiterungen gibt es in allen Designs '0','1','2'.
+- update widget_uzsu.html
+- einschränkung rückwärtskompatibilität wegen parameteränderung
+
+develop v1.4
+changelog:
+- breite time feld bei customFormat 0 einstellbar über css
+
+develop v1.3
+changelog:
+- fehlerbehebung
+
+develop v1.2
+changelog:
+- code cleanup und vertelen zum Test
+
+develop v1.1
+changelog:
+- RPC Calls mit Suche auf #uzsuPopupContent anstelle .messagePopup
+  referenziert. Damit Eindeutigkeit in der Referenzierung der Popups.
+- Überarbeitung Save / Quit.
+- data-overlay-theme='b' data-theme='a' in Zeile 31
 
 ## wichtig !!!
 Das Format der Parameter hat sich für die Texte On / Off geändert. 
