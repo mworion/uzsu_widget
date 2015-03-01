@@ -5,10 +5,6 @@
  * die Breite von 40 auf 70 px erhöht (oder nach Geschmack)   
  */
 
-html[data-useragent*='Chrome'] .uzsuTextInput{
- 	width:120px !important;
-}
-
 html[data-useragent*='Chrome'] .uzsuTimeInput{
- 	width:100px !important;
+	width:70px !important;
 }
