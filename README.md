@@ -3,9 +3,21 @@
 ###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
 (C) Michael Würtenberger 2014,2015
 
-Aktuell develop v1.7
+Aktuell 
 
-changelog: code cleanup in visu.js und widget_uzsu.html 
+develop v1.8
+changelog:
+- Bugfix Sortierung: alle zustände sollten jetzt erhalten bleiben
+
+develop v1.71
+changelog:
+- Browserdarstellung input type time auf iPad
+  Für Design Type = '0' bleibt es beim verhalten (man kann die Stings ja ohnehin nicht lesen)
+  Für Design Type = '1','2' ist der Input typ ="text". Damit bleiben die Stings auch beim iPad erhalten.
+
+develop 1.7
+changelog:
+- code cleanup in visu.js und widget_uzsu.html 
 
 develop v1.6
 changelog:

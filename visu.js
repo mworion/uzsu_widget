@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release 1.7
+// Release 1.8
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -143,7 +143,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList){
 					template += "<\/select><\/div><\/form><\/td>";
 				}
 				// time
-				template += "<td><input type='time' data-clear-btn='true' style = 'width:350px' id='uzsuEntryTime" + numberOfRow +"'>";
+				template += "<td><input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuEntryTime" + numberOfRow +"'>";
 				// rrule
 				// hier wird nur der textstring übernommen. prüfungen erfolgen keine !
 				template += "<input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuEntryRrule" + numberOfRow +"'><\/td>";
@@ -180,7 +180,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList){
 				template += "<\/select><\/div><\/form><\/td>";
 			}
 			// time
-			template += "<td><input type='time' data-clear-btn='false' id='uzsuEntryTime" + numberOfRow +"'>";
+			template += "<td><input type='text' data-clear-btn='false' id='uzsuEntryTime" + numberOfRow +"'>";
 			// rrule
 			template += "<form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
 			for(numberOfDay = 0; numberOfDay < 7; numberOfDay ++){
@@ -219,7 +219,7 @@ function uzsuBuildTableFooter(designType){
 			template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times<\/div>";
 		}
 		template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel <\/div> <\/td>";
-	template += "<td style = 'text-align: right'><h6> v1.7 <\/h6><\/td><\/div><\/tr><\/table>";
+	template += "<td style = 'text-align: right'><h6> v1.8 <\/h6><\/td><\/div><\/tr><\/table>";
 	// abschlus des gesamten span container
 	template += "<\/span>";
     // und der abschluss des popup divs
@@ -435,6 +435,8 @@ function uzsuSortFunction(a,b){
 }
 
 function uzsuSortTime(response, designType, valueType, textSelectList, e){
+	// liets erst aus dem widget zurücklesen
+	uzsuSaveTable(1, response, designType, valueType, textSelectList, false);
 	// sortieren der listeneinträge nach zeit
 	response.list.sort(uzsuSortFunction);
 	// jetzt noch die einträge wieder schreiben
