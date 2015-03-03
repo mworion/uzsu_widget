@@ -1,11 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-<<<<<<< HEAD
 // Release 1.8
-=======
-// Release 1.71
->>>>>>> refs/remotes/origin/develop
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -223,11 +219,7 @@ function uzsuBuildTableFooter(designType){
 			template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times<\/div>";
 		}
 		template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel <\/div> <\/td>";
-<<<<<<< HEAD
 	template += "<td style = 'text-align: right'><h6> v1.8 <\/h6><\/td><\/div><\/tr><\/table>";
-=======
-	template += "<td style = 'text-align: right'><h6> v1.71 <\/h6><\/td><\/div><\/tr><\/table>";
->>>>>>> refs/remotes/origin/develop
 	// abschlus des gesamten span container
 	template += "<\/span>";
     // und der abschluss des popup divs
