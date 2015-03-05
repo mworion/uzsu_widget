@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release 1.8
+// Release 1.85
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -91,7 +91,13 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList){
 					template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
 					template += "<select name='uzsuEntryValue'" + numberOfRow + "' id='uzsuEntryValue" + numberOfRow + "' data-mini='true'>";
 					for(numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry ++){
-						template += "<option data-theme='b' data-overlay-theme='a' value='" + textSelectList[numberOfListEntry] + "'>" + textSelectList[numberOfListEntry] + "<\/option>";
+						// unterscheidung anzeige und werte
+						if (textSelectList[0].split(':')[1] === undefined){
+							template += "<option value='" + textSelectList[numberOfListEntry].split(':')[0] + "'>" + textSelectList[numberOfListEntry].split(':')[0] + "<\/option>";
+						}
+						else{
+							template += "<option value='" + textSelectList[numberOfListEntry].split(':')[1] + "'>" + textSelectList[numberOfListEntry].split(':')[0] + "<\/option>";
+						}
 					}
 					template += "<\/select><\/div><\/form><\/td>";
 				}
@@ -138,7 +144,13 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList){
 					template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
 					template += "<select name='uzsuEntryValue'" + numberOfRow + "' id='uzsuEntryValue" + numberOfRow + "' data-mini='true'>";
 					for(numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry ++){
-						template += "<option value='" + textSelectList[numberOfListEntry] + "'>" + textSelectList[numberOfListEntry] + "<\/option>";
+						// unterscheidung anzeige und werte
+						if (textSelectList[0].split(':')[1] === undefined){
+							template += "<option value='" + textSelectList[numberOfListEntry].split(':')[0] + "'>" + textSelectList[numberOfListEntry].split(':')[0] + "<\/option>";
+						}
+						else{
+							template += "<option value='" + textSelectList[numberOfListEntry].split(':')[1] + "'>" + textSelectList[numberOfListEntry].split(':')[0] + "<\/option>";
+						}
 					}
 					template += "<\/select><\/div><\/form><\/td>";
 				}
@@ -175,7 +187,13 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList){
 				template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
 				template += "<select name='uzsuEntryValue'" + numberOfRow + "' id='uzsuEntryValue" + numberOfRow + "' data-mini='true'>";
 				for(numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry ++){
-					template += "<option value='" + textSelectList[numberOfListEntry] + "'>" + textSelectList[numberOfListEntry] + "<\/option>";
+					// unterscheidung anzeige und werte
+					if (textSelectList[0].split(':')[1] === undefined){
+						template += "<option value='" + textSelectList[numberOfListEntry].split(':')[0] + "'>" + textSelectList[numberOfListEntry].split(':')[0] + "<\/option>";
+					}
+					else{
+						template += "<option value='" + textSelectList[numberOfListEntry].split(':')[1] + "'>" + textSelectList[numberOfListEntry].split(':')[0] + "<\/option>";
+					}
 				}
 				template += "<\/select><\/div><\/form><\/td>";
 			}
@@ -219,7 +237,7 @@ function uzsuBuildTableFooter(designType){
 			template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times<\/div>";
 		}
 		template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel <\/div> <\/td>";
-	template += "<td style = 'text-align: right'><h6> v1.8 <\/h6><\/td><\/div><\/tr><\/table>";
+	template += "<td style = 'text-align: right'><h6> v1.85 <\/h6><\/td><\/div><\/tr><\/table>";
 	// abschlus des gesamten span container
 	template += "<\/span>";
     // und der abschluss des popup divs
@@ -270,9 +288,18 @@ function uzsuFillTable(response, designType, valueType, textSelectList){
 					for(numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry ++){
 						// wenn ich den eintrag gefunden haben, dann setze ich den eintrag auf die richtige stelle
 						// ansonsten wird einfach der erste eintrag genommen
-						if (response.list[numberOfRow].value == textSelectList[numberOfListEntry]) {
-							$("#uzsuEntryValue"+numberOfRow).val(textSelectList[numberOfListEntry]).attr('selected', true).siblings('option').removeAttr('selected');
-							$("#uzsuEntryValue"+numberOfRow).selectmenu('refresh', true);
+						// zusätzlich noch die unterscheidung, ob ich in der listen anzeige und wertezuweisung trenne
+						if (textSelectList[0].split(':')[1] === undefined){
+							if (response.list[numberOfRow].value == textSelectList[numberOfListEntry].split(':')[0]) {
+								$("#uzsuEntryValue"+numberOfRow).val(textSelectList[numberOfListEntry].split(':')[0]).attr('selected', true).siblings('option').removeAttr('selected');
+								$("#uzsuEntryValue"+numberOfRow).selectmenu('refresh', true);
+							}
+						}
+						else{
+							if (response.list[numberOfRow].value == textSelectList[numberOfListEntry].split(':')[1]) {
+								$("#uzsuEntryValue"+numberOfRow).val(textSelectList[numberOfListEntry].split(':')[1]).attr('selected', true).siblings('option').removeAttr('selected');
+								$("#uzsuEntryValue"+numberOfRow).selectmenu('refresh', true);
+							}
 						}
 					}
 				}	
@@ -304,9 +331,18 @@ function uzsuFillTable(response, designType, valueType, textSelectList){
 					// hier ist es etwas schwieriger, denn ich muß den wert mit der liste vergleichen und dann setzen
 					for(numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry ++){
 						// wenn ich den eintrag gefunden haben, dann setze ich den eintrag auf die richtige stelle
-						if (response.list[numberOfRow].value == textSelectList[numberOfListEntry]) {
-							$("#uzsuEntryValue"+numberOfRow).val(textSelectList[numberOfListEntry]).attr('selected', true).siblings('option').removeAttr('selected');
-							$("#uzsuEntryValue"+numberOfRow).selectmenu('refresh', true);
+						// zusätzlich noch die unterscheidung, ob ich in der listen anzeige und wertezuweisung trenne
+						if (textSelectList[0].split(':')[1] === undefined){
+							if (response.list[numberOfRow].value == textSelectList[numberOfListEntry].split(':')[0]) {
+								$("#uzsuEntryValue"+numberOfRow).val(textSelectList[numberOfListEntry].split(':')[0]).attr('selected', true).siblings('option').removeAttr('selected');
+								$("#uzsuEntryValue"+numberOfRow).selectmenu('refresh', true);
+							}
+						}
+						else{
+							if (response.list[numberOfRow].value == textSelectList[numberOfListEntry].split(':')[1]) {
+								$("#uzsuEntryValue"+numberOfRow).val(textSelectList[numberOfListEntry].split(':')[1]).attr('selected', true).siblings('option').removeAttr('selected');
+								$("#uzsuEntryValue"+numberOfRow).selectmenu('refresh', true);
+							}
 						}
 					}
 				}

@@ -5,6 +5,13 @@
 
 Aktuell 
 
+develop v1.85
+changelog:
+- Listendarstellung: Anzeige und Wertzuweisung können aufgesplittet werden. Dazu ist es notwendig im die beiden Einträge
+  in der Parameterübergabe im String mit ':' zu trennen. Beispiel: ['Hallo:1'] Zeigt in der Liste 'Hallo' an, weist aber 1 zu.
+  Es erfolgt keine überprüfung der Parameter auf Richtigkeit oder Vollständigkeit ! 
+   
+
 develop v1.8
 changelog:
 - Bugfix Sortierung: alle zustände sollten jetzt erhalten bleiben
