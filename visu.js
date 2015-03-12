@@ -537,7 +537,7 @@ function uzsuBuildHelperTime(type) {
 			template += "<td></td><td></td>";
 			template += "<td>nicht nach</td></tr>";
 			template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuHelperTimeMin'</td>";
-			template += "<td> <h1 style='margin:0'> < </h1> </td> <td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuHelperTimeCron'</td>";
+			template += "<td> <h1 style='margin:0'> < </h1> </td> <td><input type='text' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuHelperTimeCron'</td>";
 			template += "<td><input type='number' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuHelperTimeOffset'</td>";
 			template += "<td> Minuten</td><td> <h1 style='margin:0'> < </h1> </td>";
 			template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuHelperTimeMax'</td>";
@@ -554,7 +554,7 @@ function uzsuBuildHelperTime(type) {
 			template += "<td></td><td></td>";
 			template += "<td>nicht nach</td></tr>";
 			template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuHelperTimeMin'</td>";
-			template += "<td> <h1 style='margin:0'> < </h1> </td><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuHelperTimeCron'</td>";
+			template += "<td> <h1 style='margin:0'> < </h1> </td><td><input type='text' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuHelperTimeCron'</td>";
 			template += "<td><input type='number' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuHelperTimeOffset'</td>";
 			template += "<td> Minuten</td><td> <h1 style='margin:0'> < </h1> </td>";
 			template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuHelperTimeMax'</td>";
