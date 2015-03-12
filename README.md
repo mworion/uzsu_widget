@@ -5,6 +5,11 @@
 
 Aktuell 
 
+feature v1.87
+changelog:
+- Assistent für die Zeiteingabe zum Test realisiert
+- 2. Popup
+
 develop v1.85
 changelog:
 - Listendarstellung: Anzeige und Wertzuweisung können aufgesplittet werden. Dazu ist es notwendig im die beiden Einträge
