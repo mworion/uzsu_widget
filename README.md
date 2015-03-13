@@ -4,6 +4,10 @@
 (C) Michael Würtenberger 2014,2015
 
 Aktuell 
+feature v2.1
+changelog:
+- vorbereitung develop release auf v2.0RC1
+- mapping weitere entwicklungen auf nach v2.0 release 
 
 feature v1.87
 changelog:
