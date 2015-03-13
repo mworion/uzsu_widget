@@ -5,6 +5,10 @@
 
 Aktuell 
 
+develop v2.0RC1
+- changlog 
+- code cleanup und vorbereitung Release 2.0
+
 develop v1.85
 changelog:
 - Listendarstellung: Anzeige und Wertzuweisung können aufgesplittet werden. Dazu ist es notwendig im die beiden Einträge
