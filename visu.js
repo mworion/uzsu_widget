@@ -478,9 +478,9 @@ function uzsuBuildExpertLine(uzsuTableRow) {
 	// rahmen im Feld (wird ein Feld mit einer separaten Tabelle drin)
 	template += "<tr id='uzsuExpertLine" + uzsuTableRow + "'><td colspan='6'><table>";
 	// Tabellenüberschriften
-	template += "<tr><td>earliest</td><td>Event</td><td>Offset</td><td></td><td></td><td>latest</td></tr>";
+	template += "<tr><td>earliest</td><td></td><td>Event</td><td>+/- min</td><td></td><td></td><td>latest</td></tr>";
 	// tabellenfelder
-	template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput'id='uzsuExpertTimeMin" + uzsuTableRow + "'</td>";
+	template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput'id='uzsuExpertTimeMin" + uzsuTableRow + "'</td><td><h1 style='margin:0'> < </h1></td>";
 	
 	template += "<td><form><div data-role='fieldcontain' class='uzsuExpertEvent' style = 'height:auto !important'>";
 	template += "<select name='uzsuExpertEvent" + uzsuTableRow + "' id='uzsuExpertEvent" + uzsuTableRow + "' data-mini='true'>";
@@ -490,7 +490,7 @@ function uzsuBuildExpertLine(uzsuTableRow) {
 	template += "</div></form></td>";
 
 	template += "<td><input type='number' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuExpertTimeOffset" + uzsuTableRow + "'</td>";
-	template += "<td> Minutes</td><td> <h1 style='margin:0'> < </h1> </td>";
+	template += "<td></td><td> <h1 style='margin:0'> < </h1> </td>";
 	template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuExpertTimeMax" + uzsuTableRow + "'</td>";
 	template += "</tr>";
 	// abschluss des Tabelleeintrags
