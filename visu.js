@@ -1,11 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-<<<<<<< HEAD
-// Release Cadidate v2.0
-=======
-// Release feature v2.2
->>>>>>> refs/heads/feature
+// Release develop v2.2
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -221,16 +217,6 @@ function uzsuBuildTableFooter(designType) {
 	// hier der activierungsbutton für die gesamte uzsu
 	template += "<table style = 'border: 0'> <tr> <td> <form> <fieldset data-mini='true'> " + "<input type='checkbox' id='uzsuGeneralActive'> <label for='uzsuGeneralActive'>UZSU Activate</label>"	+ "</fieldset></form> </td>";
 	// jetzt kommen noch die buttons in der basisleiste mit rein
-<<<<<<< HEAD
-	template += "<td> <div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>"; 
-		template += "<div data-role = 'button' id = 'uzsuAddTableRow'> Add Entry <\/div>";
-		template += "<div data-role = 'button' id = 'uzsuSaveQuit'> Save&Quit<\/div>";
-		if (designType == '0'){
-			template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times<\/div>";
-		}
-		template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel <\/div> <\/td>";
-	template += "<td style = 'text-align: right'><h6> v2.0 <\/h6><\/td><\/div><\/tr><\/table>";
-=======
 	template += "<td> <div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>";
 	template += "<div data-role = 'button' id = 'uzsuAddTableRow'> Add Entry </div>";
 	template += "<div data-role = 'button' id = 'uzsuSaveQuit'> Save&Quit</div>";
@@ -239,7 +225,6 @@ function uzsuBuildTableFooter(designType) {
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
 	template += "<td style = 'text-align: right'><h6> v2.2 feature </h6></td></div></tr></table>";
->>>>>>> refs/heads/feature
 	// abschlus des gesamten span container
 	template += "</span>";
 	// und der abschluss des popup divs
