@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release develop v2.2
+// Release dev v2.3
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -224,7 +224,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times</div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.2 feature </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v2.3 dev </h6></td></div></tr></table>";
 	// abschlus des gesamten span container
 	template += "</span>";
 	// und der abschluss des popup divs
@@ -478,9 +478,9 @@ function uzsuBuildExpertLine(uzsuTableRow) {
 	// rahmen im Feld (wird ein Feld mit einer separaten Tabelle drin)
 	template += "<tr id='uzsuExpertLine" + uzsuTableRow + "'><td colspan='6'><table>";
 	// Tabellenüberschriften
-	template += "<tr><td>earliest</td><td></td><td>Event</td><td>+/- min</td><td></td><td></td><td>latest</td></tr>";
+	template += "<tr><td>earliest</td><td>Event</td><td>Offset</td><td></td><td></td><td>latest</td></tr>";
 	// tabellenfelder
-	template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput'id='uzsuExpertTimeMin" + uzsuTableRow + "'</td><td><h1 style='margin:0'> < </h1></td>";
+	template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput'id='uzsuExpertTimeMin" + uzsuTableRow + "'</td>";
 	
 	template += "<td><form><div data-role='fieldcontain' class='uzsuExpertEvent' style = 'height:auto !important'>";
 	template += "<select name='uzsuExpertEvent" + uzsuTableRow + "' id='uzsuExpertEvent" + uzsuTableRow + "' data-mini='true'>";
@@ -490,12 +490,28 @@ function uzsuBuildExpertLine(uzsuTableRow) {
 	template += "</div></form></td>";
 
 	template += "<td><input type='number' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuExpertTimeOffset" + uzsuTableRow + "'</td>";
-	template += "<td></td><td> <h1 style='margin:0'> < </h1> </td>";
+	template += "<td> Minutes</td><td> <h1 style='margin:0'> < </h1> </td>";
 	template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuExpertTimeMax" + uzsuTableRow + "'</td>";
 	template += "</tr>";
 	// abschluss des Tabelleeintrags
 	template += "</table></td></tr>";
 	return template;
+}
+
+function uzsuSetTextInputState(uzsuTableRow){
+	// hier werden die einzelnen eingabefelder aktiviert oder deaktiviert.
+	if ($("#uzsuExpertEvent"+uzsuTableRow).val() === 'time'){
+		$('#uzsuEntryTime' + uzsuTableRow).textinput('enable');
+		$('#uzsuExpertTimeMin'+uzsuTableRow).textinput('disable');
+		$('#uzsuExpertTimeOffset'+uzsuTableRow).textinput('disable');
+		$('#uzsuExpertTimeMax'+uzsuTableRow).textinput('disable');
+	}
+	else{
+		$('#uzsuEntryTime' + uzsuTableRow).textinput('disable');
+		$('#uzsuExpertTimeMin'+uzsuTableRow).textinput('enable');
+		$('#uzsuExpertTimeOffset'+uzsuTableRow).textinput('enable');
+		$('#uzsuExpertTimeMax'+uzsuTableRow).textinput('enable');
+	}
 }
 
 function uzsuAddExpertLine(e) {
@@ -519,6 +535,13 @@ function uzsuAddExpertLine(e) {
 		// propagation stoppen, sonst wird die zeile gleich wieder aufgemacht
 		e.stopImmediatePropagation();
 		uzsuDelExpertLine(e);
+	});
+	// status der eingaben setzen
+	uzsuSetTextInputState(uzsuTableRow);
+	// handler, um je nach event die inputs zu aktivieren / deaktiovieren
+	// reagiert auf die änderung des pulldown menüs
+	$.mobile.activePage.find("#uzsuExpertEvent"+uzsuTableRow).on('change', function (){
+		uzsuSetTextInputState(uzsuTableRow);
 	});
 }
 
