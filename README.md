@@ -4,21 +4,7 @@
 (C) Michael Würtenberger 2014,2015
 
 Aktuell 
-feature v2.2
-
-changelog:
-- assistent umgestellt auf experte
-
-changelog:
-- vorbereitung develop release auf v2.0RC1
-- mapping weitere entwicklungen auf nach v2.0 release 
-
-feature v1.87
-changelog:
-- Assistent für die Zeiteingabe zum Test realisiert
-- 2. Popup
-
-v2.0
+develop v2.2
 
 Installation:
 1. Download von visu.js und widget_uzsu.html aus Github
