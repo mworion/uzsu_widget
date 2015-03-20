@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release dev v2.3
+// Release dev v2.4
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -104,7 +104,10 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 			// reduzieren. ich haben keine möglichkeit gefunden dieses verhalten zu umgehen / disablen. wers braucht, kann mit der
 			// erhöhung der breite im style dieses so anpassen dass eine gut sichtbare lösung entsteht (zu lasten der gesamtbreite=
 			// werte um width = 80px schenen ganz gut zu sein.
-			template += "<td><input type='time' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuEntryTime" + numberOfRow + "'></td>";
+			template += "<td><input type='time' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuEntryTime" + numberOfRow + "'>";
+			// hier wird der timestring abgespeichert
+			template += "<div class='uzsuTimeInput' id='uzsuEntryTimeString" + numberOfRow + "'></div>";
+			template += "</td>";
 			// rrule
 			// wichtig: es findet keine prüfung statt ! wenn zu beginn das überschreiben akzeptiert wird, dann kommt das standard
 			// format des widgets zur anwendung !
@@ -121,6 +124,25 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 			template += "<td> <button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button></td>";
 			// tabelle reihen abschliessen
 			template += "</tr>";
+			// und jetzt noch die unsichbare expertenzeile
+			template += "<tr id='uzsuExpertLine" + numberOfRow + "' style='display:none;'><td colspan='6'><table>";
+			// Tabellenüberschriften
+			template += "<tr><td>earliest</td><td></td><td>Event</td><td>+/- min</td><td></td><td></td><td>latest</td></tr>";
+			// tabellenfelder
+			template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput'id='uzsuExpertTimeMin" + numberOfRow + "'</td>";
+			template += "<td> <h1 style='margin:0'> < </h1> </td>";
+			template += "<td><form><div data-role='fieldcontain' class='uzsuExpertEvent' style = 'height:auto !important'>";
+			template += "<select name='uzsuExpertEvent" + numberOfRow + "' id='uzsuExpertEvent" + numberOfRow + "' data-mini='true'>";
+			template += "<option value='time'>Time</option>";
+			template += "<option value='sunrise'>Sunrise</option>";
+			template += "<option value='sunset'>Sunset</option>";
+			template += "</div></form></td>";
+			template += "<td><input type='number' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuExpertTimeOffset" + numberOfRow + "'</td>";
+			template += "<td> Minutes</td><td> <h1 style='margin:0'> < </h1> </td>";
+			template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuExpertTimeMax" + numberOfRow + "'</td>";
+			template += "</tr>";
+			// abschluss des Tabelleeintrags der expertenzeile
+			template += "</table></td></tr>";
 			break;
 		}
 		case '1': {
@@ -150,7 +172,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 				template += "</select></div></form></td>";
 			}
 			// time
-			template += "<td><input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuEntryTime" + numberOfRow + "'>";
+			template += "<td><input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuEntryTimeString" + numberOfRow + "'>";
 			// rrule
 			// hier wird nur der textstring übernommen. prüfungen erfolgen keine !
 			template += "<input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuEntryRrule"	+ numberOfRow + "'></td>";
@@ -190,7 +212,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 				template += "</select></div></form></td>";
 			}
 			// time
-			template += "<td><input type='text' data-clear-btn='false' id='uzsuEntryTime" + numberOfRow + "'>";
+			template += "<td><input type='text' data-clear-btn='false' id='uzsuEntryTimeString" + numberOfRow + "'>";
 			// rrule
 			template += "<form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
 			for (numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
@@ -224,7 +246,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times</div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.3 dev </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v2.4 dev </h6></td></div></tr></table>";
 	// abschlus des gesamten span container
 	template += "</span>";
 	// und der abschluss des popup divs
@@ -292,7 +314,13 @@ function uzsuFillTable(response, designType, valueType, textSelectList) {
 					}
 				}
 				$('#uzsuEntryActive' + numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");
-				$('#uzsuEntryTime' + numberOfRow).val(response.list[numberOfRow].time);
+				$('#uzsuEntryTimeString' + numberOfRow).val(response.list[numberOfRow].time);
+				if(designType =='0'){
+					// den Time string erweitern und auch auf die elemente verteilen
+					uzsuExpertExpandTimestring(numberOfRow);
+					// status der eingaben setzen
+					uzsuSetTextInputState(numberOfRow);
+				}
 				// in der tabelle die werte der rrule, dabei gehe ich von dem standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU
 				// aus und setze für jeden eintrag den button.
 				var rrule = response.list[numberOfRow].rrule;
@@ -338,7 +366,7 @@ function uzsuFillTable(response, designType, valueType, textSelectList) {
 					$('#uzsuEntryValue' + numberOfRow).val(response.list[numberOfRow].value);
 				}
 				$('#uzsuEntryActive' + numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");
-				$('#uzsuEntryTime' + numberOfRow).val(response.list[numberOfRow].time);
+				$('#uzsuEntryTimeString' + numberOfRow).val(response.list[numberOfRow].time);
 				$('#uzsuEntryRrule' + numberOfRow).val(response.list[numberOfRow].rrule);
 			}
 			break;
@@ -369,7 +397,11 @@ function uzsuSaveTable(item, response, designType, valueType, textSelectList,
 				response.list[numberOfRow].value = parseInt($('#uzsuEntryValue' + numberOfRow).val());
 			}
 			response.list[numberOfRow].active = $('#uzsuEntryActive' + numberOfRow).is(':checked');
-			response.list[numberOfRow].time = $('#uzsuEntryTime' + numberOfRow).val();
+			// und jetzt wird er erweitert
+			if(designType =='0'){
+				uzsuExpertCollapseTimestring(numberOfRow);
+			}
+			response.list[numberOfRow].time = $('#uzsuEntryTimeString' + numberOfRow).val();
 			// in der tabelle die werte der rrule, dabei gehe ich von dem standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU
 			// aus und setze für jeden eintrag den button. Setzen der werte.
 			var first = true;
@@ -399,7 +431,7 @@ function uzsuSaveTable(item, response, designType, valueType, textSelectList,
 				response.list[numberOfRow].value = parseInt($('#uzsuEntryValue' + numberOfRow).val());
 			}
 			response.list[numberOfRow].active = $('#uzsuEntryActive' + numberOfRow).is(':checked');
-			response.list[numberOfRow].time = $('#uzsuEntryTime' + numberOfRow).val();
+			response.list[numberOfRow].time = $('#uzsuEntryTimeString' + numberOfRow).val();
 			response.list[numberOfRow].rrule = $('#uzsuEntryRrule' + numberOfRow).val();
 		}
 		break;
@@ -433,7 +465,7 @@ function uzsuAddTableRow(response, designType, valueType, textSelectList) {
 	});
 	// den helper handler für die neue Zeile einhängen
 	$.mobile.activePage.find("#uzsuExpert"+ numberOfNewRow).bind("tap", function(e) {
-		uzsuAddExpertLine(e);
+		uzsuShowExpertLine(e);
 	});	
 	// und daten ausfüllen. hier werdne die zeile wieder mit dem status beschrieben. status ist dann wieder im widget
 	uzsuFillTable(response, designType, valueType, textSelectList);
@@ -445,11 +477,11 @@ function uzsuDelTableRow(response, designType, valueType, textSelectList, e) {
 	// wenn überhaupt einträge vorhanden sind sollte nicht passieren, weil eigentlich auch kein button dann da ist, aber...
 	if (numberOfEntries > 0) {
 		// index heraussuchen, in welcher Zeile gelöscht wurde
-		var uzsuTableRowToDelete = parseInt(e.currentTarget.id.substr(15));
+		var numberOfRowToDelete = parseInt(e.currentTarget.id.substr(15));
 		// zwischenspeichern vor dem löschen
 		uzsuSaveTable(1, response, designType, valueType, textSelectList, false);
 		// erst mal das array entsprechen kürzen
-		response.list.splice(uzsuTableRowToDelete, 1);
+		response.list.splice(numberOfRowToDelete, 1);
 		// jetzt die Tabelle kürzen im Popup
 		$('#uzsuNumberOfRow' + (numberOfEntries - 1)).remove();
 		// und daten wieder ausfüllen
@@ -471,103 +503,65 @@ function uzsuSortTime(response, designType, valueType, textSelectList, e) {
 	uzsuFillTable(response, designType, valueType, textSelectList);
 }
 
-function uzsuBuildExpertLine(uzsuTableRow) {
-	// tabellenzeile einfügen
-	var template = '';
-	// dann eine neue HTML Zeile genenrieren hier die darstellung fuer die darstellung mit sunrise
-	// rahmen im Feld (wird ein Feld mit einer separaten Tabelle drin)
-	template += "<tr id='uzsuExpertLine" + uzsuTableRow + "'><td colspan='6'><table>";
-	// Tabellenüberschriften
-	template += "<tr><td>earliest</td><td>Event</td><td>Offset</td><td></td><td></td><td>latest</td></tr>";
-	// tabellenfelder
-	template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput'id='uzsuExpertTimeMin" + uzsuTableRow + "'</td>";
-	
-	template += "<td><form><div data-role='fieldcontain' class='uzsuExpertEvent' style = 'height:auto !important'>";
-	template += "<select name='uzsuExpertEvent" + uzsuTableRow + "' id='uzsuExpertEvent" + uzsuTableRow + "' data-mini='true'>";
-	template += "<option value='time'>Time</option>";
-	template += "<option value='sunrise'>Sunrise</option>";
-	template += "<option value='sunset'>Sunset</option>";
-	template += "</div></form></td>";
-
-	template += "<td><input type='number' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuExpertTimeOffset" + uzsuTableRow + "'</td>";
-	template += "<td> Minutes</td><td> <h1 style='margin:0'> < </h1> </td>";
-	template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuExpertTimeMax" + uzsuTableRow + "'</td>";
-	template += "</tr>";
-	// abschluss des Tabelleeintrags
-	template += "</table></td></tr>";
-	return template;
-}
-
-function uzsuSetTextInputState(uzsuTableRow){
+function uzsuSetTextInputState(numberOfRow){
 	// hier werden die einzelnen eingabefelder aktiviert oder deaktiviert.
-	if ($("#uzsuExpertEvent"+uzsuTableRow).val() === 'time'){
-		$('#uzsuEntryTime' + uzsuTableRow).textinput('enable');
-		$('#uzsuExpertTimeMin'+uzsuTableRow).textinput('disable');
-		$('#uzsuExpertTimeOffset'+uzsuTableRow).textinput('disable');
-		$('#uzsuExpertTimeMax'+uzsuTableRow).textinput('disable');
+	if ($("#uzsuExpertEvent"+numberOfRow).val() === 'time'){
+		$('#uzsuEntryTime' + numberOfRow).textinput('enable');
+		$('#uzsuExpertTimeMin'+numberOfRow).textinput('disable');
+		$('#uzsuExpertTimeOffset'+numberOfRow).textinput('disable');
+		$('#uzsuExpertTimeMax'+numberOfRow).textinput('disable');
 	}
 	else{
-		$('#uzsuEntryTime' + uzsuTableRow).textinput('disable');
-		$('#uzsuExpertTimeMin'+uzsuTableRow).textinput('enable');
-		$('#uzsuExpertTimeOffset'+uzsuTableRow).textinput('enable');
-		$('#uzsuExpertTimeMax'+uzsuTableRow).textinput('enable');
+		$('#uzsuEntryTime' + numberOfRow).textinput('disable');
+		$('#uzsuExpertTimeMin'+numberOfRow).textinput('enable');
+		$('#uzsuExpertTimeOffset'+numberOfRow).textinput('enable');
+		$('#uzsuExpertTimeMax'+numberOfRow).textinput('enable');
 	}
 }
 
-function uzsuAddExpertLine(e) {
+function uzsuShowExpertLine(e) {
 	// tabellezeile ermitteln, wo augerufen wurde. es ist die 10. Stelle des aufrufenden objektes
-	var uzsuTableRow = parseInt(e.currentTarget.id.substr(10));
-	// tabellenzeile einfügen
-	var template = '';
-	// dann eine neue HTML Zeile genenrieren
-	template = uzsuBuildExpertLine(uzsuTableRow);
-	// zeile in die Tabelle einbauen
-	$("#uzsuNumberOfRow" + uzsuTableRow).after(template);
-	// hier wichtig: damit die optimierung jquerymobile auf tabelle wirkt
-	$.mobile.activePage.trigger('pagecreate');
-	// falls werte vorhanden sind, diese wieder einsetzen
-	uzsuExpertExpandTimestring(uzsuTableRow);
+	var numberOfRow = parseInt(e.currentTarget.id.substr(10));
+	/// zeile anzeigen
+	$('#uzsuExpertLine'+numberOfRow).css('display','');
 	// jetzt noch den Button in der Zeile drüber auf arrow up ändern
-	$("#uzsuExpert"+ uzsuTableRow).buttonMarkup({ icon: "arrow-u" });
+	$("#uzsuExpert"+ numberOfRow).buttonMarkup({ icon: "arrow-u" });
 	// und den callback ändern
-	$.mobile.activePage.find("#uzsuExpert"+ uzsuTableRow).unbind("tap");
-	$.mobile.activePage.find("#uzsuExpert"+ uzsuTableRow).bind("tap", function(e) {
+	$.mobile.activePage.find("#uzsuExpert"+ numberOfRow).unbind("tap");
+	$.mobile.activePage.find("#uzsuExpert"+ numberOfRow).bind("tap", function(e) {
 		// propagation stoppen, sonst wird die zeile gleich wieder aufgemacht
 		e.stopImmediatePropagation();
-		uzsuDelExpertLine(e);
+		uzsuHideExpertLine(e);
 	});
-	// status der eingaben setzen
-	uzsuSetTextInputState(uzsuTableRow);
 	// handler, um je nach event die inputs zu aktivieren / deaktiovieren
 	// reagiert auf die änderung des pulldown menüs
-	$.mobile.activePage.find("#uzsuExpertEvent"+uzsuTableRow).on('change', function (){
-		uzsuSetTextInputState(uzsuTableRow);
+	$.mobile.activePage.find("#uzsuExpertEvent"+numberOfRow).on('change', function (){
+		uzsuSetTextInputState(numberOfRow);
 	});
 }
 
-function uzsuDelExpertLine(e) {
+function uzsuHideExpertLine(e) {
 	// tabellezeile ermitteln, wo augerufen wurde. es ist die 10. Stelle des aufrufenden objektes
-	var uzsuTableRow = parseInt(e.currentTarget.id.substr(10));
+	var numberOfRow = parseInt(e.currentTarget.id.substr(10));
 	// tabellenzeile löschen
-	if ($('#uzsuExpertLine'+uzsuTableRow)) {
-		// werte wirde in die time variable abspeichern
-		uzsuExpertCollapseTimestring(uzsuTableRow);
+	if ($('#uzsuExpertLine'+numberOfRow)) {
 		// jetzt die Tabelle kürzen im Popup
-		$('#uzsuExpertLine'+uzsuTableRow).remove();
+		$('#uzsuExpertLine'+numberOfRow).css('display','none');
 		// jetzt noch den Button in der Zeile drüber ändern auf arrow down
-		$("#uzsuExpert"+ uzsuTableRow).buttonMarkup({ icon: "arrow-d" });
+		$("#uzsuExpert"+ numberOfRow).buttonMarkup({ icon: "arrow-d" });
 		// und den callback ändern
-		$.mobile.activePage.find("#uzsuExpert"+ uzsuTableRow).unbind("tap");
-		$.mobile.activePage.find("#uzsuExpert"+ uzsuTableRow).bind("tap", function(e) {
+		$.mobile.activePage.find("#uzsuExpert"+ numberOfRow).unbind("tap");
+		$.mobile.activePage.find("#uzsuExpert"+ numberOfRow).bind("tap", function(e) {
 			// propagation stoppen, sonst wird die zeile gleich wieder aufgemacht
 			e.stopImmediatePropagation();
-			uzsuAddExpertLine(e);
+			uzsuShowExpertLine(e);
 		});
 	}
 }
 
-function uzsuExpertExpandTimestring(uzsuTableRow){
-	uzsuExpertTimestring = $('#uzsuEntryTime' + uzsuTableRow).val();
+function uzsuExpertExpandTimestring(numberOfRow){
+	uzsuExpertTimestring = $('#uzsuEntryTimeString' + numberOfRow).val();
+	uzsuExpertTime = '';
     tabsTime = uzsuExpertTimestring.split('<');
     if(tabsTime.length == 1){
     	uzsuExpertTimeMin = '';
@@ -580,6 +574,7 @@ function uzsuExpertExpandTimestring(uzsuTableRow){
         }
         else{
         	uzsuExpertEvent = 'time';
+            uzsuExpertTime = tabsTime[0].trim();
         }
     }
     else if(tabsTime.length == 2){
@@ -636,34 +631,35 @@ function uzsuExpertExpandTimestring(uzsuTableRow){
     	uzsuExpertTimeOffset = '-' + tabsOffset[0].trim();
     }
 	// Values in der Zeile setzen
-    $('#uzsuExpertTimeMin'+uzsuTableRow).val(uzsuExpertTimeMin);
-    $('#uzsuExpertTimeOffset'+uzsuTableRow).val(parseInt(uzsuExpertTimeOffset));
-    $('#uzsuExpertTimeMax'+uzsuTableRow).val(uzsuExpertTimeMax);
+    $('#uzsuExpertTimeMin'+numberOfRow).val(uzsuExpertTimeMin);
+    $('#uzsuExpertTimeOffset'+numberOfRow).val(parseInt(uzsuExpertTimeOffset));
+    $('#uzsuExpertTimeMax'+numberOfRow).val(uzsuExpertTimeMax);
+    $('#uzsuEntryTime'+numberOfRow).val(uzsuExpertTime);
     // und die pull down menür richtig, damit di eeinträge wieder stimmen
-    $('#uzsuExpertEvent'+uzsuTableRow).val(uzsuExpertEvent).attr('selected',true).siblings('option').removeAttr('selected');
+    $('#uzsuExpertEvent'+numberOfRow).val(uzsuExpertEvent).attr('selected',true).siblings('option').removeAttr('selected');
     // und der refresh, damit es angezeigt wird
-	$('#uzsuExpertEvent'+uzsuTableRow).selectmenu('refresh', true);
+	$('#uzsuExpertEvent'+numberOfRow).selectmenu('refresh', true);
 }
 
-function uzsuExpertCollapseTimestring(uzsuTableRow){
+function uzsuExpertCollapseTimestring(numberOfRow){
 	// zeitstring wieder zusammenbauen, falls Event <> 'time', damit wir den richtigen Zusammenbau im zeitstring haben
-	if($('#uzsuExpertEvent'+uzsuTableRow).val() != 'time'){
+	if($('#uzsuExpertEvent'+numberOfRow).val() != 'time'){
 		uzsuExpertTimestring = '';
-		if($('#uzsuExpertTimeMin'+uzsuTableRow).val().length >0){
-			uzsuExpertTimestring = uzsuExpertTimestring + $('#uzsuExpertTimeMin'+uzsuTableRow).val() + '<';
+		if($('#uzsuExpertTimeMin'+numberOfRow).val().length >0){
+			uzsuExpertTimestring = uzsuExpertTimestring + $('#uzsuExpertTimeMin'+numberOfRow).val() + '<';
 		}
-		uzsuExpertTimestring += $('#uzsuExpertEvent'+uzsuTableRow).val();
-		if($('#uzsuExpertTimeOffset'+uzsuTableRow).val()>0){
-			uzsuExpertTimestring = uzsuExpertTimestring + '+' + $('#uzsuExpertTimeOffset'+uzsuTableRow).val() + 'm';
+		uzsuExpertTimestring += $('#uzsuExpertEvent'+numberOfRow).val();
+		if($('#uzsuExpertTimeOffset'+numberOfRow).val()>0){
+			uzsuExpertTimestring = uzsuExpertTimestring + '+' + $('#uzsuExpertTimeOffset'+numberOfRow).val() + 'm';
 		}
-		else if($('#uzsuExpertTimeOffset'+uzsuTableRow).val()<0){
-			uzsuExpertTimestring = uzsuExpertTimestring + $('#uzsuExpertTimeOffset'+uzsuTableRow).val() + 'm';
+		else if($('#uzsuExpertTimeOffset'+numberOfRow).val()<0){
+			uzsuExpertTimestring = uzsuExpertTimestring + $('#uzsuExpertTimeOffset'+numberOfRow).val() + 'm';
 		}
-		if($('#uzsuExpertTimeMax'+uzsuTableRow).val().length >0){
-			uzsuExpertTimestring = uzsuExpertTimestring + '<' + $('#uzsuExpertTimeMax'+uzsuTableRow).val();
+		if($('#uzsuExpertTimeMax'+numberOfRow).val().length >0){
+			uzsuExpertTimestring = uzsuExpertTimestring + '<' + $('#uzsuExpertTimeMax'+numberOfRow).val();
 		}
 		// und in die Tabellezeile des content popup schreiben
-		$('#uzsuEntryTime' + uzsuTableRow).val(uzsuExpertTimestring);
+		$('#uzsuEntryTimeString' + numberOfRow).val(uzsuExpertTimestring);
 	}
 }
 
@@ -713,7 +709,7 @@ function runtimeUzsuPopup(response, headline, designType, valueType,
 		});
 		// call expert mode
 		$.mobile.activePage.find("#uzsuExpert"+ numberOfRow).bind("tap", function(e) {
-			uzsuAddExpertLine(e);
+			uzsuShowExpertLine(e);
 		});
 	}
 	// hier wir die aktuelle seite danach durchsucht, wo das popup ist
