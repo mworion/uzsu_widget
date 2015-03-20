@@ -1,0 +1,73 @@
+#UZSU Widget
+
+###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
+(C) Michael Würtenberger 2014,2015
+
+
+- changlog 
+- code cleanup und vorbereitung Release 2.0
+
+develop v1.85
+changelog:
+- Listendarstellung: Anzeige und Wertzuweisung können aufgesplittet werden. Dazu ist es notwendig im die beiden Einträge
+  in der Parameterübergabe im String mit ':' zu trennen. Beispiel: ['Hallo:1'] Zeigt in der Liste 'Hallo' an, weist aber 1 zu.
+  Es erfolgt keine überprüfung der Parameter auf Richtigkeit oder Vollständigkeit ! 
+   
+
+develop v1.8
+changelog:
+- Bugfix Sortierung: alle zustände sollten jetzt erhalten bleiben
+
+develop v1.71
+changelog:
+- Browserdarstellung input type time auf iPad
+  Für Design Type = '0' bleibt es beim verhalten (man kann die Stings ja ohnehin nicht lesen)
+  Für Design Type = '1','2' ist der Input typ ="text". Damit bleiben die Stings auch beim iPad erhalten.
+
+develop 1.7
+changelog:
+- code cleanup in visu.js und widget_uzsu.html 
+
+develop v1.6
+changelog:
+- code cleanup
+- naming parameter (sprechend)
+- angleichen widget_uzsu.html und visu.js
+-> bitte beide updaten.
+- bug fixes.
+- add browser identifiction variables
+
+develop v1.5
+changelog:
+- umsetzung valueType = 'list'
+- umsetzung valueType = 'text'
+- es wurden 2 Klassen explizit gesetzt, damit man über .css die Breite des Zeit und des Value Feldes verändern kann.
+- Die Erweiterungen gibt es in allen Designs '0','1','2'.
+- update widget_uzsu.html
+- einschränkung rückwärtskompatibilität wegen parameteränderung
+
+develop v1.4
+changelog:
+- breite time feld bei customFormat 0 einstellbar über css
+
+develop v1.3
+changelog:
+- fehlerbehebung
+
+develop v1.2
+changelog:
+- code cleanup und vertelen zum Test
+
+develop v1.1
+changelog:
+- RPC Calls mit Suche auf #uzsuPopupContent anstelle .messagePopup
+  referenziert. Damit Eindeutigkeit in der Referenzierung der Popups.
+- Überarbeitung Save / Quit.
+- data-overlay-theme='b' data-theme='a' in Zeile 31
+
+## wichtig !!!
+Das Format der Parameter hat sich für die Texte On / Off geändert. 
+Beide Parameter werden nicht mehr als einzelstring übergeben, sondern als Liste.
+Das ist notwendig, um für die Darstellung Liste auch längere Listen zu übergeben.
+Ebenfalls von 1.5 auf 1.6 das Naming der Parameter (Angleichen). Wenn beide Dateien 
+im Update laufen keine Änderung notwendig ! 

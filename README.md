@@ -5,82 +5,19 @@
 
 Aktuell 
 
-develop v2.0RC1
-- changlog 
-- code cleanup und vorbereitung Release 2.0
+v2.0
 
-develop v1.85
-changelog:
-- Listendarstellung: Anzeige und Wertzuweisung können aufgesplittet werden. Dazu ist es notwendig im die beiden Einträge
-  in der Parameterübergabe im String mit ':' zu trennen. Beispiel: ['Hallo:1'] Zeigt in der Liste 'Hallo' an, weist aber 1 zu.
-  Es erfolgt keine überprüfung der Parameter auf Richtigkeit oder Vollständigkeit ! 
-   
+Installation:
+1. Download von visu.js und widget_uzsu.html aus Github
+Link: https://github.com/mworion/uzsu_widget
+Bitte darauf achten, dass es ein master und ein develop branch gibt. (evt. auch mehrere feature branches)
+Es empfielt sich den master zu nehmen. Aktueller Stand v2.0 
 
-develop v1.8
-changelog:
-- Bugfix Sortierung: alle zustände sollten jetzt erhalten bleiben
+2. Beide Dateien in das Projektverzeichnis Eurer Visu hineinkopieren. 
+Das müßte unter /www/smartvisu/pages/"name des Projektes" liegen.
+Es gibt auch eine .css, die Ihr benötigt um z.B. beim Chrome Browser die Feldbreite zu vergößern. 
+Muß aber nicht zwingend genutzt werden.
 
-develop v1.71
-changelog:
-- Browserdarstellung input type time auf iPad
-  Für Design Type = '0' bleibt es beim verhalten (man kann die Stings ja ohnehin nicht lesen)
-  Für Design Type = '1','2' ist der Input typ ="text". Damit bleiben die Stings auch beim iPad erhalten.
-
-develop 1.7
-changelog:
-- code cleanup in visu.js und widget_uzsu.html 
-
-develop v1.6
-changelog:
-- code cleanup
-- naming parameter (sprechend)
-- angleichen widget_uzsu.html und visu.js
--> bitte beide updaten.
-- bug fixes.
-- add browser identifiction variables
-
-develop v1.5
-changelog:
-- umsetzung valueType = 'list'
-- umsetzung valueType = 'text'
-- es wurden 2 Klassen explizit gesetzt, damit man über .css die Breite des Zeit und des Value Feldes verändern kann.
-- Die Erweiterungen gibt es in allen Designs '0','1','2'.
-- update widget_uzsu.html
-- einschränkung rückwärtskompatibilität wegen parameteränderung
-
-develop v1.4
-changelog:
-- breite time feld bei customFormat 0 einstellbar über css
-
-develop v1.3
-changelog:
-- fehlerbehebung
-
-develop v1.2
-changelog:
-- code cleanup und vertelen zum Test
-
-develop v1.1
-changelog:
-- RPC Calls mit Suche auf #uzsuPopupContent anstelle .messagePopup
-  referenziert. Damit Eindeutigkeit in der Referenzierung der Popups.
-- Überarbeitung Save / Quit.
-- data-overlay-theme='b' data-theme='a' in Zeile 31
-
-## wichtig !!!
-Das Format der Parameter hat sich für die Texte On / Off geändert. 
-Beide Parameter werden nicht mehr als einzelstring übergeben, sondern als Liste.
-Das ist notwendig, um für die Darstellung Liste auch längere Listen zu übergeben.
-Ebenfalls von 1.5 auf 1.6 das Naming der Parameter (Angleichen). Wenn beide Dateien 
-im Update laufen keine Änderung notwendig ! 
-
-Hallo,
-
-ich hatte schon mehrere Anfragen zu Problemen mit der Installation, daher hier im Forum eine Schritt für Schritt Anleitung zur Installation des UZSU Widgets:
-Absprungbasis ist das installierte (und in Eurer smarthome.py funktionierende) UZSU Plugin. Also items konfiguriert usw. und auch mal im interaktiven Modus mal probiert, ob sich die Schaltuhr programmieren läßt (smarthome.py -i).
-
-1. Download von visu.js und uzsu.html aus Github: https://github.com/mworion/uzsu_widget
-2. Beide Dateien in das Projektverzeichnis Eurer Visu hineinkopieren. Das müßte unter /www/smartvisu/pages/"name des Projektes" liegen.
 3. Einbinden des Widgets in Eure Seite mit
 <pre>
 	{% import "widget_uzsu.html" as uzsu %}
@@ -90,15 +27,54 @@ das packt ihr am besten unter die Zeilen
 	{% extends "rooms.html" %}
 	{% block content %}
 </pre>
+
 4. Anlegen eines UZSU Symbols, ich habe da mein Standardtestbeispiel genommen.
 <pre>
 	{{ uzsu.uzsu_icon('eg.ez.decke.01', 'eg.ez.decke.uzsu', 'Esszimmerlampe') }}
 </pre>
+
 5. Die Parametrierung des Widgets findet Ihr ebenfalls in der widget_uzsu.html Datei. Einfach mal reinschauen.
-6. Anschliessen Reload der Seite im Browser, dann sollte das Popup kommen.
+
+6. Anschliessend reload der Seite im Browser, dann sollte das Popup kommen.
+
+7. Stimmt etwas nicht, bitte erst einmal die Fehlerkonsole in Eurem Browser aktivieren und nach den Meldungen
+schauen. Zu 95% findet Ihr dort die Lösung.  
+
+Wichtig: das widget mach funktional in Bezug auf das schalten gar nichts! Die eigentliche Funktion ist im UZSU Plugin 
+umgesetzt.
+
+Was kann das widget:
+3 unterschiedliche design typen:
+'0' = standard mode
+Anzeige der UZSU mit Zeit und Wochentagsauswahl
+'1' = expert mode
+Hier können die strings für time und rrule für das plugin direkt eingegeben werden.
+'2' = mixed mode
+Wie der Name sagt eine Mischung aus '0' und '1'.
+
+Es können untesrchiedliche Werte gesetzt werden und auch die Darstellung per Parameter konfiguriert werden:
+<pre>
+/**
+* Widget for usage of uzsu plugin
+* (c) Michael Würtenberger 2014, 2015
+*
+* v2.0
+*
+* läuft zusammen mit dem visu.js ab v1.6
+*
+* @param unique id for this widget
+* @param a gad/item
+* @param headline for popup (optional), default UZSZ
+* @param designType for popup design (optional), default = '0', 
+*												 expert mode = '1'  (value, time, rrule direct input)
+*												 mixed mode = '2' features of '0' design of 1
+* @param pic on (optional), default = clock
+* @param pic off (optional), default = clock
+* @param valueType (optional), default = bool, supported types are 'bool', 'num', 'text', 'list'
+* @param textSelectList (optional), default = ['On','Off'] for type = 'bool', any textlist for type = 'list'
+*/
+</pre>
+
+Viel Spaß
 
 Michel
-
-PS: Wenn Ihr die Visu per Automatik erstellen lasst, dann löscht die vorher die Inhalte. Geht aus meiner Sicht nur, wenn Ihr eure Visu von Hand zusammenbaut.
-
-PPS: Wenn ihr schon eine visu.js verwendet für andere Dinge, dann müßt ihr die sinnvoll zusammenfügen (aneinanderhängen).
