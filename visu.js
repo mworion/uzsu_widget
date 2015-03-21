@@ -792,7 +792,7 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]',function(event) {
 		for (var numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
 			// test, ob die RRULE fehlerhaft ist
 			if ((response.list[numberOfRow].rrule.indexOf('FREQ=WEEKLY;BYDAY=') !== 0) && (response.list[numberOfRow].rrule.length > 0)) {
-				if (!Confirm('Fehler: Parameter designType ist "0", aber gespeicherte RRULE String in UZSU "' + response.list[numberOfRow].rrule + '" entspricht nicht default Format FREQ=WEEKLY;BYDAY=MO... bei Item ' + item	+ '. Soll dieser Eintrag überschrieben werden ?')) {
+				if (!confirm('Fehler: Parameter designType ist "0", aber gespeicherte RRULE String in UZSU "' + response.list[numberOfRow].rrule + '" entspricht nicht default Format FREQ=WEEKLY;BYDAY=MO... bei Item ' + item	+ '. Soll dieser Eintrag überschrieben werden ?')) {
 					// direkter abbruch bei der entscheidung !
 					numberOfRow = numberOfEntries;
 					popupOk = false;
