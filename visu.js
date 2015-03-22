@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release dev v2.4
+// Release feature v2.5
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -52,11 +52,6 @@ function uzsuBuildTableHeader(headline, designType, valueType, textSelectList) {
 			// format 1 ist der expertenmodus, hier kann man in einem textstring de facto alles auswerten
 		case '1': {
 			template += "<tr><td>Value</td><td>Time (flex)<br>RRULE</td><td>Active</td><td>Remove</td></tr>";
-			break;
-		}
-			// format 2 ist ein hybrid aus 1 und 2
-		case '2': {
-			template += "<tr><td>Value</td><td>Time / Weekdays</td><td>Active</td><td>Remove</td></tr>";
 			break;
 		}
 	}
@@ -184,49 +179,6 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 			template += "</tr>";
 			break;
 		}
-		case '2': {
-			template += "<tr id='uzsuNumberOfRow" + numberOfRow + "'>";
-			// jetzt beginnen die spalten in der reihenfolge value, time / rrule, active, delete button mit flipswitch (bessere erkennbarkeit, die Texte können über das
-			// widget gesetzt werden unterscheidung nur ob bool oder num, wobei num int ist !
-			if (valueType == 'bool') {
-				template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + textSelectList[1] + "</option> <option value='1'> " + textSelectList[0] + " </option></select></td>";
-			} 
-			else if (valueType == 'num') {
-				template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'</td>";
-			} 
-			else if (valueType == 'text') {
-				template += "<td><input type='text' data-clear-btn='false' style = 'width:60px' class='uzsuTextInput' id='uzsuEntryValue" + numberOfRow + "'</td>";
-			} 
-			else if (valueType == 'list') {
-				template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
-				template += "<select name='uzsuEntryValue'" + numberOfRow + "' id='uzsuEntryValue" + numberOfRow + "' data-mini='true'>";
-				for (numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry++) {
-					// unterscheidung anzeige und werte
-					if (textSelectList[0].split(':')[1] === undefined) {
-						template += "<option value='" + textSelectList[numberOfListEntry].split(':')[0]	+ "'>" + textSelectList[numberOfListEntry].split(':')[0] + "</option>";
-					} 
-					else {
-						template += "<option value='" + textSelectList[numberOfListEntry].split(':')[1]	+ "'>"	+ textSelectList[numberOfListEntry].split(':')[0] + "</option>";
-					}
-				}
-				template += "</select></div></form></td>";
-			}
-			// time
-			template += "<td><input type='text' data-clear-btn='false' id='uzsuEntryTimeString" + numberOfRow + "'>";
-			// rrule
-			template += "<form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
-			for (numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
-				template += "<input type='checkbox' id='checkbox" + numberOfDay	+ "-" + numberOfRow + "'> <label for='checkbox"	+ numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "</label>";
-			}
-			template += "</fieldset></form></td>";
-			// active
-			template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'> "+ "<input type='checkbox' id='uzsuEntryActive"+ numberOfRow	+ "'> <label for='uzsuEntryActive"+ numberOfRow	+ "'>Act</label>" + "</fieldset></form></td>";
-			// del button
-			template += "<td> <button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button></td>";
-			// tabelle reihen abschliessen
-			template += "</tr>";
-			break;
-		}
 	}
 	return template;
 }
@@ -280,8 +232,7 @@ function uzsuFillTable(response, designType, valueType, textSelectList) {
 	$('#uzsuGeneralActive').prop('checked', response.active).checkboxradio("refresh");
 	// auswahl format
 	switch (designType) {
-		case '0':
-		case '2': {
+		case '0':{
 			// dann die werte der tabelle
 			for (numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
 				// beim schreiben der Daten unterscheidung, da sonst das element falsch genutzt wird
@@ -315,12 +266,10 @@ function uzsuFillTable(response, designType, valueType, textSelectList) {
 				}
 				$('#uzsuEntryActive' + numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");
 				$('#uzsuEntryTimeString' + numberOfRow).val(response.list[numberOfRow].time);
-				if(designType =='0'){
-					// den Time string erweitern und auch auf die elemente verteilen
-					uzsuExpertExpandTimestring(numberOfRow);
-					// status der eingaben setzen
-					uzsuSetTextInputState(numberOfRow);
-				}
+				// den Time string erweitern und auch auf die elemente verteilen
+				uzsuExpertExpandTimestring(numberOfRow);
+				// status der eingaben setzen
+				uzsuSetTextInputState(numberOfRow);
 				// in der tabelle die werte der rrule, dabei gehe ich von dem standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU
 				// aus und setze für jeden eintrag den button.
 				var rrule = response.list[numberOfRow].rrule;
@@ -385,8 +334,7 @@ function uzsuSaveTable(item, response, designType, valueType, textSelectList,
 	response.active = $('#uzsuGeneralActive').is(':checked');
 	// dispatcher für format
 	switch (designType) {
-	case '0':
-	case '2': {
+	case '0':{
 		// einzeleinträge
 		for (numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
 			// beim zurücklesen keine beachtung des typs, da smarthome bei bool auch 0 bzw. 1 akzeptiert
@@ -398,9 +346,7 @@ function uzsuSaveTable(item, response, designType, valueType, textSelectList,
 			}
 			response.list[numberOfRow].active = $('#uzsuEntryActive' + numberOfRow).is(':checked');
 			// und jetzt wird er erweitert
-			if(designType =='0'){
-				uzsuExpertCollapseTimestring(numberOfRow);
-			}
+			uzsuExpertCollapseTimestring(numberOfRow);
 			response.list[numberOfRow].time = $('#uzsuEntryTimeString' + numberOfRow).val();
 			// in der tabelle die werte der rrule, dabei gehe ich von dem standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU
 			// aus und setze für jeden eintrag den button. Setzen der werte.
@@ -775,7 +721,7 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]',function(event) {
 	// zunächst erst einmal popup wird angezeigt
 	var popupOk = true;
 	// fehlerhafter designType (unbekannt)
-	if ((designType !== '0') && (designType !== '1') && (designType !== '2')) {
+	if ((designType !== '0') && (designType !== '1')) {
 		alert('Fehlerhafter Parameter: "' + designType + '" im Feld designType bei Item ' + item);
 		popupOk = false;
 	}
@@ -787,7 +733,7 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]',function(event) {
 	// bei designType '0' und '2' wird rrule nach wochentagen
 	// umgewandelt und ein festes format vogegegebn
 	// hier sollte nichts versehentlich überschrieben werden
-	if ((designType == '0') || (designType == '2')) {
+	if (designType == '0') {
 		var numberOfEntries = response.list.length;
 		for (var numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
 			// test, ob die RRULE fehlerhaft ist
