@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release feature v2.5
+// Release feature v2.6
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -16,18 +16,124 @@
 //
 // und für die Anwendung in der smartvisu neu geschrieben.
 //
-// als erstes wird die callbacks der seite für das Schaltuhr Icon (uzsu.icon) geändert 
-// 		- für den status, damit man bei aktiver Schaltuhr das sofort sehen kann
-// 		- für die Auswahl des Icons, damit ein Popup ausgemacht wird, um die Einträge zu editieren
-//
-// durch den dispatcher für die customFormat kann man sich auch selbst eine anpassung oder
-// überarbeitung schreiben ohne auf die basis zu verzichten. einfach ein typ kopieren und anpassen
 // 
-// ----- set browser and platform identification variables -----------------------------------------------------
+// set browser and platform identification variables
 var browserIdentificationVariable = document.documentElement;
 	browserIdentificationVariable.setAttribute('data-useragent',navigator.userAgent);
 	browserIdentificationVariable.setAttribute('data-platform', navigator.platform);
 	browserIdentificationVariable.className += ((!!('ontouchstart' in window) || !!('onmsgesturechange' in window)) ? ' touch' : '');
+
+function uzsuCollapseTimestring(response){
+	for (numberOfEntry = 0; numberOfEntry < response.list.length; numberOfEntry++) {
+		// zeitstring wieder zusammenbauen, falls Event <> 'time', damit wir den richtigen Zusammenbau im zeitstring haben
+		timeString = '';
+		if(response.list[numberOfEntry].event === 'time'){
+			response.list[numberOfEntry].time = response.list[numberOfEntry].timeCron;
+		}
+		else{
+			if(response.list[numberOfEntry].timeMin.length > 0){
+				timeString = timeString + response.list[numberOfEntry].timeMin + '<';
+			}
+			timeString += response.list[numberOfEntry].event;
+			if(response.list[numberOfEntry].timeOffset > 0){
+				timeString = timeString + '+' + response.list[numberOfEntry].timeOffset + 'm';
+			}
+			else if(response.list[numberOfEntry].timeOffset < 0){
+				timeString = timeString + response.list[numberOfEntry].timeOffset + 'm';
+			}
+			if(response.list[numberOfEntry].timeMax.length > 0){
+				timeString = timeString + '<' + response.list[numberOfEntry].timeMax;
+			}
+			// jetzt nocht die zu vielen einträge aus dem dicts löschen
+			delete response.list[numberOfEntry].timeMin;
+			delete response.list[numberOfEntry].timeMax;
+			delete response.list[numberOfEntry].timeOffset;
+			delete response.list[numberOfEntry].timeCron;
+			delete response.list[numberOfEntry].event;
+			response.list[numberOfEntry].time = timeString;
+		}
+	}
+}
+
+function uzsuExpandTimestring(response){
+	for (numberOfEntry = 0; numberOfEntry < response.list.length; numberOfEntry++) {
+		timeCron = '';
+	    tabsTime = response.list[numberOfEntry].time.split('<');
+	    if(tabsTime.length == 1){
+	    	timeMin = '';
+	        timeMax = '';
+	        if (tabsTime[0].trim().indexOf('sunrise')===0){
+	        	event = 'sunrise';
+	        }
+	        else if (tabsTime[0].trim().indexOf('sunset')===0){
+	        	event = 'sunset';
+	        }
+	        else{
+	        	event = 'time';
+	            timeCron = tabsTime[0].trim();
+	        }
+	    }
+	    else if(tabsTime.length == 2){
+	        if(tabsTime[0].indexOf('sunrise')===0){
+	        	timeMin = '';
+	        	event = 'sunrise';
+	        	timeMax = tabsTime[1].trim();
+	        }
+	        else if(tabsTime[0].indexOf('sunset')===0){
+	        	timeMin = '';
+	        	event = 'sunset';
+	        	timeMax = tabsTime[1].trim();
+	        }
+	        else{
+	        	timeMin = tabsTime[0].trim();
+	        	timeMax = '';
+	            if(event.indexOf('sunrise')===0){
+	            	event = 'sunrise';
+	            }
+	            else{
+	            	event = 'sunset';
+	            }
+	        }
+	    }
+	    else if(tabsTime.length == 3){
+	    	timeMin = tabsTime[0].trim();
+	    	event = tabsTime[1].trim();
+	    	timeMax = tabsTime[2].trim();
+	        if(event.indexOf('sunrise')===0){
+	        	event = 'sunrise';
+	        }
+	        else{
+	        	event = 'sunset';
+	        }
+	    }
+	    else{
+	    	// formatfehler ! ich nehme dann defaulteinstellung an
+	    	timeMin = '';
+	    	event = 'time';
+	    	timeMax = '';
+	    }
+		timeOffset = '';
+	    // nun noch der offset herausnehmen
+	    tabsOffset = response.list[numberOfEntry].time.split('+');
+	    if(tabsOffset.length == 2){
+	    	// dann steht ein plus drin
+	    	tabsOffset = tabsOffset[1].split('m');
+	    	timeOffset = '+' + tabsOffset[0].trim();
+	    }
+	    tabsOffset = response.list[numberOfEntry].time.split('-');
+	    if(tabsOffset.length == 2){
+	    	// dann steht ein minus drin
+	    	tabsOffset = tabsOffset[1].split('m');
+	    	timeOffset = '-' + tabsOffset[0].trim();
+	    }
+	    // zuweisung der neuen werte im dict
+		response.list[numberOfEntry].timeMin = timeMin;
+		response.list[numberOfEntry].timeMax = timeMax;
+		response.list[numberOfEntry].timeCron = timeCron;
+		response.list[numberOfEntry].timeOffset = timeOffset;
+		response.list[numberOfEntry].event = event;
+	}
+}
 
 function uzsuBuildTableHeader(headline, designType, valueType, textSelectList) {
 	// Kopf und überschrift des Popups
@@ -70,19 +176,19 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 			// jetzt beginnen die spalten in der reihenfolge value, time / rrule, active, delete button mit flipswitch (bessere erkennbarkeit, die Texte können über das
 			// widget gesetzt werden unterscheidung nur ob bool oder num, wobei num int ist !
 			if (valueType == 'bool') {
-				template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + textSelectList[1] + "</option> <option value='1'> "	+ textSelectList[0] + " </option></select></td>";
+				template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + textSelectList[1] + "</option> <option value='1'> "	+ textSelectList[0] + " </option></select></td>";
 			} 
 			else if (valueType == 'num') {
-				template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'</td>";
+				template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuValue" + numberOfRow + "'</td>";
 			} 
 			else if (valueType == 'text') {
-				template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'</td>";
+				template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuValue" + numberOfRow + "'</td>";
 			} 
 			else if (valueType == 'list') {
 				// das listenformat mit select ist sehr trickreich. ich weiss nicht, wie ich automatisch die richtige höhe bekomme
 				// ich musste die explizi auf die 34 px setzen. ohne das ist die zeilehähe deutlich zu hoch
 				template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
-				template += "<select name='uzsuEntryValue'" + numberOfRow + "' id='uzsuEntryValue" + numberOfRow + "' data-mini='true'>";
+				template += "<select name='uzsuValue'" + numberOfRow + "' id='uzsuValue" + numberOfRow + "' data-mini='true'>";
 				for (numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry++) {
 					// unterscheidung anzeige und werte
 					if (textSelectList[0].split(':')[1] === undefined) {
@@ -99,9 +205,9 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 			// reduzieren. ich haben keine möglichkeit gefunden dieses verhalten zu umgehen / disablen. wers braucht, kann mit der
 			// erhöhung der breite im style dieses so anpassen dass eine gut sichtbare lösung entsteht (zu lasten der gesamtbreite=
 			// werte um width = 80px schenen ganz gut zu sein.
-			template += "<td><input type='time' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuEntryTime" + numberOfRow + "'>";
+			template += "<td><input type='time' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>";
 			// hier wird der timestring abgespeichert
-			template += "<div class='uzsuTimeInput' id='uzsuEntryTimeString" + numberOfRow + "'></div>";
+			template += "<div class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'></div>";
 			template += "</td>";
 			// rrule
 			// wichtig: es findet keine prüfung statt ! wenn zu beginn das überschreiben akzeptiert wird, dann kommt das standard
@@ -112,7 +218,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 			}
 			template += "</fieldset></form></td>";
 			// active schalter, die einzelne zeilen der schaltuhr aktivieren.
-			template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'> " + "<input type='checkbox' id='uzsuEntryActive"	+ numberOfRow + "'> <label for='uzsuEntryActive" + numberOfRow + "'>Act</label>" + "</fieldset></form></td>";
+			template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'> " + "<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'> <label for='uzsuActive" + numberOfRow + "'>Act</label>" + "</fieldset></form></td>";
 			// expert button
 			template += "<td> <button id='uzsuExpert" + numberOfRow + "' data-mini='true' data-icon='arrow-d' data-iconpos='notext'></button></td>";
 			// del button löschen eines zeileneintrags
@@ -124,17 +230,17 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 			// Tabellenüberschriften
 			template += "<tr><td>earliest</td><td></td><td>Event</td><td>+/- min</td><td></td><td></td><td>latest</td></tr>";
 			// tabellenfelder
-			template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput'id='uzsuExpertTimeMin" + numberOfRow + "'</td>";
+			template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput'id='uzsuTimeMin" + numberOfRow + "'</td>";
 			template += "<td> <h1 style='margin:0'> < </h1> </td>";
-			template += "<td><form><div data-role='fieldcontain' class='uzsuExpertEvent' style = 'height:auto !important'>";
-			template += "<select name='uzsuExpertEvent" + numberOfRow + "' id='uzsuExpertEvent" + numberOfRow + "' data-mini='true'>";
+			template += "<td><form><div data-role='fieldcontain' class='uzsuEvent' style = 'height:auto !important'>";
+			template += "<select name='uzsuEvent" + numberOfRow + "' id='uzsuEvent" + numberOfRow + "' data-mini='true'>";
 			template += "<option value='time'>Time</option>";
 			template += "<option value='sunrise'>Sunrise</option>";
 			template += "<option value='sunset'>Sunset</option>";
 			template += "</div></form></td>";
-			template += "<td><input type='number' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuExpertTimeOffset" + numberOfRow + "'</td>";
+			template += "<td><input type='number' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuTimeOffset" + numberOfRow + "'</td>";
 			template += "<td> Minutes</td><td> <h1 style='margin:0'> < </h1> </td>";
-			template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuExpertTimeMax" + numberOfRow + "'</td>";
+			template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuTimeMax" + numberOfRow + "'</td>";
 			template += "</tr>";
 			// abschluss des Tabelleeintrags der expertenzeile
 			template += "</table></td></tr>";
@@ -144,17 +250,17 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 			template += "<tr id='uzsuNumberOfRow" + numberOfRow + "'>";
 			// jetzt beginnen die spalten in der reihenfolge value, time /rrule, active, delete button
 			if (valueType == 'bool') {
-				template += "<td><select name='UZSU' id='uzsuEntryValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + textSelectList[1] + "</option> <option value='1'> "	+ textSelectList[0] + " </option></select></td>";
+				template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + textSelectList[1] + "</option> <option value='1'> "	+ textSelectList[0] + " </option></select></td>";
 			} 
 			else if (valueType == 'num') {
-				template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuEntryValue" + numberOfRow + "'</td>";
+				template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuValue" + numberOfRow + "'</td>";
 			} 
 			else if (valueType == 'text') {
-				template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuEntryValue" + numberOfRow + "'</td>";
+				template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuValue" + numberOfRow + "'</td>";
 			} 
 			else if (valueType == 'list') {
 				template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
-				template += "<select name='uzsuEntryValue'" + numberOfRow + "' id='uzsuEntryValue" + numberOfRow + "' data-mini='true'>";
+				template += "<select name='uzsuValue'" + numberOfRow + "' id='uzsuValue" + numberOfRow + "' data-mini='true'>";
 				for (numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry++) {
 					// unterscheidung anzeige und werte
 					if (textSelectList[0].split(':')[1] === undefined) {
@@ -167,12 +273,12 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 				template += "</select></div></form></td>";
 			}
 			// time
-			template += "<td><input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuEntryTimeString" + numberOfRow + "'>";
+			template += "<td><input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuTime" + numberOfRow + "'>";
 			// rrule
 			// hier wird nur der textstring übernommen. prüfungen erfolgen keine !
-			template += "<input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuEntryRrule"	+ numberOfRow + "'></td>";
+			template += "<input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuRrule"	+ numberOfRow + "'></td>";
 			// active
-			template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'> " + "<input type='checkbox' id='uzsuEntryActive"	+ numberOfRow + "'> <label for='uzsuEntryActive" + numberOfRow + "'>Act</label>" + "</fieldset></form></td>";
+			template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'> " + "<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'> <label for='uzsuActive" + numberOfRow + "'>Act</label>" + "</fieldset></form></td>";
 			// del button
 			template += "<td> <button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button></td>";
 			// tabelle reihen abschliessen
@@ -198,7 +304,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times</div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.4 dev </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v2.6 feature </h6></td></div></tr></table>";
 	// abschlus des gesamten span container
 	template += "</span>";
 	// und der abschluss des popup divs
@@ -222,6 +328,23 @@ function uzsuBuildTable(response, headline, designType, valueType,
 	return template;
 }
 
+function uzsuSetTextInputState(numberOfRow){
+	// status der eingaben setzen
+	// brauchen wir an mehrerer stellen
+	if ($("#uzsuEvent"+numberOfRow).val() === 'time'){
+		$('#uzsuTimeCron' + numberOfRow).textinput('enable');
+		$('#uzsuTimeMin'+numberOfRow).textinput('disable');
+		$('#uzsuTimeOffset'+numberOfRow).textinput('disable');
+		$('#uzsuTimeMax'+numberOfRow).textinput('disable');
+	}
+	else{
+		$('#uzsuTimeCron' + numberOfRow).textinput('disable');
+		$('#uzsuTimeMin'+numberOfRow).textinput('enable');
+		$('#uzsuTimeOffset'+numberOfRow).textinput('enable');
+		$('#uzsuTimeMax'+numberOfRow).textinput('enable');
+	}
+}
+
 function uzsuFillTable(response, designType, valueType, textSelectList) {
 	// tabelle füllen es werden die daten aus der variablen response gelesen und in den status
 	// darstellung der widgetblöcke zugewiesen. der aktuelle status in dann in der darstellung enthalten !
@@ -230,95 +353,70 @@ function uzsuFillTable(response, designType, valueType, textSelectList) {
 	// jetzt wird die tabelle befüllt allgemeiner Status, bitte nicht mit attr, sondern mit prop, siehe
 	// https://github.com/jquery/jquery-mobile/issues/5587
 	$('#uzsuGeneralActive').prop('checked', response.active).checkboxradio("refresh");
-	// auswahl format
-	switch (designType) {
-		case '0':{
-			// dann die werte der tabelle
-			for (numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
-				// beim schreiben der Daten unterscheidung, da sonst das element falsch genutzt wird
-				// mit flipswitch für die bool variante
-				if (valueType == 'bool') {
-					$('#uzsuEntryValue' + numberOfRow).val(response.list[numberOfRow].value).slider("refresh");
-				}
-				// mit int value für die num variante
-				else if ((valueType == 'num') || (valueType == 'text')) {
-					$('#uzsuEntryValue' + numberOfRow).val(response.list[numberOfRow].value);
-				} 
-				else if (valueType == 'list') {
-					// hier ist es etwas schwieriger, denn ich muß den wert mit der liste vergleichen und dann setzen
-					for (numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry++) {
-						// wenn ich den eintrag gefunden haben, dann setze ich den eintrag auf die richtige stelle
-						// ansonsten wird einfach der erste eintrag genommen zusätzlich noch die unterscheidung, ob ich in der listen
-						// anzeige und wertezuweisung trenne
-						if (textSelectList[0].split(':')[1] === undefined) {
-							if (response.list[numberOfRow].value == textSelectList[numberOfListEntry].split(':')[0]) {
-								$("#uzsuEntryValue" + numberOfRow).val(textSelectList[numberOfListEntry].split(':')[0]).attr('selected',true).siblings('option').removeAttr('selected');
-								$("#uzsuEntryValue" + numberOfRow).selectmenu('refresh', true);
-							}
-						} 
-						else {
-							if (response.list[numberOfRow].value == textSelectList[numberOfListEntry].split(':')[1]) {
-								$("#uzsuEntryValue" + numberOfRow).val(textSelectList[numberOfListEntry].split(':')[1]).attr('selected',true).siblings('option').removeAttr('selected');
-								$("#uzsuEntryValue" + numberOfRow).selectmenu('refresh', true);
-							}
-						}
-					}
-				}
-				$('#uzsuEntryActive' + numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");
-				$('#uzsuEntryTimeString' + numberOfRow).val(response.list[numberOfRow].time);
-				// den Time string erweitern und auch auf die elemente verteilen
-				uzsuExpertExpandTimestring(numberOfRow);
-				// status der eingaben setzen
-				uzsuSetTextInputState(numberOfRow);
-				// in der tabelle die werte der rrule, dabei gehe ich von dem standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU
-				// aus und setze für jeden eintrag den button.
-				var rrule = response.list[numberOfRow].rrule;
-				if (typeof rrule == "undefined") {
-					rrule = '';
-				}
-				var ind = rrule.indexOf('BYDAY');
-				// wenn der standard drin ist
-				if (ind > 0) {
-					var days = rrule.substring(ind);
-					// Setzen der werte
-					for (numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
-						$('#checkbox' + numberOfDay + '-' + numberOfRow).prop('checked', days.indexOf(weekDays[numberOfDay]) > 0).checkboxradio("refresh");
-					}
-				}
-			}
-			break;
+	// dann die werte der tabelle
+	for (numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
+		// beim schreiben der Daten unterscheidung, da sonst das element falsch genutzt wird
+		// mit flipswitch für die bool variante
+		if (valueType == 'bool') {
+			$('#uzsuValue' + numberOfRow).val(response.list[numberOfRow].value).slider("refresh");
 		}
-		case '1': {
-			// dann die werte der tabelle
-			for (numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
-				// bei der listendarstellung anders
-				if (valueType == 'list') {
-					// hier ist es etwas schwieriger, denn ich muß den wert mit der liste vergleichen und dann setzen
-					for (numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry++) {
-						// wenn ich den eintrag gefunden haben, dann setze ich den eintrag auf die richtige stelle
-						// zusätzlich noch die unterscheidung, ob ich in der listen anzeige und wertezuweisung trenne
-						if (textSelectList[0].split(':')[1] === undefined) {
-							if (response.list[numberOfRow].value == textSelectList[numberOfListEntry].split(':')[0]) {
-								$("#uzsuEntryValue" + numberOfRow).val(textSelectList[numberOfListEntry].split(':')[0]).attr('selected',true).siblings('option').removeAttr('selected');
-								$("#uzsuEntryValue" + numberOfRow).selectmenu('refresh', true);
-							}
-						} 
-						else {
-							if (response.list[numberOfRow].value == textSelectList[numberOfListEntry].split(':')[1]) {
-								$("#uzsuEntryValue" + numberOfRow).val(textSelectList[numberOfListEntry].split(':')[1]).attr('selected',true).siblings('option').removeAttr('selected');
-								$("#uzsuEntryValue" + numberOfRow).selectmenu('refresh', true);
-							}
-						}
+		// mit int value für die num variante
+		else if ((valueType == 'num') || (valueType == 'text')) {
+			$('#uzsuValue' + numberOfRow).val(response.list[numberOfRow].value);
+		} 
+		else if (valueType == 'list') {
+			// hier ist es etwas schwieriger, denn ich muß den wert mit der liste vergleichen und dann setzen
+			for (numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry++) {
+				// wenn ich den eintrag gefunden haben, dann setze ich den eintrag auf die richtige stelle
+				// ansonsten wird einfach der erste eintrag genommen zusätzlich noch die unterscheidung, ob ich in der listen
+				// anzeige und wertezuweisung trenne
+				if (textSelectList[0].split(':')[1] === undefined) {
+					if (response.list[numberOfRow].value == textSelectList[numberOfListEntry].split(':')[0]) {
+						$("#uzsuValue" + numberOfRow).val(textSelectList[numberOfListEntry].split(':')[0]).attr('selected',true).siblings('option').removeAttr('selected');
+						$("#uzsuValue" + numberOfRow).selectmenu('refresh', true);
 					}
 				} 
 				else {
-					$('#uzsuEntryValue' + numberOfRow).val(response.list[numberOfRow].value);
+					if (response.list[numberOfRow].value == textSelectList[numberOfListEntry].split(':')[1]) {
+						$("#uzsuValue" + numberOfRow).val(textSelectList[numberOfListEntry].split(':')[1]).attr('selected',true).siblings('option').removeAttr('selected');
+						$("#uzsuValue" + numberOfRow).selectmenu('refresh', true);
+					}
 				}
-				$('#uzsuEntryActive' + numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");
-				$('#uzsuEntryTimeString' + numberOfRow).val(response.list[numberOfRow].time);
-				$('#uzsuEntryRrule' + numberOfRow).val(response.list[numberOfRow].rrule);
 			}
-			break;
+		}
+		// Values in der Zeile setzen
+		$('#uzsuActive' + numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");
+		$('#uzsuTime' + numberOfRow).val(response.list[numberOfRow].time);
+	    $('#uzsuTimeMin'+numberOfRow).val(response.list[numberOfRow].timeMin);
+	    $('#uzsuTimeOffset'+numberOfRow).val(parseInt(response.list[numberOfRow].timeOffset));
+	    $('#uzsuTimeMax'+numberOfRow).val(response.list[numberOfRow].timeMax);
+	    $('#uzsuTimeCron'+numberOfRow).val(response.list[numberOfRow].timeCron);
+	    // und die pull down menüs richtig, damit die einträge wieder stimmen
+	    $('#uzsuEvent'+numberOfRow).val(response.list[numberOfRow].event).attr('selected',true).siblings('option').removeAttr('selected');
+	    // und der refresh, damit es angezeigt wird
+		$('#uzsuEvent'+numberOfRow).selectmenu('refresh', true);
+		// fallunterscheidung für den expertenmodus
+		uzsuSetTextInputState(numberOfRow);
+		if(designType === '0'){
+			// in der tabelle die werte der rrule, dabei gehe ich von dem standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU
+			// aus und setze für jeden eintrag den button.
+			var rrule = response.list[numberOfRow].rrule;
+			if (typeof rrule == "undefined") {
+				rrule = '';
+			}
+			var ind = rrule.indexOf('BYDAY');
+			// wenn der standard drin ist
+			if (ind > 0) {
+				var days = rrule.substring(ind);
+				// Setzen der werte
+				for (numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
+					$('#checkbox' + numberOfDay + '-' + numberOfRow).prop('checked', days.indexOf(weekDays[numberOfDay]) > 0).checkboxradio("refresh");
+				}
+			}
+		}
+		else{
+			// wenn experte, dann einfach nur den string
+			$('#uzsuRrule' + numberOfRow).val(response.list[numberOfRow].rrule);
 		}
 	}
 }
@@ -332,22 +430,24 @@ function uzsuSaveTable(item, response, designType, valueType, textSelectList,
 	// bitte darauf achten, dass das zurückspielen exakt dem der anzeige enspricht.
 	// gesamthafte aktivierung
 	response.active = $('#uzsuGeneralActive').is(':checked');
-	// dispatcher für format
-	switch (designType) {
-	case '0':{
-		// einzeleinträge
-		for (numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
-			// beim zurücklesen keine beachtung des typs, da smarthome bei bool auch 0 bzw. 1 akzeptiert
-			if ((valueType == 'text') || (valueType == 'list')) {
-				response.list[numberOfRow].value = $('#uzsuEntryValue' + numberOfRow).val();
-			} 
-			else {
-				response.list[numberOfRow].value = parseInt($('#uzsuEntryValue' + numberOfRow).val());
-			}
-			response.list[numberOfRow].active = $('#uzsuEntryActive' + numberOfRow).is(':checked');
-			// und jetzt wird er erweitert
-			uzsuExpertCollapseTimestring(numberOfRow);
-			response.list[numberOfRow].time = $('#uzsuEntryTimeString' + numberOfRow).val();
+	// einzeleinträge
+	for (numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
+		// beim zurücklesen keine beachtung des typs, da smarthome bei bool auch 0 bzw. 1 akzeptiert
+		if ((valueType == 'text') || (valueType == 'list')) {
+			response.list[numberOfRow].value = $('#uzsuValue' + numberOfRow).val();
+		} 
+		else {
+			response.list[numberOfRow].value = parseInt($('#uzsuValue' + numberOfRow).val());
+		}
+		// Values aus der Zeile auslesen
+		response.list[numberOfRow].active = $('#uzsuActive' + numberOfRow).is(':checked');
+		response.list[numberOfRow].time = $('#uzsuTimeCron' + numberOfRow).val();
+		response.list[numberOfRow].timeMin = $('#uzsuTimeMin'+numberOfRow).val();
+		response.list[numberOfRow].timeOffset = $('#uzsuTimeOffset'+numberOfRow).val();
+		response.list[numberOfRow].timeMax = $('#uzsuTimeMax'+numberOfRow).val();
+		response.list[numberOfRow].timeCron = $('#uzsuTimeCron'+numberOfRow).val();
+		response.list[numberOfRow].event = $('#uzsuEvent'+numberOfRow).val();
+	    if(designType === '0'){
 			// in der tabelle die werte der rrule, dabei gehe ich von dem standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU
 			// aus und setze für jeden eintrag den button. Setzen der werte.
 			var first = true;
@@ -365,26 +465,14 @@ function uzsuSaveTable(item, response, designType, valueType, textSelectList,
 			}
 			response.list[numberOfRow].rrule = rrule;
 		}
-		break;
-	}
-	case '1': {
-		// einzeleinträge
-		for (numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
-			if ((valueType == 'text') || (valueType == 'list')) {
-				response.list[numberOfRow].value = $('#uzsuEntryValue' + numberOfRow).val();
-			} 
-			else {
-				response.list[numberOfRow].value = parseInt($('#uzsuEntryValue' + numberOfRow).val());
-			}
-			response.list[numberOfRow].active = $('#uzsuEntryActive' + numberOfRow).is(':checked');
-			response.list[numberOfRow].time = $('#uzsuEntryTimeString' + numberOfRow).val();
-			response.list[numberOfRow].rrule = $('#uzsuEntryRrule' + numberOfRow).val();
+		else{
+			// hier wird der string direkt übergeben
+			response.list[numberOfRow].rrule = $('#uzsuRrule' + numberOfRow).val();
 		}
-		break;
-	}
 	}
 	// über json interface / treiber herausschreiben
 	if (saveSmarthome) {
+		uzsuCollapseTimestring(response);
 		io.write(item, {active : response.active,list : response.list});
 	}
 }
@@ -449,22 +537,6 @@ function uzsuSortTime(response, designType, valueType, textSelectList, e) {
 	uzsuFillTable(response, designType, valueType, textSelectList);
 }
 
-function uzsuSetTextInputState(numberOfRow){
-	// hier werden die einzelnen eingabefelder aktiviert oder deaktiviert.
-	if ($("#uzsuExpertEvent"+numberOfRow).val() === 'time'){
-		$('#uzsuEntryTime' + numberOfRow).textinput('enable');
-		$('#uzsuExpertTimeMin'+numberOfRow).textinput('disable');
-		$('#uzsuExpertTimeOffset'+numberOfRow).textinput('disable');
-		$('#uzsuExpertTimeMax'+numberOfRow).textinput('disable');
-	}
-	else{
-		$('#uzsuEntryTime' + numberOfRow).textinput('disable');
-		$('#uzsuExpertTimeMin'+numberOfRow).textinput('enable');
-		$('#uzsuExpertTimeOffset'+numberOfRow).textinput('enable');
-		$('#uzsuExpertTimeMax'+numberOfRow).textinput('enable');
-	}
-}
-
 function uzsuShowExpertLine(e) {
 	// tabellezeile ermitteln, wo augerufen wurde. es ist die 10. Stelle des aufrufenden objektes
 	var numberOfRow = parseInt(e.currentTarget.id.substr(10));
@@ -481,7 +553,7 @@ function uzsuShowExpertLine(e) {
 	});
 	// handler, um je nach event die inputs zu aktivieren / deaktiovieren
 	// reagiert auf die änderung des pulldown menüs
-	$.mobile.activePage.find("#uzsuExpertEvent"+numberOfRow).on('change', function (){
+	$.mobile.activePage.find("#uzsuEvent"+numberOfRow).on('change', function (){
 		uzsuSetTextInputState(numberOfRow);
 	});
 }
@@ -502,110 +574,6 @@ function uzsuHideExpertLine(e) {
 			e.stopImmediatePropagation();
 			uzsuShowExpertLine(e);
 		});
-	}
-}
-
-function uzsuExpertExpandTimestring(numberOfRow){
-	uzsuExpertTimestring = $('#uzsuEntryTimeString' + numberOfRow).val();
-	uzsuExpertTime = '';
-    tabsTime = uzsuExpertTimestring.split('<');
-    if(tabsTime.length == 1){
-    	uzsuExpertTimeMin = '';
-        uzsuExpertTimeMax = '';
-        if (tabsTime[0].trim().indexOf('sunrise')===0){
-        	uzsuExpertEvent = 'sunrise';
-        }
-        else if (tabsTime[0].trim().indexOf('sunset')===0){
-        	uzsuExpertEvent = 'sunset';
-        }
-        else{
-        	uzsuExpertEvent = 'time';
-            uzsuExpertTime = tabsTime[0].trim();
-        }
-    }
-    else if(tabsTime.length == 2){
-        if(tabsTime[0].indexOf('sunrise')===0){
-        	uzsuExpertTimeMin = '';
-        	uzsuExpertEvent = 'sunrise';
-        	uzsuExpertTimeMax = tabsTime[1].trim();
-        }
-        else if(tabsTime[0].indexOf('sunset')===0){
-        	uzsuExpertTimeMin = '';
-        	uzsuExpertEvent = 'sunset';
-        	uzsuExpertTimeMax = tabsTime[1].trim();
-        }
-        else{
-        	uzsuExpertTimeMin = tabsTime[0].trim();
-        	uzsuExpertTimeMax = '';
-            if(uzsuExpertEvent.indexOf('sunrise')===0){
-            	uzsuExpertEvent = 'sunrise';
-            }
-            else{
-            	uzsuExpertEvent = 'sunset';
-            }
-        }
-    }
-    else if(tabsTime.length == 3){
-    	uzsuExpertTimeMin = tabsTime[0].trim();
-    	uzsuExpertEvent = tabsTime[1].trim();
-    	uzsuExpertTimeMax = tabsTime[2].trim();
-        if(uzsuExpertEvent.indexOf('sunrise')===0){
-        	uzsuExpertEvent = 'sunrise';
-        }
-        else{
-        	uzsuExpertEvent = 'sunset';
-        }
-    }
-    else{
-    	// formatfehler ! ich nehme dann defaulteinstellung an
-    	uzsuExpertTimeMin = '';
-    	uzsuExpertEvent = 'time';
-    	uzsuExpertTimeMax = '';
-    }
-	uzsuExpertTimeOffset = '';
-    // nun noch der offset herausnehmen
-    tabsOffset = uzsuExpertTimestring.split('+');
-    if(tabsOffset.length == 2){
-    	// dann steht ein plus drin
-    	tabsOffset = tabsOffset[1].split('m');
-    	uzsuExpertTimeOffset = '+' + tabsOffset[0].trim();
-    }
-    tabsOffset = uzsuExpertTimestring.split('-');
-    if(tabsOffset.length == 2){
-    	// dann steht ein minus drin
-    	tabsOffset = tabsOffset[1].split('m');
-    	uzsuExpertTimeOffset = '-' + tabsOffset[0].trim();
-    }
-	// Values in der Zeile setzen
-    $('#uzsuExpertTimeMin'+numberOfRow).val(uzsuExpertTimeMin);
-    $('#uzsuExpertTimeOffset'+numberOfRow).val(parseInt(uzsuExpertTimeOffset));
-    $('#uzsuExpertTimeMax'+numberOfRow).val(uzsuExpertTimeMax);
-    $('#uzsuEntryTime'+numberOfRow).val(uzsuExpertTime);
-    // und die pull down menür richtig, damit di eeinträge wieder stimmen
-    $('#uzsuExpertEvent'+numberOfRow).val(uzsuExpertEvent).attr('selected',true).siblings('option').removeAttr('selected');
-    // und der refresh, damit es angezeigt wird
-	$('#uzsuExpertEvent'+numberOfRow).selectmenu('refresh', true);
-}
-
-function uzsuExpertCollapseTimestring(numberOfRow){
-	// zeitstring wieder zusammenbauen, falls Event <> 'time', damit wir den richtigen Zusammenbau im zeitstring haben
-	if($('#uzsuExpertEvent'+numberOfRow).val() != 'time'){
-		uzsuExpertTimestring = '';
-		if($('#uzsuExpertTimeMin'+numberOfRow).val().length >0){
-			uzsuExpertTimestring = uzsuExpertTimestring + $('#uzsuExpertTimeMin'+numberOfRow).val() + '<';
-		}
-		uzsuExpertTimestring += $('#uzsuExpertEvent'+numberOfRow).val();
-		if($('#uzsuExpertTimeOffset'+numberOfRow).val()>0){
-			uzsuExpertTimestring = uzsuExpertTimestring + '+' + $('#uzsuExpertTimeOffset'+numberOfRow).val() + 'm';
-		}
-		else if($('#uzsuExpertTimeOffset'+numberOfRow).val()<0){
-			uzsuExpertTimestring = uzsuExpertTimestring + $('#uzsuExpertTimeOffset'+numberOfRow).val() + 'm';
-		}
-		if($('#uzsuExpertTimeMax'+numberOfRow).val().length >0){
-			uzsuExpertTimestring = uzsuExpertTimestring + '<' + $('#uzsuExpertTimeMax'+numberOfRow).val();
-		}
-		// und in die Tabellezeile des content popup schreiben
-		$('#uzsuEntryTimeString' + numberOfRow).val(uzsuExpertTimestring);
 	}
 }
 
@@ -658,8 +626,7 @@ function runtimeUzsuPopup(response, headline, designType, valueType,
 			uzsuShowExpertLine(e);
 		});
 	}
-	// hier wir die aktuelle seite danach durchsucht, wo das popup ist
-	// und im folgenden das popup initialisiert, geöffnet und die schliessen
+	// hier wir die aktuelle seite danach durchsucht, wo das popup ist und im folgenden das popup initialisiert, geöffnet und die schliessen
 	// funktion daran gebunden. diese entfern wieder das popup aus dem baum
 	$.mobile.activePage.find("#uzsuPopupContent").popup("open").bind({
 		popupafterclose: function () {
@@ -669,56 +636,38 @@ function runtimeUzsuPopup(response, headline, designType, valueType,
 }
 
 $(document).on("update",'[data-widget="uzsu.uzsu_icon"]',function(event, response) {
-			// initialisierung
-			// zunächst wird festgestellt, ob Item mit Eigenschaft vorhanden.
-			// Wenn nicht: active = false
+			// initialisierung zunächst wird festgestellt, ob Item mit Eigenschaft vorhanden. Wenn nicht: active = false
 			// ansonsten ist der Status von active gleich dem gesetzten Status
 			var active = response.length > 0 ? response[0].active : false;
-			// Das Icon wird aktiviert, falls Status auf aktiv, ansonsten
-			// deaktiviert angezeigt
+			// Das Icon wird aktiviert, falls Status auf aktiv, ansonsten deaktiviert angezeigt
 			$('#' + this.id + ' img').attr('src',(active ? $(this).attr('data-pic-on') : $(this).attr('data-pic-off')));
-			// wenn keine Daten vorhanden, dann ist kein item mit den
-			// eigenschaften hinterlegt
-			// und es wird nichts gemacht
+			// wenn keine Daten vorhanden, dann ist kein item mit den eigenschaften hinterlegt und es wird nichts gemacht
 			if (response.length === 0)
 				return;
-			// Wenn ein Update erfolgt, dann werden die Daten erneut in die
-			// Variable uzsu geladen
-			// damit sind die UZSU objekte auch in der click funktion verfügbar
+			// Wenn ein Update erfolgt, dann werden die Daten erneut in die Variable uzsu geladen damit sind die UZSU objekte auch in der click funktion verfügbar
 			if (response[0].list instanceof Array) {
 				$(this).data('uzsu', response[0]);
 			} 
 			else {$(this).data('uzsu', {active : true,list : []	});
 			}
 		});
-// als zweites der handler für die callbacks des click events
-// kann man auch zusammen machen, habe ich aus übersichtlichkeit getrennt
+
 $(document).on("click",'[data-widget="uzsu.uzsu_icon"]',function(event) {
-	// hier werden die parameter aus den attributen
-	// herausgenommen
-	// und beim öffnen mit .open(....) an das popup objekt
-	// übergeben
-	// und zwar mit deep copy, damit ich bei cancel die
-	// ursprünglichen werte nicht überschrieben habe
+	// hier werden die parameter aus den attributen herausgenommen und beim öffnen mit .open(....) an das popup objekt übergeben
+	// und zwar mit deep copy, damit ich bei cancel die ursprünglichen werte nicht überschrieben habe
 	var response = jQuery.extend(true, {}, $(this).data('uzsu'));
-	// auswertung der übergabeparameter
+	// jetzt erweitern wir die dicts pro eintrag, um nemen dem dort einhaltenen timestring die enthaltenen einzelteile zu bekommen
+	uzsuExpandTimestring(response);
+ 	// auswertung der übergabeparameter
 	var headline = $(this).attr('data-headline');
 	var designType = $(this).attr('data-designType');
 	var valueType = $(this).attr('data-valueType');
-	// hier wird die komplette liste übergeben. widget.explode
-	// kehr das implode au der webseite wieder um
+	// hier wird die komplette liste übergeben. widget.explode kehrt das implode au der webseite wieder um
 	var textSelectList = widget.explode($(this).attr('data-textSelectList'));
-	// data-item ist der sh.py item, in dem alle attribute
-	// lagern, die für die steuerung notwendig ist
-	// ist ja vom typ dict. das item, was tatsächlich per
-	// schaltuhr verwendet wird ist nur als attribut (child)
-	// enthalten und wird ausschliesslich vom plugin verwendet.
-	// wird für das rückschreiben der Daten an smarthome.py
-	// benötigt
+	// data-item ist der sh.py item, in dem alle attribute lagern, die für die steuerung notwendig ist ist ja vom typ dict. das item, was tatsächlich per
+	// schaltuhr verwendet wird ist nur als attribut (child) enthalten und wird ausschliesslich vom plugin verwendet. wird für das rückschreiben der Daten an smarthome.py benötigt
 	var item = $(this).attr('data-item');
-	// jetzt kommt noch die liste von prüfungen, damit hinterher
-	// keine fehler passieren
-	// zunächst erst einmal popup wird angezeigt
+	// jetzt kommt noch die liste von prüfungen, damit hinterher keine fehler passieren zunächst erst einmal popup wird angezeigt
 	var popupOk = true;
 	// fehlerhafter designType (unbekannt)
 	if ((designType !== '0') && (designType !== '1')) {
@@ -730,11 +679,9 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]',function(event) {
 		alert('Fehlerhafter Parameter: "' + valueType + '" im Feld valueType bei Item ' + item);
 		popupOk = false;
 	}
-	// bei designType '0' und '2' wird rrule nach wochentagen
-	// umgewandelt und ein festes format vogegegebn
-	// hier sollte nichts versehentlich überschrieben werden
+	// bei designType '0' wird rrule nach wochentagen umgewandelt und ein festes format vogegegeben hier sollte nichts versehentlich überschrieben werden
 	if (designType == '0') {
-		var numberOfEntries = response.list.length;
+		numberOfEntries = response.list.length;
 		for (var numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
 			// test, ob die RRULE fehlerhaft ist
 			if ((response.list[numberOfRow].rrule.indexOf('FREQ=WEEKLY;BYDAY=') !== 0) && (response.list[numberOfRow].rrule.length > 0)) {
@@ -746,8 +693,7 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]',function(event) {
 			}
 		}
 	}
-	// wenn bei designType = 'list' ein split angegeben wird,
-	// dann muss er immer angegeben sein
+	// wenn bei designType = 'list' ein split angegeben wird, dann muss er immer angegeben sein
 	if ((valueType == 'list') && !(textSelectList[0].split(':')[1] === undefined)) {
 		for (var numberOfTextEntries = 0; numberOfTextEntries < textSelectList.length; numberOfTextEntries++) {
 			if (textSelectList[numberOfTextEntries].split(':')[1] === undefined) {
@@ -757,8 +703,7 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]',function(event) {
 		}
 	}
 	if (popupOk) {
-		// öffnen des popups bei clicken des icons und
-		// ausführung der eingabefunktion
+		// öffnen des popups bei clicken des icons und ausführung der eingabefunktion
 		runtimeUzsuPopup(response, headline, designType, valueType, textSelectList, item);
 	}
 });
