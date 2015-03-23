@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release feature v2.6
+// Release feature v2.7
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -23,14 +23,16 @@ var browserIdentificationVariable = document.documentElement;
 	browserIdentificationVariable.setAttribute('data-platform', navigator.platform);
 	browserIdentificationVariable.className += ((!!('ontouchstart' in window) || !!('onmsgesturechange' in window)) ? ' touch' : '');
 
-function uzsuCollapseTimestring(response){
+function uzsuCollapseTimestring(response, designType){
 	for (numberOfEntry = 0; numberOfEntry < response.list.length; numberOfEntry++) {
 		// zeitstring wieder zusammenbauen, falls Event <> 'time', damit wir den richtigen Zusammenbau im zeitstring haben
 		timeString = '';
 		if(response.list[numberOfEntry].event === 'time'){
+			// wenn der eintrag time ist, dann kommt die zeit rein
 			response.list[numberOfEntry].time = response.list[numberOfEntry].timeCron;
 		}
 		else{
+			// ansonsten wird er aus der bestandteilen zusammengebaut
 			if(response.list[numberOfEntry].timeMin.length > 0){
 				timeString = timeString + response.list[numberOfEntry].timeMin + '<';
 			}
@@ -44,18 +46,22 @@ function uzsuCollapseTimestring(response){
 			if(response.list[numberOfEntry].timeMax.length > 0){
 				timeString = timeString + '<' + response.list[numberOfEntry].timeMax;
 			}
-			// jetzt nocht die zu vielen einträge aus dem dicts löschen
-			delete response.list[numberOfEntry].timeMin;
-			delete response.list[numberOfEntry].timeMax;
-			delete response.list[numberOfEntry].timeOffset;
-			delete response.list[numberOfEntry].timeCron;
-			delete response.list[numberOfEntry].event;
-			response.list[numberOfEntry].time = timeString;
+			// und den string setzen, bei designtype = 1 bleibt er bestehen, wird nicht geändert
+			if(designType === '0'){
+				response.list[numberOfEntry].time = timeString;
+			}
 		}
+		// jetzt noch die zu vielen einträge aus dem dict löschen
+		delete response.list[numberOfEntry].timeMin;
+		delete response.list[numberOfEntry].timeMax;
+		delete response.list[numberOfEntry].timeOffset;
+		delete response.list[numberOfEntry].timeCron;
+		delete response.list[numberOfEntry].event;
 	}
 }
 
 function uzsuExpandTimestring(response){
+	// ist aus dem uzsu plugin übernommen und nach js portiert
 	for (numberOfEntry = 0; numberOfEntry < response.list.length; numberOfEntry++) {
 		timeCron = '';
 	    tabsTime = response.list[numberOfEntry].time.split('<');
@@ -87,24 +93,14 @@ function uzsuExpandTimestring(response){
 	        else{
 	        	timeMin = tabsTime[0].trim();
 	        	timeMax = '';
-	            if(event.indexOf('sunrise')===0){
-	            	event = 'sunrise';
-	            }
-	            else{
-	            	event = 'sunset';
-	            }
+	            if(event.indexOf('sunrise')===0) event = 'sunrise'; else event = 'sunset';
 	        }
 	    }
 	    else if(tabsTime.length == 3){
 	    	timeMin = tabsTime[0].trim();
 	    	event = tabsTime[1].trim();
 	    	timeMax = tabsTime[2].trim();
-	        if(event.indexOf('sunrise')===0){
-	        	event = 'sunrise';
-	        }
-	        else{
-	        	event = 'sunset';
-	        }
+	        if(event.indexOf('sunrise')===0) event = 'sunrise'; else event = 'sunset';
 	    }
 	    else{
 	    	// formatfehler ! ich nehme dann defaulteinstellung an
@@ -132,6 +128,7 @@ function uzsuExpandTimestring(response){
 		response.list[numberOfEntry].timeCron = timeCron;
 		response.list[numberOfEntry].timeOffset = timeOffset;
 		response.list[numberOfEntry].event = event;
+		if(event != 'time') response.list[numberOfEntry].timeCron = event;
 	}
 }
 
@@ -149,17 +146,13 @@ function uzsuBuildTableHeader(headline, designType, valueType, textSelectList) {
 	template += "<table id='uzsuTable' style = 'border: 1px solid;padding-right: 3px;padding-left: 3px'> ";
 	// generell gibt es dann dispatcher für die einzelnen formate. ich fasse sie zusammen, wo immer es geht.
 	// hier kann man auch die formate für sich selbst erweitern und anpassen.
-	switch (designType) {
+	if(designType === '0'){
 		// format 0 ist der default, macht wochentage, eine konfigurierbar eingabe des wertes und die aktivierungen
-		case '0': {
-			template += "<tr><td>Value</td><td>Time</td><td>Weekdays</td><td>Active</td><td>Expert</td><td>Remove</td></tr>";
-			break;
-		}
-			// format 1 ist der expertenmodus, hier kann man in einem textstring de facto alles auswerten
-		case '1': {
-			template += "<tr><td>Value</td><td>Time (flex)<br>RRULE</td><td>Active</td><td>Remove</td></tr>";
-			break;
-		}
+		template += "<tr><td>Value</td><td>Time</td><td>Weekdays</td><td>Active</td><td>Expert</td><td>Remove</td></tr>";
+	}
+	else{
+		// format 1 ist der profimodus, hier kann man in einem textstring de facto alles auswerten
+		template += "<tr><td>Value</td><td>Time (flex)<br>RRULE</td><td>Active</td><td>Remove</td></tr>";
 	}
 	return template;
 }
@@ -169,123 +162,79 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 	var template = "";
 	// liste für die wochentage, damit ich später per index darauf zugreifen kann
 	var weekDays = [ 'MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU' ];
-	// auch hier wieder der dispatcher für die formate
-	switch (designType) {
-		case '0': {
-			template += "<tr id='uzsuNumberOfRow" + numberOfRow + "'>";
-			// jetzt beginnen die spalten in der reihenfolge value, time / rrule, active, delete button mit flipswitch (bessere erkennbarkeit, die Texte können über das
-			// widget gesetzt werden unterscheidung nur ob bool oder num, wobei num int ist !
-			if (valueType == 'bool') {
-				template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + textSelectList[1] + "</option> <option value='1'> "	+ textSelectList[0] + " </option></select></td>";
+	template += "<tr id='uzsuNumberOfRow" + numberOfRow + "'>";
+	// jetzt beginnen die spalten in der reihenfolge value, time / rrule, active, delete button mit flipswitch (bessere erkennbarkeit, die Texte können über das
+	// widget gesetzt werden unterscheidung nur ob bool oder num, wobei num int ist !
+	if (valueType == 'bool') {
+		template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + textSelectList[1] + "</option> <option value='1'> "	+ textSelectList[0] + " </option></select></td>";
+	} 
+	else if (valueType == 'num') {
+		template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuValue" + numberOfRow + "'</td>";
+	} 
+	else if (valueType == 'text') {
+		template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuValue" + numberOfRow + "'</td>";
+	} 
+	else if (valueType == 'list') {
+		// das listenformat mit select ist sehr trickreich. ich weiss nicht, wie ich automatisch die richtige höhe bekomme
+		template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
+		template += "<select name='uzsuValue'" + numberOfRow + "' id='uzsuValue" + numberOfRow + "' data-mini='true'>";
+		for (numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry++) {
+			// unterscheidung anzeige und werte
+			if (textSelectList[0].split(':')[1] === undefined) {
+				template += "<option value='" + textSelectList[numberOfListEntry].split(':')[0]	+ "'>"+ textSelectList[numberOfListEntry].split(':')[0]	+ "</option>";
 			} 
-			else if (valueType == 'num') {
-				template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuValue" + numberOfRow + "'</td>";
-			} 
-			else if (valueType == 'text') {
-				template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuValue" + numberOfRow + "'</td>";
-			} 
-			else if (valueType == 'list') {
-				// das listenformat mit select ist sehr trickreich. ich weiss nicht, wie ich automatisch die richtige höhe bekomme
-				// ich musste die explizi auf die 34 px setzen. ohne das ist die zeilehähe deutlich zu hoch
-				template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
-				template += "<select name='uzsuValue'" + numberOfRow + "' id='uzsuValue" + numberOfRow + "' data-mini='true'>";
-				for (numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry++) {
-					// unterscheidung anzeige und werte
-					if (textSelectList[0].split(':')[1] === undefined) {
-						template += "<option value='" + textSelectList[numberOfListEntry].split(':')[0]	+ "'>"+ textSelectList[numberOfListEntry].split(':')[0]	+ "</option>";
-					} 
-					else {
-						template += "<option value='" + textSelectList[numberOfListEntry].split(':')[1]	+ "'>"+ textSelectList[numberOfListEntry].split(':')[0]	+ "</option>";
-					}
-				}
-				template += "</select></div></form></td>";
+			else {
+				template += "<option value='" + textSelectList[numberOfListEntry].split(':')[1]	+ "'>"+ textSelectList[numberOfListEntry].split(':')[0]	+ "</option>";
 			}
-			// time
-			// bei der darstellung der time als HTML5 format ist besonders beim chrome browser die darstellung mit zusätzlichen elementen, die dann die eingabebreite effektiv
-			// reduzieren. ich haben keine möglichkeit gefunden dieses verhalten zu umgehen / disablen. wers braucht, kann mit der
-			// erhöhung der breite im style dieses so anpassen dass eine gut sichtbare lösung entsteht (zu lasten der gesamtbreite=
-			// werte um width = 80px schenen ganz gut zu sein.
-			template += "<td><input type='time' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>";
-			// hier wird der timestring abgespeichert
-			template += "<div class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'></div>";
-			template += "</td>";
-			// rrule
-			// wichtig: es findet keine prüfung statt ! wenn zu beginn das überschreiben akzeptiert wird, dann kommt das standard
-			// format des widgets zur anwendung !
-			template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
-			for (numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
-				template += "<input type='checkbox' id='checkbox" + numberOfDay	+ "-" + numberOfRow + "'> <label for='checkbox"	+ numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "</label>";
-			}
-			template += "</fieldset></form></td>";
-			// active schalter, die einzelne zeilen der schaltuhr aktivieren.
-			template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'> " + "<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'> <label for='uzsuActive" + numberOfRow + "'>Act</label>" + "</fieldset></form></td>";
-			// expert button
-			template += "<td> <button id='uzsuExpert" + numberOfRow + "' data-mini='true' data-icon='arrow-d' data-iconpos='notext'></button></td>";
-			// del button löschen eines zeileneintrags
-			template += "<td> <button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button></td>";
-			// tabelle reihen abschliessen
-			template += "</tr>";
-			// und jetzt noch die unsichbare expertenzeile
-			template += "<tr id='uzsuExpertLine" + numberOfRow + "' style='display:none;'><td colspan='6'><table>";
-			// Tabellenüberschriften
-			template += "<tr><td>earliest</td><td></td><td>Event</td><td>+/- min</td><td></td><td></td><td>latest</td></tr>";
-			// tabellenfelder
-			template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput'id='uzsuTimeMin" + numberOfRow + "'</td>";
-			template += "<td> <h1 style='margin:0'> < </h1> </td>";
-			template += "<td><form><div data-role='fieldcontain' class='uzsuEvent' style = 'height:auto !important'>";
-			template += "<select name='uzsuEvent" + numberOfRow + "' id='uzsuEvent" + numberOfRow + "' data-mini='true'>";
-			template += "<option value='time'>Time</option>";
-			template += "<option value='sunrise'>Sunrise</option>";
-			template += "<option value='sunset'>Sunset</option>";
-			template += "</div></form></td>";
-			template += "<td><input type='number' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuTimeOffset" + numberOfRow + "'</td>";
-			template += "<td> Minutes</td><td> <h1 style='margin:0'> < </h1> </td>";
-			template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuTimeMax" + numberOfRow + "'</td>";
-			template += "</tr>";
-			// abschluss des Tabelleeintrags der expertenzeile
-			template += "</table></td></tr>";
-			break;
 		}
-		case '1': {
-			template += "<tr id='uzsuNumberOfRow" + numberOfRow + "'>";
-			// jetzt beginnen die spalten in der reihenfolge value, time /rrule, active, delete button
-			if (valueType == 'bool') {
-				template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + textSelectList[1] + "</option> <option value='1'> "	+ textSelectList[0] + " </option></select></td>";
-			} 
-			else if (valueType == 'num') {
-				template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuValue" + numberOfRow + "'</td>";
-			} 
-			else if (valueType == 'text') {
-				template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuValue" + numberOfRow + "'</td>";
-			} 
-			else if (valueType == 'list') {
-				template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
-				template += "<select name='uzsuValue'" + numberOfRow + "' id='uzsuValue" + numberOfRow + "' data-mini='true'>";
-				for (numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry++) {
-					// unterscheidung anzeige und werte
-					if (textSelectList[0].split(':')[1] === undefined) {
-						template += "<option value='" + textSelectList[numberOfListEntry].split(':')[0]	+ "'>" + textSelectList[numberOfListEntry].split(':')[0] + "</option>";
-					} 
-					else {
-						template += "<option value='" + textSelectList[numberOfListEntry].split(':')[1]	+ "'>" + textSelectList[numberOfListEntry].split(':')[0] + "</option>";
-					}
-				}
-				template += "</select></div></form></td>";
-			}
-			// time
-			template += "<td><input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuTime" + numberOfRow + "'>";
-			// rrule
-			// hier wird nur der textstring übernommen. prüfungen erfolgen keine !
-			template += "<input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuRrule"	+ numberOfRow + "'></td>";
-			// active
-			template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'> " + "<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'> <label for='uzsuActive" + numberOfRow + "'>Act</label>" + "</fieldset></form></td>";
-			// del button
-			template += "<td> <button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button></td>";
-			// tabelle reihen abschliessen
-			template += "</tr>";
-			break;
-		}
+		template += "</select></div></form></td>";
 	}
+	// time
+	if(designType === '0'){
+		template += "<td><input type='time' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>";
+		// rrule wurde auf die tage verteilt
+		template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
+		for (numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
+			template += "<input type='checkbox' id='checkbox" + numberOfDay	+ "-" + numberOfRow + "'> <label for='checkbox"	+ numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "</label>";
+		}
+		template += "</fieldset></form></td>";
+	}
+	else{
+		// time
+		template += "<td><input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuTime" + numberOfRow + "'>";
+		// rrule hier wird nur der textstring übernommen. prüfungen erfolgen keine !
+		template += "<input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuRrule"	+ numberOfRow + "'></td>";
+	}
+	// active schalter, die einzelne zeilen der schaltuhr aktivieren.
+	template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'> " + "<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'> <label for='uzsuActive" + numberOfRow + "'>Act</label>" + "</fieldset></form></td>";
+	if(designType === '0'){
+		// expert button nur bei type = 0
+		template += "<td> <button id='uzsuExpert" + numberOfRow + "' data-mini='true' data-icon='arrow-d' data-iconpos='notext'></button></td>";
+	}
+	// del button löschen eines zeileneintrags
+	template += "<td> <button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button></td>";
+	// tabelle reihen abschliessen
+	template += "</tr>";
+	// und jetzt noch die unsichbare expertenzeile
+	template += "<tr id='uzsuExpertLine" + numberOfRow + "' style='display:none;'><td colspan='6'><table>";
+	// Tabellenüberschriften
+	template += "<tr><td>earliest</td><td></td><td>Event</td><td>+/- min</td><td></td><td></td><td>latest</td></tr>";
+	// tabellenfelder
+	template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput'id='uzsuTimeMin" + numberOfRow + "'</td>";
+	template += "<td> <h1 style='margin:0'> < </h1> </td>";
+	template += "<td><form><div data-role='fieldcontain' class='uzsuEvent' style = 'height:auto !important'>";
+	template += "<select name='uzsuEvent" + numberOfRow + "' id='uzsuEvent" + numberOfRow + "' data-mini='true'>";
+	template += "<option value='time'>Time</option>";
+	template += "<option value='sunrise'>Sunrise</option>";
+	template += "<option value='sunset'>Sunset</option>";
+	template += "</div></form></td>";
+	template += "<td><input type='number' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuTimeOffset" + numberOfRow + "'</td>";
+	template += "<td> Minutes</td><td> <h1 style='margin:0'> < </h1> </td>";
+	template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuTimeMax" + numberOfRow + "'</td>";
+	template += "</tr>";
+	// abschluss des Tabelleeintrags der expertenzeile
+	template += "</table></td></tr>";
+
 	return template;
 }
 
@@ -304,7 +253,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times</div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.6 feature </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v2.7 feature </h6></td></div></tr></table>";
 	// abschlus des gesamten span container
 	template += "</span>";
 	// und der abschluss des popup divs
@@ -472,7 +421,7 @@ function uzsuSaveTable(item, response, designType, valueType, textSelectList,
 	}
 	// über json interface / treiber herausschreiben
 	if (saveSmarthome) {
-		uzsuCollapseTimestring(response);
+		uzsuCollapseTimestring(response, designType);
 		io.write(item, {active : response.active,list : response.list});
 	}
 }
@@ -484,9 +433,8 @@ function uzsuAddTableRow(response, designType, valueType, textSelectList) {
 	// alten zustand mal in die Liste rein. da der aktuelle zustand ja nur im widget selbst enthalten ist,
 	// wird er vor dem umbau wieder in die variable response zurückgespeichert.
 	uzsuSaveTable(1, response, designType, valueType, textSelectList, false);
-	// ich hänge immer an die letzte Zeile dran ! erst einmal das array
-	// erweitern
-	response.list.push({active : false,	rrule : '',	time : '00:00',	value : 0});
+	// ich hänge immer an die letzte Zeile dran ! erst einmal das array erweitern
+	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:''});
 	// dann eine neue HTML Zeile genenrieren
 	template = uzsuBuildTableRow(numberOfNewRow, designType, valueType,	textSelectList);
 	// zeile in die Tabelle einbauen
