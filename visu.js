@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release feature v2.7
+// Release feature v2.8
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -132,7 +132,7 @@ function uzsuExpandTimestring(response){
 	}
 }
 
-function uzsuBuildTableHeader(headline, designType, valueType, textSelectList) {
+function uzsuBuildTableHeader(headline, designType, valueType, valueParameterList) {
 	// Kopf und überschrift des Popups
 	var template = "";
 	// hier kommt der popup container mit der beschreibung ein eigenschaften
@@ -157,7 +157,7 @@ function uzsuBuildTableHeader(headline, designType, valueType, textSelectList) {
 	return template;
 }
 
-function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
+function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterList) {
 	// Tabelleneinträge
 	var template = "";
 	// liste für die wochentage, damit ich später per index darauf zugreifen kann
@@ -166,10 +166,10 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 	// jetzt beginnen die spalten in der reihenfolge value, time / rrule, active, delete button mit flipswitch (bessere erkennbarkeit, die Texte können über das
 	// widget gesetzt werden unterscheidung nur ob bool oder num, wobei num int ist !
 	if (valueType == 'bool') {
-		template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + textSelectList[1] + "</option> <option value='1'> "	+ textSelectList[0] + " </option></select></td>";
+		template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + valueParameterList[1] + "</option> <option value='1'> "	+ valueParameterList[0] + " </option></select></td>";
 	} 
 	else if (valueType == 'num') {
-		template += "<td><input type='number' data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuValue" + numberOfRow + "'</td>";
+		template += "<td><input type='number' " + valueParameterList[0] + " data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuValue" + numberOfRow + "'</td>";
 	} 
 	else if (valueType == 'text') {
 		template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuValue" + numberOfRow + "'</td>";
@@ -178,13 +178,13 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList) {
 		// das listenformat mit select ist sehr trickreich. ich weiss nicht, wie ich automatisch die richtige höhe bekomme
 		template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
 		template += "<select name='uzsuValue'" + numberOfRow + "' id='uzsuValue" + numberOfRow + "' data-mini='true'>";
-		for (numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry++) {
+		for (numberOfListEntry = 0; numberOfListEntry < valueParameterList.length; numberOfListEntry++) {
 			// unterscheidung anzeige und werte
-			if (textSelectList[0].split(':')[1] === undefined) {
-				template += "<option value='" + textSelectList[numberOfListEntry].split(':')[0]	+ "'>"+ textSelectList[numberOfListEntry].split(':')[0]	+ "</option>";
+			if (valueParameterList[0].split(':')[1] === undefined) {
+				template += "<option value='" + valueParameterList[numberOfListEntry].split(':')[0]	+ "'>"+ valueParameterList[numberOfListEntry].split(':')[0]	+ "</option>";
 			} 
 			else {
-				template += "<option value='" + textSelectList[numberOfListEntry].split(':')[1]	+ "'>"+ textSelectList[numberOfListEntry].split(':')[0]	+ "</option>";
+				template += "<option value='" + valueParameterList[numberOfListEntry].split(':')[1]	+ "'>"+ valueParameterList[numberOfListEntry].split(':')[0]	+ "</option>";
 			}
 		}
 		template += "</select></div></form></td>";
@@ -253,7 +253,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times</div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.7 feature </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v2.8 feature </h6></td></div></tr></table>";
 	// abschlus des gesamten span container
 	template += "</span>";
 	// und der abschluss des popup divs
@@ -262,16 +262,16 @@ function uzsuBuildTableFooter(designType) {
 }
 
 function uzsuBuildTable(response, headline, designType, valueType,
-		textSelectList) {
+		valueParameterList) {
 	// hier wird das template zusammengestellt, die tabellenzeilen separat, weil ich die bei einer
 	// ergänzung der tabelle wieder verwenden kann
 	var template = "";
 	var numberOfEntries = response.list.length;
 	// erst den header, dann die zeilen, dann den footer
 	template = uzsuBuildTableHeader(headline, designType, valueType,
-			textSelectList);
+			valueParameterList);
 	for (numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
-		template += uzsuBuildTableRow(numberOfRow, designType, valueType, textSelectList);
+		template += uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterList);
 	}
 	template += uzsuBuildTableFooter(designType);
 	return template;
@@ -294,7 +294,7 @@ function uzsuSetTextInputState(numberOfRow){
 	}
 }
 
-function uzsuFillTable(response, designType, valueType, textSelectList) {
+function uzsuFillTable(response, designType, valueType, valueParameterList) {
 	// tabelle füllen es werden die daten aus der variablen response gelesen und in den status
 	// darstellung der widgetblöcke zugewiesen. der aktuelle status in dann in der darstellung enthalten !
 	var numberOfEntries = response.list.length;
@@ -315,19 +315,19 @@ function uzsuFillTable(response, designType, valueType, textSelectList) {
 		} 
 		else if (valueType == 'list') {
 			// hier ist es etwas schwieriger, denn ich muß den wert mit der liste vergleichen und dann setzen
-			for (numberOfListEntry = 0; numberOfListEntry < textSelectList.length; numberOfListEntry++) {
+			for (numberOfListEntry = 0; numberOfListEntry < valueParameterList.length; numberOfListEntry++) {
 				// wenn ich den eintrag gefunden haben, dann setze ich den eintrag auf die richtige stelle
 				// ansonsten wird einfach der erste eintrag genommen zusätzlich noch die unterscheidung, ob ich in der listen
 				// anzeige und wertezuweisung trenne
-				if (textSelectList[0].split(':')[1] === undefined) {
-					if (response.list[numberOfRow].value == textSelectList[numberOfListEntry].split(':')[0]) {
-						$("#uzsuValue" + numberOfRow).val(textSelectList[numberOfListEntry].split(':')[0]).attr('selected',true).siblings('option').removeAttr('selected');
+				if (valueParameterList[0].split(':')[1] === undefined) {
+					if (response.list[numberOfRow].value == valueParameterList[numberOfListEntry].split(':')[0]) {
+						$("#uzsuValue" + numberOfRow).val(valueParameterList[numberOfListEntry].split(':')[0]).attr('selected',true).siblings('option').removeAttr('selected');
 						$("#uzsuValue" + numberOfRow).selectmenu('refresh', true);
 					}
 				} 
 				else {
-					if (response.list[numberOfRow].value == textSelectList[numberOfListEntry].split(':')[1]) {
-						$("#uzsuValue" + numberOfRow).val(textSelectList[numberOfListEntry].split(':')[1]).attr('selected',true).siblings('option').removeAttr('selected');
+					if (response.list[numberOfRow].value == valueParameterList[numberOfListEntry].split(':')[1]) {
+						$("#uzsuValue" + numberOfRow).val(valueParameterList[numberOfListEntry].split(':')[1]).attr('selected',true).siblings('option').removeAttr('selected');
 						$("#uzsuValue" + numberOfRow).selectmenu('refresh', true);
 					}
 				}
@@ -370,7 +370,7 @@ function uzsuFillTable(response, designType, valueType, textSelectList) {
 	}
 }
 
-function uzsuSaveTable(item, response, designType, valueType, textSelectList,
+function uzsuSaveTable(item, response, designType, valueType, valueParameterList,
 		saveSmarthome) {
 	// tabelle auslesen und speichern
 	var numberOfEntries = response.list.length;
@@ -426,34 +426,34 @@ function uzsuSaveTable(item, response, designType, valueType, textSelectList,
 	}
 }
 
-function uzsuAddTableRow(response, designType, valueType, textSelectList) {
+function uzsuAddTableRow(response, designType, valueType, valueParameterList) {
 	// tabellenzeile einfügen
 	var numberOfNewRow = response.list.length;
 	var template = '';
 	// alten zustand mal in die Liste rein. da der aktuelle zustand ja nur im widget selbst enthalten ist,
 	// wird er vor dem umbau wieder in die variable response zurückgespeichert.
-	uzsuSaveTable(1, response, designType, valueType, textSelectList, false);
+	uzsuSaveTable(1, response, designType, valueType, valueParameterList, false);
 	// ich hänge immer an die letzte Zeile dran ! erst einmal das array erweitern
 	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:''});
 	// dann eine neue HTML Zeile genenrieren
-	template = uzsuBuildTableRow(numberOfNewRow, designType, valueType,	textSelectList);
+	template = uzsuBuildTableRow(numberOfNewRow, designType, valueType,	valueParameterList);
 	// zeile in die Tabelle einbauen
 	$('#uzsuTable').append(template);
 	// hier wichtig: damit die optimierung jquerymobile auf tabelle wirkt
 	$.mobile.activePage.trigger('pagecreate');
 	// den delete handler für die neue Zeile einhängen
 	$.mobile.activePage.find("#uzsuDelTableRow" + numberOfNewRow).bind("tap",function(e) {
-		uzsuDelTableRow(response, designType, valueType,textSelectList, e);
+		uzsuDelTableRow(response, designType, valueType,valueParameterList, e);
 	});
 	// den helper handler für die neue Zeile einhängen
 	$.mobile.activePage.find("#uzsuExpert"+ numberOfNewRow).bind("tap", function(e) {
 		uzsuShowExpertLine(e);
 	});	
 	// und daten ausfüllen. hier werdne die zeile wieder mit dem status beschrieben. status ist dann wieder im widget
-	uzsuFillTable(response, designType, valueType, textSelectList);
+	uzsuFillTable(response, designType, valueType, valueParameterList);
 }
 
-function uzsuDelTableRow(response, designType, valueType, textSelectList, e) {
+function uzsuDelTableRow(response, designType, valueType, valueParameterList, e) {
 	// tabellenzeile löschen
 	var numberOfEntries = response.list.length;
 	// wenn überhaupt einträge vorhanden sind sollte nicht passieren, weil eigentlich auch kein button dann da ist, aber...
@@ -461,13 +461,13 @@ function uzsuDelTableRow(response, designType, valueType, textSelectList, e) {
 		// index heraussuchen, in welcher Zeile gelöscht wurde
 		var numberOfRowToDelete = parseInt(e.currentTarget.id.substr(15));
 		// zwischenspeichern vor dem löschen
-		uzsuSaveTable(1, response, designType, valueType, textSelectList, false);
+		uzsuSaveTable(1, response, designType, valueType, valueParameterList, false);
 		// erst mal das array entsprechen kürzen
 		response.list.splice(numberOfRowToDelete, 1);
 		// jetzt die Tabelle kürzen im Popup
 		$('#uzsuNumberOfRow' + (numberOfEntries - 1)).remove();
 		// und daten wieder ausfüllen
-		uzsuFillTable(response, designType, valueType, textSelectList);
+		uzsuFillTable(response, designType, valueType, valueParameterList);
 	}
 }
 
@@ -476,13 +476,13 @@ function uzsuSortFunction(a, b) {
 	return (a.time.replace(':', '') - b.time.replace(':', ''));
 }
 
-function uzsuSortTime(response, designType, valueType, textSelectList, e) {
+function uzsuSortTime(response, designType, valueType, valueParameterList, e) {
 	// liets erst aus dem widget zurücklesen
-	uzsuSaveTable(1, response, designType, valueType, textSelectList, false);
+	uzsuSaveTable(1, response, designType, valueType, valueParameterList, false);
 	// sortieren der listeneinträge nach zeit
 	response.list.sort(uzsuSortFunction);
 	// jetzt noch die einträge wieder schreiben
-	uzsuFillTable(response, designType, valueType, textSelectList);
+	uzsuFillTable(response, designType, valueType, valueParameterList);
 }
 
 function uzsuShowExpertLine(e) {
@@ -526,17 +526,17 @@ function uzsuHideExpertLine(e) {
 }
 
 function runtimeUzsuPopup(response, headline, designType, valueType,
-		textSelectList, item) {
+		valueParameterList, item) {
 	// steuerung des Popups
 	// erst einmal wird der leeranteil angelegt
 	var template = uzsuBuildTable(response, headline, designType, valueType,
-			textSelectList);
+			valueParameterList);
 	// dann speichern wir uns für cancel die ursprünglichen werte ab
 	var responseCancel = jQuery.extend(true, {}, response);
 	// dann hängen wir das an die aktuelle Seite
 	$.mobile.activePage.append(template).trigger("pagecreate");
 	// dann die werte eintragen.
-	uzsuFillTable(response, designType, valueType, textSelectList);
+	uzsuFillTable(response, designType, valueType, valueParameterList);
 	// Popup schliessen mit close rechts oben in der box
 	$.mobile.activePage.find("#uzsuClose").bind("tap", function(e) {
 		// wenn keine Änderungen gemacht werden sollen (cancel), dann auch im
@@ -553,21 +553,21 @@ function runtimeUzsuPopup(response, headline, designType, valueType,
 	$.mobile.activePage.find("#uzsuSaveQuit").bind("tap", function(e) {
 		// jetzt wird die Kopie auf das original kopiert
 		// und geschlossen
-		uzsuSaveTable(item, response, designType, valueType, textSelectList, true);
+		uzsuSaveTable(item, response, designType, valueType, valueParameterList, true);
 		$.mobile.activePage.find("#uzsuPopupContent").popup("close");
 	});
 	// eintrag hinzufügen mit add
 	$.mobile.activePage.find("#uzsuAddTableRow").bind("tap", function(e) {
-		uzsuAddTableRow(response, designType, valueType, textSelectList);
+		uzsuAddTableRow(response, designType, valueType, valueParameterList);
 	});
 	// eintrag sortieren nach zeit
 	$.mobile.activePage.find("#uzsuSortTime").bind("tap", function(e) {
-		uzsuSortTime(response, designType, valueType, textSelectList);
+		uzsuSortTime(response, designType, valueType, valueParameterList);
 	});
 	// löschen mit del als callback eintragen
 	for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
 		$.mobile.activePage.find("#uzsuDelTableRow" + numberOfRow).bind("tap",function(e) {
-			uzsuDelTableRow(response, designType, valueType, textSelectList, e);
+			uzsuDelTableRow(response, designType, valueType, valueParameterList, e);
 		});
 		// call expert mode
 		$.mobile.activePage.find("#uzsuExpert"+ numberOfRow).bind("tap", function(e) {
@@ -611,7 +611,14 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]',function(event) {
 	var designType = $(this).attr('data-designType');
 	var valueType = $(this).attr('data-valueType');
 	// hier wird die komplette liste übergeben. widget.explode kehrt das implode au der webseite wieder um
-	var textSelectList = widget.explode($(this).attr('data-textSelectList'));
+	var valueParameterList = widget.explode($(this).attr('data-valueParameterList'));
+	// default werte setzen fuer valueParameterList
+	if(valueParameterList === undefined){
+		if(valueType === 'bool') valueParameterList = ['On','Off'];
+		else if (valueType === 'num') valueParameterList = ["step = '1'"];
+		else if (valueType === 'text') valueParameterList = [''];
+		else if (valueType === 'list') valueParameterList = ['Deault','0'];
+	}
 	// data-item ist der sh.py item, in dem alle attribute lagern, die für die steuerung notwendig ist ist ja vom typ dict. das item, was tatsächlich per
 	// schaltuhr verwendet wird ist nur als attribut (child) enthalten und wird ausschliesslich vom plugin verwendet. wird für das rückschreiben der Daten an smarthome.py benötigt
 	var item = $(this).attr('data-item');
@@ -642,16 +649,16 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]',function(event) {
 		}
 	}
 	// wenn bei designType = 'list' ein split angegeben wird, dann muss er immer angegeben sein
-	if ((valueType == 'list') && !(textSelectList[0].split(':')[1] === undefined)) {
-		for (var numberOfTextEntries = 0; numberOfTextEntries < textSelectList.length; numberOfTextEntries++) {
-			if (textSelectList[numberOfTextEntries].split(':')[1] === undefined) {
-				alert('Fehlerhafte Einträge im Parameter textSelectList !');
+	if ((valueType == 'list') && !(valueParameterList[0].split(':')[1] === undefined)) {
+		for (var numberOfTextEntries = 0; numberOfTextEntries < valueParameterList.length; numberOfTextEntries++) {
+			if (valueParameterList[numberOfTextEntries].split(':')[1] === undefined) {
+				alert('Fehlerhafte Einträge im Parameter valueParameterList !');
 				popupOk = false;
 			}
 		}
 	}
 	if (popupOk) {
 		// öffnen des popups bei clicken des icons und ausführung der eingabefunktion
-		runtimeUzsuPopup(response, headline, designType, valueType, textSelectList, item);
+		runtimeUzsuPopup(response, headline, designType, valueType, valueParameterList, item);
 	}
 });
