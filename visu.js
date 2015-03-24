@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release feature v2.8
+// Release feature v2.85
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -52,11 +52,12 @@ function uzsuCollapseTimestring(response, designType){
 			}
 		}
 		// jetzt noch die zu vielen einträge aus dem dict löschen
-		delete response.list[numberOfEntry].timeMin;
-		delete response.list[numberOfEntry].timeMax;
-		delete response.list[numberOfEntry].timeOffset;
-		delete response.list[numberOfEntry].timeCron;
-		delete response.list[numberOfEntry].event;
+		// erst einmal auskommentiert fuer fhem
+		// delete response.list[numberOfEntry].timeMin;
+		// delete response.list[numberOfEntry].timeMax;
+		// delete response.list[numberOfEntry].timeOffset;
+		// delete response.list[numberOfEntry].timeCron;
+		// delete response.list[numberOfEntry].event;
 	}
 }
 
@@ -253,7 +254,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times</div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.8 feature </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v2.85 feature </h6></td></div></tr></table>";
 	// abschlus des gesamten span container
 	template += "</span>";
 	// und der abschluss des popup divs
@@ -278,19 +279,23 @@ function uzsuBuildTable(response, headline, designType, valueType,
 }
 
 function uzsuSetTextInputState(numberOfRow){
-	// status der eingaben setzen
-	// brauchen wir an mehrerer stellen
+	// status der eingaben setzen, das brauchen wir an mehreren stellen
 	if ($("#uzsuEvent"+numberOfRow).val() === 'time'){
 		$('#uzsuTimeCron' + numberOfRow).textinput('enable');
 		$('#uzsuTimeMin'+numberOfRow).textinput('disable');
 		$('#uzsuTimeOffset'+numberOfRow).textinput('disable');
 		$('#uzsuTimeMax'+numberOfRow).textinput('disable');
+		// und den Zeit auf 00:00 stellen wenn von sunrise auf time umgeschaltet wird
+		if($('#uzsuTimeCron' + numberOfRow).val().indexOf('sun')===0)
+			$('#uzsuTimeCron' + numberOfRow).val('00:00');
 	}
 	else{
 		$('#uzsuTimeCron' + numberOfRow).textinput('disable');
 		$('#uzsuTimeMin'+numberOfRow).textinput('enable');
 		$('#uzsuTimeOffset'+numberOfRow).textinput('enable');
 		$('#uzsuTimeMax'+numberOfRow).textinput('enable');
+		// und den Text event auf sunrise bzw. sunset setzen, damit man ihn erkennt !
+		$('#uzsuTimeCron' + numberOfRow).val($("#uzsuEvent"+numberOfRow).val());
 	}
 }
 
@@ -390,7 +395,7 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 		}
 		// Values aus der Zeile auslesen
 		response.list[numberOfRow].active = $('#uzsuActive' + numberOfRow).is(':checked');
-		response.list[numberOfRow].time = $('#uzsuTimeCron' + numberOfRow).val();
+		response.list[numberOfRow].time = $('#uzsuTime'+numberOfRow).val();
 		response.list[numberOfRow].timeMin = $('#uzsuTimeMin'+numberOfRow).val();
 		response.list[numberOfRow].timeOffset = $('#uzsuTimeOffset'+numberOfRow).val();
 		response.list[numberOfRow].timeMax = $('#uzsuTimeMax'+numberOfRow).val();
@@ -473,7 +478,7 @@ function uzsuDelTableRow(response, designType, valueType, valueParameterList, e)
 
 function uzsuSortFunction(a, b) {
 	// sort funktion, wirklich vereinfacht für den speziellen fall
-	return (a.time.replace(':', '') - b.time.replace(':', ''));
+	return (a.timeCron.replace(':', '') - b.timeCron.replace(':', ''));
 }
 
 function uzsuSortTime(response, designType, valueType, valueParameterList, e) {
@@ -613,11 +618,11 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]',function(event) {
 	// hier wird die komplette liste übergeben. widget.explode kehrt das implode au der webseite wieder um
 	var valueParameterList = widget.explode($(this).attr('data-valueParameterList'));
 	// default werte setzen fuer valueParameterList
-	if(valueParameterList === undefined){
+	if(valueParameterList.length === 0){
 		if(valueType === 'bool') valueParameterList = ['On','Off'];
-		else if (valueType === 'num') valueParameterList = ["step = '1'"];
+		else if (valueType === 'num') valueParameterList = ['step = 1'];
 		else if (valueType === 'text') valueParameterList = [''];
-		else if (valueType === 'list') valueParameterList = ['Deault','0'];
+		else if (valueType === 'list') valueParameterList = ['Default','0'];
 	}
 	// data-item ist der sh.py item, in dem alle attribute lagern, die für die steuerung notwendig ist ist ja vom typ dict. das item, was tatsächlich per
 	// schaltuhr verwendet wird ist nur als attribut (child) enthalten und wird ausschliesslich vom plugin verwendet. wird für das rückschreiben der Daten an smarthome.py benötigt
