@@ -3,8 +3,12 @@
 ###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
 (C) Michael Würtenberger 2014,2015
 
+changelog
 
-changelog v2.85
+v2.86
+- breite num wegen schrittweite auf 50 px 
+
+v2.85
 - anpassung variablennamen visu.js und widget_uzsu.html
 - in den parametern kann jetzt bei valueParameterList auch bei num die schrittweite, min und max einegegeben werden
   beispiel : {{ uzsu.uzsu_icon('eg.ez.decke.12a', 'rechner.test.uzsu', 'Esszimmerlampe', '0','','','num',['step = 0.1 min = 0']) }}

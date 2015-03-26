@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release feature v2.85
+// Release feature v2.86
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -170,7 +170,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 		template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + valueParameterList[1] + "</option> <option value='1'> "	+ valueParameterList[0] + " </option></select></td>";
 	} 
 	else if (valueType == 'num') {
-		template += "<td><input type='number' " + valueParameterList[0] + " data-clear-btn='false' pattern='[0-9]*' style = 'width:40px' id='uzsuValue" + numberOfRow + "'</td>";
+		template += "<td><input type='number' " + valueParameterList[0] + " data-clear-btn='false' pattern='[0-9]*' style = 'width:50px' id='uzsuValue" + numberOfRow + "'</td>";
 	} 
 	else if (valueType == 'text') {
 		template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuValue" + numberOfRow + "'</td>";
@@ -254,7 +254,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times</div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.85 feature </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v2.86 develop </h6></td></div></tr></table>";
 	// abschlus des gesamten span container
 	template += "</span>";
 	// und der abschluss des popup divs
