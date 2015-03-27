@@ -5,6 +5,9 @@
 
 changelog
 
+v2.9
+- parameter überprüfungen angepasst
+
 v2.86
 - breite num wegen schrittweite auf 50 px 
 

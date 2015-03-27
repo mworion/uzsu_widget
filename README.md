@@ -4,13 +4,11 @@
 (C) Michael Würtenberger 2014,2015
 
 Aktuell 
-develop v2.86
+develop v2.9
 
 Installation:
 1. Download von visu.js und widget_uzsu.html aus Github
 Link: https://github.com/mworion/uzsu_widget
-Bitte darauf achten, dass es ein master und ein develop branch gibt. (evt. auch mehrere feature branches)
-Es empfielt sich den master zu nehmen. Aktueller Stand v2.0 
 
 2. Beide Dateien in das Projektverzeichnis Eurer Visu hineinkopieren. 
 Das müßte unter /www/smartvisu/pages/"name des Projektes" liegen.

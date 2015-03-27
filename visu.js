@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release feature v2.86
+// Release feature v2.9
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -254,7 +254,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times</div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.86 develop </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v2.9 develop </h6></td></div></tr></table>";
 	// abschlus des gesamten span container
 	template += "</span>";
 	// und der abschluss des popup divs
@@ -620,9 +620,9 @@ $(document).on("click",'[data-widget="uzsu.uzsu_icon"]',function(event) {
 	// default werte setzen fuer valueParameterList
 	if(valueParameterList.length === 0){
 		if(valueType === 'bool') valueParameterList = ['On','Off'];
-		else if (valueType === 'num') valueParameterList = ['step = 1'];
+		else if (valueType === 'num') valueParameterList = [''];
 		else if (valueType === 'text') valueParameterList = [''];
-		else if (valueType === 'list') valueParameterList = ['Default','0'];
+		else if (valueType === 'list') valueParameterList = [''];
 	}
 	// data-item ist der sh.py item, in dem alle attribute lagern, die für die steuerung notwendig ist ist ja vom typ dict. das item, was tatsächlich per
 	// schaltuhr verwendet wird ist nur als attribut (child) enthalten und wird ausschliesslich vom plugin verwendet. wird für das rückschreiben der Daten an smarthome.py benötigt
