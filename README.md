@@ -55,20 +55,19 @@ Es können untesrchiedliche Werte gesetzt werden und auch die Darstellung per Pa
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015
 *
-* v2.0
+* develop v2.9
 *
-* läuft zusammen mit dem visu.js ab v1.6
+* läuft zusammen mit dem visu.js ab v2.8 
 *
 * @param unique id for this widget
 * @param a gad/item
 * @param headline for popup (optional), default UZSZ
 * @param designType for popup design (optional), default = '0', 
 *												 expert mode = '1'  (value, time, rrule direct input)
-*												 mixed mode = '2' features of '0' design of 1
 * @param pic on (optional), default = clock
 * @param pic off (optional), default = clock
 * @param valueType (optional), default = bool, supported types are 'bool', 'num', 'text', 'list'
-* @param textSelectList (optional), default = ['On','Off'] for type = 'bool', any textlist for type = 'list'
+* @param valueParameterList (optional), default set in js depending on valueType
 */
 </pre>
 
