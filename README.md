@@ -4,7 +4,7 @@
 (C) Michael Würtenberger 2014,2015
 
 Aktuell 
-develop v2.9 
+develop v2.91 
 
 Installation:
 1. Download von visu.js und widget_uzsu.html aus Github
@@ -41,13 +41,11 @@ Wichtig: das widget mach funktional in Bezug auf das schalten gar nichts! Die ei
 umgesetzt.
 
 Was kann das widget:
-3 unterschiedliche design typen:
+2 unterschiedliche design typen:
 '0' = standard mode
 Anzeige der UZSU mit Zeit und Wochentagsauswahl
 '1' = expert mode
 Hier können die strings für time und rrule für das plugin direkt eingegeben werden.
-'2' = mixed mode
-Wie der Name sagt eine Mischung aus '0' und '1'.
 
 Es können untesrchiedliche Werte gesetzt werden und auch die Darstellung per Parameter konfiguriert werden:
 <pre>

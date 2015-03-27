@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release feature v2.9 
+// Release feature v2.91
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -254,7 +254,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times</div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.9 develop </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v2.91 develop </h6></td></div></tr></table>";
 	// abschlus des gesamten span container
 	template += "</span>";
 	// und der abschluss des popup divs
@@ -281,21 +281,25 @@ function uzsuBuildTable(response, headline, designType, valueType,
 function uzsuSetTextInputState(numberOfRow){
 	// status der eingaben setzen, das brauchen wir an mehreren stellen
 	if ($("#uzsuEvent"+numberOfRow).val() === 'time'){
-		$('#uzsuTimeCron' + numberOfRow).textinput('enable');
 		$('#uzsuTimeMin'+numberOfRow).textinput('disable');
 		$('#uzsuTimeOffset'+numberOfRow).textinput('disable');
 		$('#uzsuTimeMax'+numberOfRow).textinput('disable');
 		// und den Zeit auf 00:00 stellen wenn von sunrise auf time umgeschaltet wird
-		if($('#uzsuTimeCron' + numberOfRow).val().indexOf('sun')===0)
-			$('#uzsuTimeCron' + numberOfRow).val('00:00');
+		if($('#uzsuTimeCron' + numberOfRow).length !== 0){
+			$('#uzsuTimeCron' + numberOfRow).textinput('enable');
+			if($('#uzsuTimeCron' + numberOfRow).val().indexOf('sun')===0)
+				$('#uzsuTimeCron' + numberOfRow).val('00:00');
+		}
 	}
 	else{
-		$('#uzsuTimeCron' + numberOfRow).textinput('disable');
 		$('#uzsuTimeMin'+numberOfRow).textinput('enable');
 		$('#uzsuTimeOffset'+numberOfRow).textinput('enable');
 		$('#uzsuTimeMax'+numberOfRow).textinput('enable');
 		// und den Text event auf sunrise bzw. sunset setzen, damit man ihn erkennt !
-		$('#uzsuTimeCron' + numberOfRow).val($("#uzsuEvent"+numberOfRow).val());
+		if($('#uzsuTimeCron' + numberOfRow).length !== 0){
+			$('#uzsuTimeCron' + numberOfRow).textinput('disable');
+			$('#uzsuTimeCron' + numberOfRow).val($("#uzsuEvent"+numberOfRow).val());
+		}
 	}
 }
 
@@ -386,14 +390,7 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 	response.active = $('#uzsuGeneralActive').is(':checked');
 	// einzeleinträge
 	for (numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
-		// beim zurücklesen keine beachtung des typs, da smarthome bei bool auch 0 bzw. 1 akzeptiert
-		if ((valueType == 'text') || (valueType == 'list')) {
-			response.list[numberOfRow].value = $('#uzsuValue' + numberOfRow).val();
-		} 
-		else {
-			response.list[numberOfRow].value = parseInt($('#uzsuValue' + numberOfRow).val());
-		}
-		// Values aus der Zeile auslesen
+		response.list[numberOfRow].value = $('#uzsuValue' + numberOfRow).val();
 		response.list[numberOfRow].active = $('#uzsuActive' + numberOfRow).is(':checked');
 		response.list[numberOfRow].time = $('#uzsuTime'+numberOfRow).val();
 		response.list[numberOfRow].timeMin = $('#uzsuTimeMin'+numberOfRow).val();

@@ -4,6 +4,9 @@
 (C) Michael Würtenberger 2014,2015
 
 changelog 
+v2.91
+- bugfix parseInt mhatte num werte mit nachkomma verhindert
+- DOM Fehler beim wechsel des design types 
 
 v2.9
 - parameter überprüfungen angepasst
