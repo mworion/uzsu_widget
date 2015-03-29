@@ -4,6 +4,14 @@
 (C) Michael Würtenberger 2014,2015
 
 changelog 
+v2.93
+- bugfix wegen Parsing Fehler bei designType=1 während des Speicherns
+- cleanup der Kommentare, design Pattern rein, Lesbarkeit erhöht
+
+v2.92
+- bugfix wegen Parsing Fehler in 07:00<sunset 
+
+
 v2.91
 - bugfix parseInt mhatte num werte mit nachkomma verhindert
 - DOM Fehler beim wechsel des design types 
