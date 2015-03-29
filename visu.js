@@ -1,7 +1,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release feature v2.91
+// Release feature v2.92
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -51,13 +51,6 @@ function uzsuCollapseTimestring(response, designType){
 				response.list[numberOfEntry].time = timeString;
 			}
 		}
-		// jetzt noch die zu vielen einträge aus dem dict löschen
-		// erst einmal auskommentiert fuer fhem
-		// delete response.list[numberOfEntry].timeMin;
-		// delete response.list[numberOfEntry].timeMax;
-		// delete response.list[numberOfEntry].timeOffset;
-		// delete response.list[numberOfEntry].timeCron;
-		// delete response.list[numberOfEntry].event;
 	}
 }
 
@@ -94,13 +87,14 @@ function uzsuExpandTimestring(response){
 	        else{
 	        	timeMin = tabsTime[0].trim();
 	        	timeMax = '';
+		    	event = tabsTime[1].trim();
 	            if(event.indexOf('sunrise')===0) event = 'sunrise'; else event = 'sunset';
 	        }
 	    }
 	    else if(tabsTime.length == 3){
 	    	timeMin = tabsTime[0].trim();
-	    	event = tabsTime[1].trim();
 	    	timeMax = tabsTime[2].trim();
+	    	event = tabsTime[1].trim();
 	        if(event.indexOf('sunrise')===0) event = 'sunrise'; else event = 'sunset';
 	    }
 	    else{
@@ -254,7 +248,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times</div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.91 develop </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v2.92 develop </h6></td></div></tr></table>";
 	// abschlus des gesamten span container
 	template += "</span>";
 	// und der abschluss des popup divs
