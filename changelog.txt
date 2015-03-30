@@ -4,7 +4,7 @@
 (C) Michael Würtenberger 2014,2015
 
 changelog
-v2.94
+v2.94 
 - erweiterung der klassen, um die textbreiten anzugeben
 - weiterer code cleanup
  
