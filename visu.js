@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release feature v2.93
+// Release feature v2.94
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -181,14 +181,14 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 		template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + valueParameterList[1] + "</option> <option value='1'> "	+ valueParameterList[0] + " </option></select></td>";
 	} 
 	else if (valueType == 'num') {
-		template += "<td><input type='number' " + valueParameterList[0] + " data-clear-btn='false' pattern='[0-9]*' style = 'width:50px' id='uzsuValue" + numberOfRow + "'</td>";
+		template += "<td><input type='number' " + valueParameterList[0] + " data-clear-btn='false' class='uzsuValueInput' pattern='[0-9]*' style = 'width:50px' id='uzsuValue" + numberOfRow + "'</td>";
 	} 
 	else if (valueType == 'text') {
 		template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuValue" + numberOfRow + "'</td>";
 	} 
 	else if (valueType == 'list') {
 		// das Listenformat mit select ist sehr trickreich.
-		template += "<td><form><div data-role='fieldcontain' class='uzsuTextInput' style = 'width:120px; height:auto !important'>";
+		template += "<td><form><div data-role='fieldcontain' class='uzsuListInput' style = 'width:120px; height:auto !important'>";
 		template += "<select name='uzsuValue'" + numberOfRow + "' id='uzsuValue" + numberOfRow + "' data-mini='true'>";
 		for (var numberOfListEntry = 0; numberOfListEntry < valueParameterList.length; numberOfListEntry++) {
 			// Unterscheidung Anzeige und Werte
@@ -232,7 +232,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	// Tabellenüberschriften
 	template += "<tr><td>earliest</td><td></td><td>Event</td><td>+/- min</td><td></td><td></td><td>latest</td></tr>";
 	// Tabellenfelder
-	template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput'id='uzsuTimeMin" + numberOfRow + "'</td>";
+	template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeMaxMinInput' id='uzsuTimeMin" + numberOfRow + "'</td>";
 	template += "<td> <h1 style='margin:0'> < </h1> </td>";
 	template += "<td><form><div data-role='fieldcontain' class='uzsuEvent' style = 'height:auto !important'>";
 	template += "<select name='uzsuEvent" + numberOfRow + "' id='uzsuEvent" + numberOfRow + "' data-mini='true'>";
@@ -240,13 +240,12 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	template += "<option value='sunrise'>Sunrise</option>";
 	template += "<option value='sunset'>Sunset</option>";
 	template += "</div></form></td>";
-	template += "<td><input type='number' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuTimeOffset" + numberOfRow + "'</td>";
+	template += "<td><input type='number' data-clear-btn='false' style='width:60px' class='uzsuTimeOffsetInput' id='uzsuTimeOffset" + numberOfRow + "'</td>";
 	template += "<td> Minutes</td><td> <h1 style='margin:0'> < </h1> </td>";
-	template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeInput' id='uzsuTimeMax" + numberOfRow + "'</td>";
+	template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeMaxMinInput' id='uzsuTimeMax" + numberOfRow + "'</td>";
 	template += "</tr>";
 	// Abschluss des Tabelleeintrags der Expertenzeile
 	template += "</table></td></tr>";
-
 	return template;
 }
 
@@ -262,10 +261,10 @@ function uzsuBuildTableFooter(designType) {
 	template += "<div data-role = 'button' id = 'uzsuAddTableRow'> Add Entry </div>";
 	template += "<div data-role = 'button' id = 'uzsuSaveQuit'> Save&Quit</div>";
 	if (designType == '0') {
-		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times</div>";
+		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times </div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.93 develop </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v2.94 develop </h6></td></div></tr></table>";
 	// Abschlus des gesamten span container
 	template += "</span>";
 	// und der Abschluss des popup divs
