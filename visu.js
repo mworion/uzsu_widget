@@ -536,8 +536,7 @@ function uzsuSortTime(response, designType, valueType, valueParameterList, e) {
 function uzsuRuntimePopup(response, headline, designType, valueType,
 		valueParameterList, item) {
 	// Steuerung des Popups erst einmal wird der Leeranteil angelegt
-	var template = uzsuBuildTable(response, headline, designType, valueType,
-			valueParameterList);
+	var template = uzsuBuildTable(response, headline, designType, valueType, valueParameterList);
 	// dann speichern wir uns für cancel die ursprünglichen Werte ab
 	var responseCancel = jQuery.extend(true, {}, response);
 	// dann hängen wir das an die aktuelle Seite
