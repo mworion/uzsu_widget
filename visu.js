@@ -206,7 +206,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 		template += "<td><input type='time' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>";
 		// rrule wurde auf die Tage verteilt
 		template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
-		for (numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
+		for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
 			template += "<input type='checkbox' id='checkbox" + numberOfDay	+ "-" + numberOfRow + "'> <label for='checkbox"	+ numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "</label>";
 		}
 		template += "</fieldset></form></td>";
@@ -533,7 +533,7 @@ function uzsuSortTime(response, designType, valueType, valueParameterList, e) {
 	uzsuFillTable(response, designType, valueType, valueParameterList);
 }
 
-function runtimeUzsuPopup(response, headline, designType, valueType,
+function uzsuRuntimePopup(response, headline, designType, valueType,
 		valueParameterList, item) {
 	// Steuerung des Popups erst einmal wird der Leeranteil angelegt
 	var template = uzsuBuildTable(response, headline, designType, valueType,
@@ -642,7 +642,7 @@ function uzsuDomClick(event) {
 	}
 	// bei designType '0' wird rrule nach Wochentagen umgewandelt und ein festes Format vogegegeben hier sollte nichts versehentlich überschrieben werden
 	if (designType == '0') {
-		numberOfEntries = response.list.length;
+		var numberOfEntries = response.list.length;
 		for (var numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
 			// test, ob die RRULE fehlerhaft ist
 			if ((response.list[numberOfRow].rrule.indexOf('FREQ=WEEKLY;BYDAY=') !== 0) && (response.list[numberOfRow].rrule.length > 0)) {
@@ -665,7 +665,7 @@ function uzsuDomClick(event) {
 	}
 	if (popupOk) {
 		// Öffnen des Popups bei clicken des icons und Ausführung der Eingabefunktion
-		runtimeUzsuPopup(response, headline, designType, valueType, valueParameterList, item);
+		uzsuRuntimePopup(response, headline, designType, valueType, valueParameterList, item);
 	}
 }
 // Verankerung als Callback in den DOM Elementen
