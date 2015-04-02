@@ -48,7 +48,7 @@ function uzsuCollapseTimestring(response, designType){
 			}
 			else{
 				// ansonsten wird er aus der bestandteilen zusammengebaut
-				if(response.list[numberOfEntry].timeMin.length > 0){
+				if(response.list[numberOfEntry].timeMin.length > 0){ 
 					timeString = timeString + response.list[numberOfEntry].timeMin + '<';
 				}
 				timeString += response.list[numberOfEntry].event;
@@ -203,7 +203,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	}
 	// time
 	if(designType === '0'){
-		template += "<td><input type='time' data-clear-btn='false' style='width:40px' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>";
+		template += "<td><input type='time' data-clear-btn='false' style='width:50px' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>";
 		// rrule wurde auf die Tage verteilt
 		template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
 		for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
@@ -272,19 +272,6 @@ function uzsuBuildTableFooter(designType) {
 	return template;
 }
 
-function uzsuBuildTable(response, headline, designType, valueType,
-		valueParameterList) {
-	// hier wird das Template zusammengestellt, die Tabellenzeilen separat, weil ich die bei einer Ergänzung der Tabelle wieder verwenden kann
-	var template = "";
-	var numberOfEntries = response.list.length;
-	// erst den header, dann die zeilen, dann den footer
-	template = uzsuBuildTableHeader(headline, designType, valueType, valueParameterList);
-	for (var numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
-		template += uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterList);
-	}
-	template += uzsuBuildTableFooter(designType);
-	return template;
-}
 //----------------------------------------------------------------------------
 // Funktionen für das dynamische Handling der Seiteninhalte des Popups
 //----------------------------------------------------------------------------
@@ -531,15 +518,21 @@ function uzsuSortTime(response, designType, valueType, valueParameterList, e) {
 	// dann die Einträge wieder schreiben
 	uzsuFillTable(response, designType, valueType, valueParameterList);
 }
-
-function uzsuRuntimePopup(response, headline, designType, valueType,
-		valueParameterList, item) {
+//----------------------------------------------------------------------------
+// Funktionen für den Aufbau des Popups und das Einrichten der Callbacks
+//----------------------------------------------------------------------------
+function uzsuRuntimePopup(response, headline, designType, valueType, valueParameterList, item) {
 	// Steuerung des Popups erst einmal wird der Leeranteil angelegt
-	var template = uzsuBuildTable(response, headline, designType, valueType, valueParameterList);
-	// dann speichern wir uns für cancel die ursprünglichen Werte ab
-	var responseCancel = jQuery.extend(true, {}, response);
+	// erst den Header, dann die Zeilen, dann den Footer
+	var template = uzsuBuildTableHeader(headline, designType, valueType, valueParameterList);
+	for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
+		template += uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterList);
+	}
+	template += uzsuBuildTableFooter(designType);
 	// dann hängen wir das an die aktuelle Seite
 	$.mobile.activePage.append(template).trigger('pagecreate');
+	// dann speichern wir uns für cancel die ursprünglichen im DOM gespeicherten Werte in eine Variable ab
+	var responseCancel = jQuery.extend(true, {}, response);
 	// dann die Werte eintragen.
 	uzsuFillTable(response, designType, valueType, valueParameterList);
 	// Popup schliessen mit close rechts oben in der Box
@@ -567,7 +560,7 @@ function uzsuRuntimePopup(response, headline, designType, valueType,
 		uzsuSortTime(response, designType, valueType, valueParameterList);
 	});
 	// Löschen mit del als Callback eintragen
-	for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
+	for (numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
 		$.mobile.activePage.find('#uzsuDelTableRow' + numberOfRow).bind('tap',function(e) {
 			uzsuDelTableRow(response, designType, valueType, valueParameterList, e);
 		});
@@ -658,7 +651,7 @@ function uzsuDomClick(event) {
 		}
 	}
 	// wenn bei designType = 'list' ein Split angegeben wird, dann muss er immer angegeben sein
-	if ((valueType == 'list') && !(valueParameterList[0].split(':')[1] === undefined)) {
+	if ((valueType == 'list') && (valueParameterList[0].split(':')[1] !== undefined)) {
 		for (var numberOfTextEntries = 0; numberOfTextEntries < valueParameterList.length; numberOfTextEntries++) {
 			if (valueParameterList[numberOfTextEntries].split(':')[1] === undefined) {
 				alert('Fehlerhafte Einträge im Parameter valueParameterList !');
