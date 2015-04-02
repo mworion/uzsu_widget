@@ -622,7 +622,7 @@ function uzsuDomClick(event) {
 	// jetzt kommt noch die Liste von Prüfungen, damit hinterher keine Fehler passieren
 	var popupOk = true;
 	// fehlerbehandlung für ein nicht vorhandenes DOM Objekt. Warum das manchmal passiert, weiß ich nicht !
-	if(response.list.length === undefined){
+	if(response.list.length === undefined){ 
 		alert('DOM Daten für UZSU nicht vorhanden !');
 		popupOk = false;
 	}
