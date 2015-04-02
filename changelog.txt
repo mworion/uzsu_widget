@@ -4,6 +4,10 @@
 (C) Michael Würtenberger 2014,2015
 
 changelog
+v2.95
+- fehlerfindung dom update kommt zu spät
+- checkbox, dass fehler vorliegt
+
 v2.94 
 - erweiterung der klassen, um die textbreiten anzugeben
 - weiterer code cleanup

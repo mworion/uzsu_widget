@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release feature v2.94
+// Release feature v2.95
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -264,7 +264,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times </div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.94 develop </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v2.95 develop </h6></td></div></tr></table>";
 	// Abschlus des gesamten span container
 	template += "</span>";
 	// und der Abschluss des popup divs
@@ -626,8 +626,13 @@ function uzsuDomClick(event) {
 	// data-item ist der sh.py item, in dem alle Attribute lagern, die für die Steuerung notwendig ist ist ja vom typ dict. das item, was tatsächlich per
 	// Schaltuhr verwendet wird ist nur als attribut (child) enthalten und wird ausschliesslich vom Plugin verwendet. wird für das rückschreiben der Daten an smarthome.py benötigt
 	var item = $(this).attr('data-item');
-	// jetzt kommt noch die Liste von prüfungen, damit hinterher keine Fehler passieren zunächst erst einmal Popup wird angezeigt
+	// jetzt kommt noch die Liste von Prüfungen, damit hinterher keine Fehler passieren
 	var popupOk = true;
+	// fehlerbehandlung für ein nicht vorhandenes DOM Objekt. Warum das manchmal passiert, weiß ich nicht !
+	if(response.list.length === undefined){
+		alert('DOM Daten für UZSU nicht vorhanden !');
+		popupOk = false;
+	}
 	// fehlerhafter designType (unbekannt)
 	if ((designType !== '0') && (designType !== '1')) {
 		alert('Fehlerhafter Parameter: "' + designType + '" im Feld designType bei Item ' + item);
