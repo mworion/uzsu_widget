@@ -587,8 +587,10 @@ function uzsuDomUpdate(event, response) {
 	// Das Icon wird aktiviert, falls Status auf aktiv, ansonsten deaktiviert angezeigt
 	$('#' + this.id + ' img').attr('src',(active ? $(this).attr('data-pic-on') : $(this).attr('data-pic-off')));
 	// wenn keine Daten vorhanden, dann ist kein item mit den eigenschaften hinterlegt und es wird nichts gemacht
-	if (response.length === 0)
+	if (response.length === 0){
+		console.log('Fehler im DOM Objekt -> nicht vorhanden',event,response);
 		return;
+	}
 	// Wenn ein Update erfolgt, dann werden die Daten erneut in die Variable uzsu geladen damit sind die UZSU objekte auch in der click Funktion verfügbar
 	if (response[0].list instanceof Array) {
 		$(this).data('uzsu', response[0]);
@@ -601,6 +603,13 @@ function uzsuDomClick(event) {
 	// hier werden die Parameter aus den Attributen herausgenommen und beim Öffnen mit .open(....) an das Popup Objekt übergeben
 	// und zwar mit deep copy, damit ich bei cancel die ursprünglichen werte nicht überschrieben habe
 	var response = jQuery.extend(true, {}, $(this).data('uzsu'));
+	// erst gehen wir davon aus, dass die Prüfungen positiv und ein Popup angezeigt wird
+	var popupOk = true;
+	// fehlerbehandlung für ein nicht vorhandenes DOM Objekt. Warum das manchmal passiert, weiß ich nicht !
+	if(response.list === undefined){ 
+		alert('DOM Daten für UZSU nicht vorhanden !');
+		popupOk = false;
+	}
 	// jetzt erweitern wir die dicts pro Eintrag, um dem dort einhaltenen Timestring die enthaltenen Einzelteile zu bekommen
 	uzsuExpandTimestring(response);
  	// Auswertung der Übergabeparameter
@@ -619,14 +628,7 @@ function uzsuDomClick(event) {
 	// data-item ist der sh.py item, in dem alle Attribute lagern, die für die Steuerung notwendig ist ist ja vom typ dict. das item, was tatsächlich per
 	// Schaltuhr verwendet wird ist nur als attribut (child) enthalten und wird ausschliesslich vom Plugin verwendet. wird für das rückschreiben der Daten an smarthome.py benötigt
 	var item = $(this).attr('data-item');
-	// jetzt kommt noch die Liste von Prüfungen, damit hinterher keine Fehler passieren
-	var popupOk = true;
-	// fehlerbehandlung für ein nicht vorhandenes DOM Objekt. Warum das manchmal passiert, weiß ich nicht !
-	if(response.list.length === undefined){ 
-		alert('DOM Daten für UZSU nicht vorhanden !');
-		popupOk = false;
-	}
-	// fehlerhafter designType (unbekannt)
+	// jetzt kommt noch die Liste von Prüfungen, damit hinterher keine Fehler passieren, zunächst fehlerhafter designType (unbekannt)
 	if ((designType !== '0') && (designType !== '1')) {
 		alert('Fehlerhafter Parameter: "' + designType + '" im Feld designType bei Item ' + item);
 		popupOk = false;
