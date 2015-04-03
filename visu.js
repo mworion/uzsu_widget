@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release feature v2.95
+// Release feature v3 RC1
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -68,7 +68,7 @@ function uzsuCollapseTimestring(response, designType){
 }
 
 function uzsuExpandTimestring(response){
-	// ist aus dem uzsu plugin von 2ndsky übernommen und nach js portiert
+	// ist aus cron von schedule.py aus sh.py übernommen und nach js portiert
 	var timeCron = '';
 	var timeMin = '';
 	var timeMax = '';
@@ -117,12 +117,12 @@ function uzsuExpandTimestring(response){
 	        if(event.indexOf('sunrise')===0) event = 'sunrise'; else event = 'sunset';
 	    }
 	    else{
-	    	// formatfehler ! ich nehme dann defaulteinstellung an
+	    	// Formatfehler ! ich nehme dann Defaulteinstellung an
 	    	timeMin = '';
 	    	event = 'time';
 	    	timeMax = '';
 	    }
-	    // nun noch der offset herausnehmen
+	    // nun noch der Offset herausnehmen
 	    var tabsOffset = response.list[numberOfEntry].time.split('+');
 	    if(tabsOffset.length == 2){
 	    	// dann steht ein plus drin
@@ -135,7 +135,7 @@ function uzsuExpandTimestring(response){
 	    	tabsOffset = tabsOffset[1].split('m');
 	    	timeOffset = '-' + tabsOffset[0].trim();
 	    }
-	    // zuweisung der neuen werte im dict
+	    // zuweisung der neuen Werte im dict
 		response.list[numberOfEntry].timeMin = timeMin;
 		response.list[numberOfEntry].timeMax = timeMax;
 		response.list[numberOfEntry].timeCron = timeCron;
@@ -160,7 +160,7 @@ function uzsuBuildTableHeader(headline, designType, valueType, valueParameterLis
 	template += "<table id='uzsuTable' style = 'border: 1px solid;padding-right: 3px;padding-left: 3px'> ";
 	// generell gibt es dann dispatcher für die einzelnen Formate. Ich fasse sie zusammen, wo immer es geht. Hier kann man auch die Formate für sich selbst erweitern und anpassen.
 	if(designType === '0'){
-		// Format 0 ist der default, macht Wochentage, eine konfigurierbare Eingabe des Wertes und die Aktivierungen
+		// Format 0 ist der Default, macht Wochentage, eine konfigurierbare Eingabe des Wertes und die Aktivierungen
 		template += "<tr><td>Value</td><td>Time</td><td>Weekdays</td><td>Active</td><td>Expert</td><td>Remove</td></tr>";
 	}
 	else{
@@ -176,7 +176,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	// Liste für die Wochentage, damit ich später per Index darauf zugreifen kann
 	var weekDays = [ 'MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU' ];
 	template += "<tr id='uzsuNumberOfRow" + numberOfRow + "'>";
-	// Jetzt beginnen die Spalten in der Reihenfolge value, time / rrule, active, delete button mit flipswitch (bessere Erkennbarkeit), die Texte können über das widget gesetzt werden
+	// Jetzt beginnen die Spalten in der Reihenfolge value, time / rrule, active, delete button mit flipswitch (bessere Erkennbarkeit), die Texte können über das Widget gesetzt werden
 	if (valueType == 'bool') {
 		template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + valueParameterList[1] + "</option> <option value='1'> "	+ valueParameterList[0] + " </option></select></td>";
 	} 
@@ -236,14 +236,10 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	template += "<td> <h1 style='margin:0'> < </h1> </td>";
 	template += "<td><form><div data-role='fieldcontain' class='uzsuEvent' style = 'height:auto !important'>";
 	template += "<select name='uzsuEvent" + numberOfRow + "' id='uzsuEvent" + numberOfRow + "' data-mini='true'>";
-	template += "<option value='time'>Time</option>";
-	template += "<option value='sunrise'>Sunrise</option>";
-	template += "<option value='sunset'>Sunset</option>";
-	template += "</div></form></td>";
+	template += "<option value='time'>Time</option><option value='sunrise'>Sunrise</option><option value='sunset'>Sunset</option></div></form></td>";
 	template += "<td><input type='number' data-clear-btn='false' style='width:60px' class='uzsuTimeOffsetInput' id='uzsuTimeOffset" + numberOfRow + "'</td>";
 	template += "<td> Minutes</td><td> <h1 style='margin:0'> < </h1> </td>";
-	template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeMaxMinInput' id='uzsuTimeMax" + numberOfRow + "'</td>";
-	template += "</tr>";
+	template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeMaxMinInput' id='uzsuTimeMax" + numberOfRow + "'</td></tr>";
 	// Abschluss des Tabelleeintrags der Expertenzeile
 	template += "</table></td></tr>";
 	return template;
@@ -264,14 +260,13 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times </div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v2.95 develop </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v3 RC1 develop </h6></td></div></tr></table>";
 	// Abschlus des gesamten span container
 	template += "</span>";
 	// und der Abschluss des popup divs
 	template += "</div>";
 	return template;
 }
-
 //----------------------------------------------------------------------------
 // Funktionen für das dynamische Handling der Seiteninhalte des Popups
 //----------------------------------------------------------------------------
@@ -342,7 +337,7 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 	    $('#uzsuTimeOffset'+numberOfRow).val(parseInt(response.list[numberOfRow].timeOffset));
 	    $('#uzsuTimeMax'+numberOfRow).val(response.list[numberOfRow].timeMax);
 	    $('#uzsuTimeCron'+numberOfRow).val(response.list[numberOfRow].timeCron);
-	    // und die pull down menüs richtig, damit die einträge wieder stimmen
+	    // und die pull down Menüs richtig, damit die Einträge wieder stimmen
 	    $('#uzsuEvent'+numberOfRow).val(response.list[numberOfRow].event).attr('selected',true).siblings('option').removeAttr('selected');
 	    // und der Refresh, damit es angezeigt wird
 		$('#uzsuEvent'+numberOfRow).selectmenu('refresh', true);
@@ -355,7 +350,7 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 				rrule = '';
 			}
 			var ind = rrule.indexOf('BYDAY');
-			// wenn der sSandard drin ist
+			// wenn der Standard drin ist
 			if (ind > 0) {
 				var days = rrule.substring(ind);
 				// Setzen der Werte
@@ -365,7 +360,7 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 			}
 		}
 		else{
-			// wenn experte, dann einfach nur den string
+			// wenn Experte, dann einfach nur den String
 			$('#uzsuRrule' + numberOfRow).val(response.list[numberOfRow].rrule);
 		}
 	}
