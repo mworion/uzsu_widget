@@ -588,7 +588,7 @@ function uzsuDomUpdate(event, response) {
 	$('#' + this.id + ' img').attr('src',(active ? $(this).attr('data-pic-on') : $(this).attr('data-pic-off')));
 	// wenn keine Daten vorhanden, dann ist kein item mit den eigenschaften hinterlegt und es wird nichts gemacht
 	if (response.length === 0){
-		console.log('Fehler im DOM Objekt -> nicht vorhanden',event,response);
+		alert('DOM Daten für UZSU nicht vorhanden in uzsuDomUpdate !');
 		return;
 	}
 	// Wenn ein Update erfolgt, dann werden die Daten erneut in die Variable uzsu geladen damit sind die UZSU objekte auch in der click Funktion verfügbar
@@ -605,9 +605,11 @@ function uzsuDomClick(event) {
 	var response = jQuery.extend(true, {}, $(this).data('uzsu'));
 	// erst gehen wir davon aus, dass die Prüfungen positiv und ein Popup angezeigt wird
 	var popupOk = true;
-	// fehlerbehandlung für ein nicht vorhandenes DOM Objekt. Warum das manchmal passiert, weiß ich nicht !
+	// Fehlerbehandlung für ein nicht vorhandenes DOM Objekt. Das response Objekt ist erst da, wenn es mit update angelegt wurde. Da diese
+	// Schritte asynchron erfolgen, kann es sein, dass das Icon bereits da ist, clickbar, aber nocht keine Daten angekommen. Dann darf ich nicht
+	// auf diese Daten zugreifen wollen !
 	if(response.list === undefined){ 
-		alert('DOM Daten für UZSU nicht vorhanden !');
+		alert('DOM Daten für UZSU nicht vorhanden in uzsuDomClick!');
 		popupOk = false;
 	}
 	// jetzt erweitern wir die dicts pro Eintrag, um dem dort einhaltenen Timestring die enthaltenen Einzelteile zu bekommen
