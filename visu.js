@@ -238,7 +238,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	template += "<select name='uzsuEvent" + numberOfRow + "' id='uzsuEvent" + numberOfRow + "' data-mini='true'>";
 	template += "<option value='time'>Time</option><option value='sunrise'>Sunrise</option><option value='sunset'>Sunset</option></div></form></td>";
 	template += "<td><input type='number' data-clear-btn='false' style='width:60px' class='uzsuTimeOffsetInput' id='uzsuTimeOffset" + numberOfRow + "'</td>";
-	template += "<td> Minutes</td><td> <h1 style='margin:0'> < </h1> </td>";
+	template += "<td> <h1 style='margin:0'> < </h1> </td>";
 	template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeMaxMinInput' id='uzsuTimeMax" + numberOfRow + "'</td></tr>";
 	// Abschluss des Tabelleeintrags der Expertenzeile
 	template += "</table></td></tr>";
