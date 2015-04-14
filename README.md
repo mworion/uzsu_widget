@@ -32,7 +32,7 @@ das packt ihr am besten unter die Zeilen
 
 5. Die Parametrierung des Widgets findet Ihr ebenfalls in der widget_uzsu.html Datei. Einfach mal reinschauen.
 
-6. Anschliessend reload der Seite im Browser, dann sollte das Popup kommen.
+6. Anschliessend Reload der Seite im Browser, dann sollte das Popup kommen.
 
 7. Stimmt etwas nicht, bitte erst einmal die Fehlerkonsole in Eurem Browser aktivieren und nach den Meldungen
 schauen. Zu 95% findet Ihr dort die Lösung.  
@@ -40,20 +40,41 @@ schauen. Zu 95% findet Ihr dort die Lösung.
 Wichtig: das widget mach funktional in Bezug auf das schalten gar nichts! Die eigentliche Funktion ist im UZSU Plugin 
 umgesetzt.
 
-Was kann das widget:
-2 unterschiedliche design typen:
-'0' = standard mode
-Anzeige der UZSU mit Zeit und Wochentagsauswahl
-'1' = expert mode
-Hier können die strings für time und rrule für das plugin direkt eingegeben werden.
+Es können unterschiedliche Werte gesetzt werden und auch die Darstellung per Parameter konfiguriert werden:
+<pre>
+Parametersatz für UZSU.UZSU_ICON:
+(Eindeutige ID des Widgets, Item der UZSU in smarthome, Überschrift Popup, Erscheinungsbild Popup, 
+    Bild UZSU Aktiv, Bild UZSU Inaktiv, Werte Typ, Parameterliste Werte)
 
-Es können untesrchiedliche Werte gesetzt werden und auch die Darstellung per Parameter konfiguriert werden:
+Optionen Erscheinungsbild Popup:
+0: Standard. Es wird Wert, Zeit HH:MM, Wochentage zur Auswahl, Zeile Aktiv behandelt.
+1: Profimodus. Zeit kann als Textstring (volle Funktion des Plugins inkl. surise usw.), und Wochentag als rrule String angegeben werden.
+ 
+Optionen Werte Typ wählt die Werteingabe im Popup aus:
+bool:   Slideranzeige. 
+num:    Numerisches Eingabefeld.
+text:   Texteingabefeld.
+list:   Stellt Pull-Down Liste dar.  
+
+Optionen Parameterliste Wert:
+Werte Typ    Parameter                Beschreibung: 
+bool         ['text off','text on']   'text off' wird bei Bool=0,False,Off angezeigt   
+                                      'text on'  wird bei Bool=1,True,On angezeigt
+num          ['min max step']         'string' zum Setzen der Eingabeparameter bei z.B. <input type="number" step="0.01" min="0" >
+                                      siehe auch http://www.w3.org/TR/html-markup/input.number.html#input.number.attrs.step.float
+text         []                       keine Parameter werden verwendet
+list         ['Wert1','Wert2']        Die Strings 'Wert1' und 'Wert2' werden in der Auswahlliste gezeigt und so als Wert gesetzt
+             ['W1:x1','W2:x2']        Die Strings 'Wert1' und 'Wert2' werden in der Auswahlliste gezeigt und x1 bzw. x2 als Wert gesetzt
+             
+</pre>
+
+Nochmal die Parameter im Widget:
 <pre>
 /**
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015
 *
-* develop v2.9
+* develop v3 RC1
 *
 * läuft zusammen mit dem visu.js ab v2.8 
 *
