@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release develop v3RC2
+// Release develop v3
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -230,7 +230,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	// und jetzt noch die unsichbare Expertenzeile
 	template += "<tr id='uzsuExpertLine" + numberOfRow + "' style='display:none;'><td colspan='6'><table>";
 	// Tabellenüberschriften
-	template += "<tr><td>earliest</td><td></td><td>Event</td><td>+/- min</td><td></td><td></td><td>latest</td></tr>";
+	template += "<tr><td>earliest</td><td></td><td>Event</td><td>+/- min</td><td></td><td>latest</td></tr>";
 	// Tabellenfelder
 	template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeMaxMinInput' id='uzsuTimeMin" + numberOfRow + "'</td>";
 	template += "<td> <h1 style='margin:0'> < </h1> </td>";
@@ -260,7 +260,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times </div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> develop v3RC2 </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v3 </h6></td></div></tr></table>";
 	// Abschlus des gesamten span container
 	template += "</span>";
 	// und der Abschluss des popup divs
