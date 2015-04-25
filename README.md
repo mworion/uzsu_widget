@@ -4,7 +4,7 @@
 (C) Michael Würtenberger 2014,2015
 
 Aktuell 
-develop v3
+develop v4
 
 Installation:
 1. Download von visu.js und widget_uzsu.html aus Github
