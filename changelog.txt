@@ -3,7 +3,10 @@
 ###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
 (C) Michael Würtenberger 2014,2015
 
-changelog 
+changelog
+v3 RC2
+- sortierung mit sunset und sunrise
+ 
 v3 RC1
 - alert meldung bei fehler DOM Element UZSU
 - schreibfehler, code cleanup

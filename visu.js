@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release feature v3 RC1
+// Release develop v3RC2
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -260,7 +260,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times </div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v3 RC1 develop </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> develop v3RC2 </h6></td></div></tr></table>";
 	// Abschlus des gesamten span container
 	template += "</span>";
 	// und der Abschluss des popup divs
@@ -502,7 +502,15 @@ function uzsuHideExpertLine(e) {
 //----------------------------------------------------------------------------
 function uzsuSortFunction(a, b) {
 	// sort Funktion, wirklich vereinfacht für den speziellen Fall
-	return (a.timeCron.replace(':', '') - b.timeCron.replace(':', ''));
+	// ergänzt um das sunrise und sunset Thema
+	var A = a.timeCron.replace(':', '');
+	var B = b.timeCron.replace(':', '');
+	// Reihenfolge ist erst die Zeiten, dann sunrise, dann sunset 
+	if(A == 'sunrise') A = '2400';
+	if(A == 'sunset') A = '2400';
+	if(B == 'sunrise') B = '2401';
+	if(B == 'sunset') B = '2401';
+	return (A - B);
 }
 
 function uzsuSortTime(response, designType, valueType, valueParameterList, e) {
@@ -518,7 +526,7 @@ function uzsuSortTime(response, designType, valueType, valueParameterList, e) {
 //----------------------------------------------------------------------------
 function uzsuRuntimePopup(response, headline, designType, valueType, valueParameterList, item) {
 	// Steuerung des Popups erst einmal wird der Leeranteil angelegt
-	// erst den Header, dann die Zeilen, dann den Footer
+	// erst den Header, dann die Zeilen, dann den Footer 
 	var template = uzsuBuildTableHeader(headline, designType, valueType, valueParameterList);
 	for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
 		template += uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterList);
