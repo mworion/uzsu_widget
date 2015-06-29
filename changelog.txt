@@ -4,6 +4,9 @@
 (C) Michael Würtenberger 2014,2015
 
 changelog
+v3.01
+- Service release wegen anpassung Fehlermeldung und Readme
+
 v3
 - Expertenzeile Zeilenüberschrift bei latest um eine nach links (war versetzt)
 
