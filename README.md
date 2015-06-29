@@ -3,8 +3,7 @@
 ###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
 (C) Michael Würtenberger 2014,2015
 
-Aktuell 
-develop v4
+Stand: develop v4
 
 Installation:
 1. Download von visu.js und widget_uzsu.html aus Github
@@ -74,7 +73,7 @@ Nochmal die Parameter im Widget:
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015
 *
-* develop v3 RC1
+* master v3.01
 *
 * läuft zusammen mit dem visu.js ab v2.8 
 *
@@ -83,8 +82,8 @@ Nochmal die Parameter im Widget:
 * @param headline for popup (optional), default UZSZ
 * @param designType for popup design (optional), default = '0', 
 *												 expert mode = '1'  (value, time, rrule direct input)
-* @param pic on (optional), default = clock
-* @param pic off (optional), default = clock
+* @param pic on (optional), default icon is a clock
+* @param pic off (optional), default icon is a clock
 * @param valueType (optional), default = bool, supported types are 'bool', 'num', 'text', 'list'
 * @param valueParameterList (optional), default set in js depending on valueType
 */

@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// develop v4
+// Release develop v4
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -260,7 +260,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times </div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v3 </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v4 </h6></td></div></tr></table>";
 	// Abschlus des gesamten span container
 	template += "</span>";
 	// und der Abschluss des popup divs
@@ -591,7 +591,7 @@ function uzsuDomUpdate(event, response) {
 	$('#' + this.id + ' img').attr('src',(active ? $(this).attr('data-pic-on') : $(this).attr('data-pic-off')));
 	// wenn keine Daten vorhanden, dann ist kein item mit den eigenschaften hinterlegt und es wird nichts gemacht
 	if (response.length === 0){
-		alert('DOM Daten für UZSU nicht vorhanden in uzsuDomUpdate !');
+		alert('DOM Daten für UZSU nicht vorhanden! Item falsch konfiguriert oder nicht vorhanden ! (update-event)');
 		return;
 	}
 	// Wenn ein Update erfolgt, dann werden die Daten erneut in die Variable uzsu geladen damit sind die UZSU objekte auch in der click Funktion verfügbar
@@ -612,11 +612,14 @@ function uzsuDomClick(event) {
 	// Schritte asynchron erfolgen, kann es sein, dass das Icon bereits da ist, clickbar, aber nocht keine Daten angekommen. Dann darf ich nicht
 	// auf diese Daten zugreifen wollen !
 	if(response.list === undefined){ 
-		alert('DOM Daten für UZSU nicht vorhanden in uzsuDomClick!');
+		alert('DOM Daten für UZSU nicht vorhanden! Item falsch konfiguriert oder nicht vorhanden ! (click-event)');
 		popupOk = false;
 	}
-	// jetzt erweitern wir die dicts pro Eintrag, um dem dort einhaltenen Timestring die enthaltenen Einzelteile zu bekommen
-	uzsuExpandTimestring(response);
+	else
+	{
+		// jetzt erweitern wir die dicts pro Eintrag, um dem dort einhaltenen Timestring die enthaltenen Einzelteile zu bekommen
+		uzsuExpandTimestring(response);
+	}
  	// Auswertung der Übergabeparameter
 	var headline = $(this).attr('data-headline');
 	var designType = $(this).attr('data-designType');
