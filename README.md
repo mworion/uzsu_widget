@@ -3,11 +3,11 @@
 ###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
 (C) Michael Würtenberger 2014,2015
 
-Stand: develop v4
+Stand: develop v 3.1
 
 Installation:
 1. Download von visu.js und widget_uzsu.html aus Github
-Link: https://github.com/mworion/uzsu_widget
+Link: https://github.com/mworion/usu_widget
 
 2. Beide Dateien in das Projektverzeichnis Eurer Visu hineinkopieren. 
 Das müßte unter /www/smartvisu/pages/"name des Projektes" liegen.

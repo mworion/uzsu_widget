@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release develop v4
+// Release develop v3.1
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -178,7 +178,15 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	template += "<tr id='uzsuNumberOfRow" + numberOfRow + "'>";
 	// Jetzt beginnen die Spalten in der Reihenfolge value, time / rrule, active, delete button mit flipswitch (bessere Erkennbarkeit), die Texte können über das Widget gesetzt werden
 	if (valueType == 'bool') {
-		template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + valueParameterList[1] + "</option> <option value='1'> "	+ valueParameterList[0] + " </option></select></td>";
+		// Unterscheidung Anzeige und Werte
+		if (valueParameterList[0].split(':')[1] === undefined) {
+			template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + valueParameterList[1] + "</option> <option value='1'> "	+ valueParameterList[0] + " </option></select></td>";
+		} 
+		else {
+			template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'>";
+			template += "<option value='" + valueParameterList[1].split(':')[1]	+ "'>" + valueParameterList[1].split(':')[0] + "</option>";
+			template += "<option value='" + valueParameterList[0].split(':')[1]	+ "'> "	+ valueParameterList[0].split(':')[0] + " </option></select></td>";
+		}
 	} 
 	else if (valueType == 'num') {
 		template += "<td><input type='number' " + valueParameterList[0] + " data-clear-btn='false' class='uzsuValueInput' pattern='[0-9]*' style = 'width:50px' id='uzsuValue" + numberOfRow + "'</td>";
@@ -260,7 +268,7 @@ function uzsuBuildTableFooter(designType) {
 		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times </div>";
 	}
 	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v4 </h6></td></div></tr></table>";
+	template += "<td style = 'text-align: right'><h6> v3.1 </h6></td></div></tr></table>";
 	// Abschlus des gesamten span container
 	template += "</span>";
 	// und der Abschluss des popup divs
@@ -660,8 +668,8 @@ function uzsuDomClick(event) {
 			}
 		}
 	}
-	// wenn bei designType = 'list' ein Split angegeben wird, dann muss er immer angegeben sein
-	if ((valueType == 'list') && (valueParameterList[0].split(':')[1] !== undefined)) {
+	// wenn bei designType = 'list' und 'bool' ein Split angegeben wird, dann muss er immer angegeben sein
+	if (((valueType == 'list') || (valueType == 'bool')) && (valueParameterList[0].split(':')[1] !== undefined)) {
 		for (var numberOfTextEntries = 0; numberOfTextEntries < valueParameterList.length; numberOfTextEntries++) {
 			if (valueParameterList[numberOfTextEntries].split(':')[1] === undefined) {
 				alert('Fehlerhafte Einträge im Parameter valueParameterList !');
