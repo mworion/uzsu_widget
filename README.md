@@ -59,6 +59,8 @@ Optionen Parameterliste Wert:
 Werte Typ    Parameter                Beschreibung: 
 bool         ['text on','text off']   'text off' wird bei Bool=0,False,Off angezeigt   
                                       'text on'  wird bei Bool=1,True,On angezeigt
+             ['W1:x1','W2:x2']        Die Strings 'Wert1' und 'Wert2' werden im Slider gezeigt und x1 bzw. x2 als Wert gesetzt
+
 num          ['min max step']         'string' zum Setzen der Eingabeparameter bei z.B. <input type="number" step="0.01" min="0" >
                                       siehe auch http://www.w3.org/TR/html-markup/input.number.html#input.number.attrs.step.float
 text         []                       keine Parameter werden verwendet
