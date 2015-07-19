@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release develop v3.1
+// Release develop v3.2
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -149,131 +149,187 @@ function uzsuExpandTimestring(response){
 //----------------------------------------------------------------------------
 function uzsuBuildTableHeader(headline, designType, valueType, valueParameterList) {
 	// Kopf und überschrift des Popups
-	var template = "";
+	var tt = "";
 	// hier kommt der Popup Container mit der Beschreibung ein Eigenschaften
-	template += "<div data-role='popup' data-overlay-theme='b' data-theme='a' class='messagePopup' id='uzsuPopupContent' data-dismissible = 'false'>";
-	// Schliessen Button rechts oben
-	template += "<div data-rel='back' data-role='button' data-icon='delete' data-iconpos='notext' class='ui-btn-right' id='uzsuClose'></div>";
-	// jetzt der Inhalt geklammert mit span
-	template += " <span> <div style='text-align:center'><h1>" + headline + "</h1></div>";
-	// und dann der Aufbau mit einer Tabelle. Hier muss im 2. Schritt die Formatierung über span laufen um eine Anpassung auf die aktuellen Notation hinzubekommen. Table ist leider nicht zukunftsweisend
-	template += "<table id='uzsuTable' style = 'border: 1px solid;padding-right: 3px;padding-left: 3px'> ";
-	// generell gibt es dann dispatcher für die einzelnen Formate. Ich fasse sie zusammen, wo immer es geht. Hier kann man auch die Formate für sich selbst erweitern und anpassen.
-	if(designType === '0'){
-		// Format 0 ist der Default, macht Wochentage, eine konfigurierbare Eingabe des Wertes und die Aktivierungen
-		template += "<tr><td>Value</td><td>Time</td><td>Weekdays</td><td>Active</td><td>Expert</td><td>Remove</td></tr>";
-	}
-	else{
-		// Format 1 ist der Profimodus, hier kann man in einem Textstring de facto alles auswerten
-		template += "<tr><td>Value</td><td>Time (flex)<br>RRULE</td><td>Active</td><td>Remove</td></tr>";
-	}
-	return template;
+	tt += 	"<div data-role='popup' data-overlay-theme='b' data-theme='a' class='messagePopup' id='uzsuPopupContent' data-dismissible = 'false'>" +
+			"<div data-rel='back' data-role='button' data-icon='delete' data-iconpos='notext' class='ui-btn-right' id='uzsuClose'></div>" +
+				"<div class='uzsuClear'><div class='uzsuPopupHeader'>" + headline + "</div>" +
+					"<div class='uzsuTableMain' id='uzsuTable'>";
+	return tt;
 }
 
 function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterList) {
 	// Tabelleneinträge
-	var template = "";
+	var tt = "";
 	// Liste für die Wochentage, damit ich später per Index darauf zugreifen kann
 	var weekDays = [ 'MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU' ];
-	template += "<tr id='uzsuNumberOfRow" + numberOfRow + "'>";
+	tt += "<div class='uzsuRow' id='uzsuNumberOfRow" + numberOfRow + "'>";
 	// Jetzt beginnen die Spalten in der Reihenfolge value, time / rrule, active, delete button mit flipswitch (bessere Erkennbarkeit), die Texte können über das Widget gesetzt werden
 	if (valueType == 'bool') {
 		// Unterscheidung Anzeige und Werte
 		if (valueParameterList[0].split(':')[1] === undefined) {
-			template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> <option value='0'>" + valueParameterList[1] + "</option> <option value='1'> "	+ valueParameterList[0] + " </option></select></td>";
+			tt += 	"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'>Value</div>" +
+						"<select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'> " +
+							"<option value='0'>" + valueParameterList[1] + "</option>" +
+							"<option value='1'> "	+ valueParameterList[0] + " </option>" +
+						"</select>" +
+					"</div>";
 		} 
 		else {
-			template += "<td><select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'>";
-			template += "<option value='" + valueParameterList[1].split(':')[1]	+ "'>" + valueParameterList[1].split(':')[0] + "</option>";
-			template += "<option value='" + valueParameterList[0].split(':')[1]	+ "'> "	+ valueParameterList[0].split(':')[0] + " </option></select></td>";
+			tt += 	"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'>Value</div>" +
+						"<select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'>" +
+							"<option value='" + valueParameterList[1].split(':')[1]	+ "'>" + valueParameterList[1].split(':')[0] + "</option>" +
+							"<option value='" + valueParameterList[0].split(':')[1]	+ "'> "	+ valueParameterList[0].split(':')[0] + " </option>" +
+						"</select>" +
+					"</div>";
 		}
 	} 
 	else if (valueType == 'num') {
-		template += "<td><input type='number' " + valueParameterList[0] + " data-clear-btn='false' class='uzsuValueInput' pattern='[0-9]*' style = 'width:50px' id='uzsuValue" + numberOfRow + "'</td>";
+		tt += 	"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Value</div>" +
+					"<input type='number' " + valueParameterList[0] + " data-clear-btn='false' class='uzsuValueInput' pattern='[0-9]*' id='uzsuValue" + numberOfRow + "'>" +
+				"</div>";
 	} 
 	else if (valueType == 'text') {
-		template += "<td><input type='text' data-clear-btn='false' class='uzsuTextInput' style = 'width:60px' id='uzsuValue" + numberOfRow + "'</td>";
+		tt += 	"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Value</div>" +
+					"<input type='text' data-clear-btn='false' class='uzsuTextInput' id='uzsuValue" + numberOfRow + "'>" +
+				"</div>";
 	} 
 	else if (valueType == 'list') {
 		// das Listenformat mit select ist sehr trickreich.
-		template += "<td><form><div data-role='fieldcontain' class='uzsuListInput' style = 'width:120px; height:auto !important'>";
-		template += "<select name='uzsuValue'" + numberOfRow + "' id='uzsuValue" + numberOfRow + "' data-mini='true'>";
-		for (var numberOfListEntry = 0; numberOfListEntry < valueParameterList.length; numberOfListEntry++) {
-			// Unterscheidung Anzeige und Werte
-			if (valueParameterList[0].split(':')[1] === undefined) {
-				template += "<option value='" + valueParameterList[numberOfListEntry].split(':')[0]	+ "'>"+ valueParameterList[numberOfListEntry].split(':')[0]	+ "</option>";
-			} 
-			else {
-				template += "<option value='" + valueParameterList[numberOfListEntry].split(':')[1]	+ "'>"+ valueParameterList[numberOfListEntry].split(':')[0]	+ "</option>";
-			}
-		}
-		template += "</select></div></form></td>";
+		tt += 	"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Value</div>" +
+					"<form>" +
+						"<div data-role='fieldcontain' class='uzsuListInput'>" +
+							"<select name='uzsuValue'" + numberOfRow + "' id='uzsuValue" + numberOfRow + "' data-mini='true'>";
+								for (var numberOfListEntry = 0; numberOfListEntry < valueParameterList.length; numberOfListEntry++) {
+									// Unterscheidung Anzeige und Werte
+									if (valueParameterList[0].split(':')[1] === undefined) {
+										tt += "<option value='" + valueParameterList[numberOfListEntry].split(':')[0]	+ "'>"+ valueParameterList[numberOfListEntry].split(':')[0]	+ "</option>";
+									} 
+									else {
+										tt += "<option value='" + valueParameterList[numberOfListEntry].split(':')[1]	+ "'>"+ valueParameterList[numberOfListEntry].split(':')[0]	+ "</option>";
+									}
+								}
+		tt += 				"</select>" +
+						"</div>" +
+					"</form>" +
+				"</div>";
 	}
-	// time
 	if(designType === '0'){
-		template += "<td><input type='time' data-clear-btn='false' style='width:50px' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>";
+		// time
+		tt += 	"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Time</div>" +
+					"<input type='time' data-clear-btn='false' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>" +
+				"</div>";
+		tt += 	"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Activate</div>" +
+					"<form>" +
+						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
+							"<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'>" +
+								"<label for='uzsuActive" + numberOfRow + "'>Act</label>" +
+						"</fieldset>" +
+					"</form>" +
+				"</div>";
+		tt += 	"<div class='uzsuCellExpert'>" +
+					"<div class='uzsuCellText'>Expert</div>" +
+					"<button id='uzsuExpert" + numberOfRow + "' data-mini='true' data-icon='arrow-d' data-iconpos='notext'></button>" +
+				"</div>";
+		tt += 	"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Remove</div>" +
+					"<button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button>" +
+				"</div>";
 		// rrule wurde auf die Tage verteilt
-		template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
-		for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
-			template += "<input type='checkbox' id='checkbox" + numberOfDay	+ "-" + numberOfRow + "'> <label for='checkbox"	+ numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "</label>";
-		}
-		template += "</fieldset></form></td>";
+		tt += 	"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Weekdays</div>" +
+					"<form>" +
+						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
+							for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
+								tt += "<input type='checkbox' id='checkbox" + numberOfDay	+ "-" + numberOfRow + "'> <label for='checkbox"	+ numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "</label>";
+							}
+		tt += 			"</fieldset>" +
+					"</form>" +
+				"</div>";
 	}
 	else{
 		// time
-		template += "<td><input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuTime" + numberOfRow + "'>";
+		tt += "<div class='uzsuCell' ><input type='text' class='uzsuTextWideInput' data-clear-btn='true' id='uzsuTime" + numberOfRow + "'>";
 		// rrule hier wird nur der Textstring übernommen. Prüfungen erfolgen keine !
-		template += "<input type='text' data-clear-btn='true' style = 'width:350px' id='uzsuRrule"	+ numberOfRow + "'></td>";
+		tt += "<input type='text' class='uzsuTextWideInput' data-clear-btn='true' id='uzsuRrule" + numberOfRow + "'></div>";
+		// Aktive Schalter, die einzelne Zeilen der Schaltuhr aktivieren.
+		tt += "<div class='uzsuCell'><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'> " + "<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'> <label for='uzsuActive" + numberOfRow + "'>Act</label>" + "</fieldset></form></div>";
+		// del Button zum Löschen eines Zeileneintrags
+		tt += "<div class='uzsuCell'> <button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button></div>";
 	}
-	// Aktive Schalter, die einzelne Zeilen der Schaltuhr aktivieren.
-	template += "<td><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'> " + "<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'> <label for='uzsuActive" + numberOfRow + "'>Act</label>" + "</fieldset></form></td>";
-	if(designType === '0'){
-		// Expert Button nur bei type = 0
-		template += "<td> <button id='uzsuExpert" + numberOfRow + "' data-mini='true' data-icon='arrow-d' data-iconpos='notext'></button></td>";
-	}
-	// del Button zum Löschen eines Zeileneintrags
-	template += "<td> <button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button></td>";
 	// Tabelle Reihen abschliessen
-	template += "</tr>";
+	tt += "</div>";
 	// und jetzt noch die unsichbare Expertenzeile
-	template += "<tr id='uzsuExpertLine" + numberOfRow + "' style='display:none;'><td colspan='6'><table>";
-	// Tabellenüberschriften
-	template += "<tr><td>earliest</td><td></td><td>Event</td><td>+/- min</td><td></td><td>latest</td></tr>";
-	// Tabellenfelder
-	template += "<tr><td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeMaxMinInput' id='uzsuTimeMin" + numberOfRow + "'</td>";
-	template += "<td> <h1 style='margin:0'> < </h1> </td>";
-	template += "<td><form><div data-role='fieldcontain' class='uzsuEvent' style = 'height:auto !important'>";
-	template += "<select name='uzsuEvent" + numberOfRow + "' id='uzsuEvent" + numberOfRow + "' data-mini='true'>";
-	template += "<option value='time'>Time</option><option value='sunrise'>Sunrise</option><option value='sunset'>Sunset</option></div></form></td>";
-	template += "<td><input type='number' data-clear-btn='false' style='width:60px' class='uzsuTimeOffsetInput' id='uzsuTimeOffset" + numberOfRow + "'</td>";
-	template += "<td> <h1 style='margin:0'> < </h1> </td>";
-	template += "<td><input type='time' data-clear-btn='false' style='width:60px' class='uzsuTimeMaxMinInput' id='uzsuTimeMax" + numberOfRow + "'</td></tr>";
-	// Abschluss des Tabelleeintrags der Expertenzeile
-	template += "</table></td></tr>";
-	return template;
+	tt += 	"<div class='uzsuRowExpert' id='uzsuExpertLine" + numberOfRow + "' style='display:none;'>" +
+				"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>ealiest</div>" +
+					"<input type='time' data-clear-btn='false' class='uzsuTimeMaxMinInput' id='uzsuTimeMin" + numberOfRow + "'>" +
+				"</div>" +
+				"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Event</div>" +
+					"<form>" +
+						"<div data-role='fieldcontain' class='uzsuEvent' >" +
+							"<select name='uzsuEvent" + numberOfRow + "' id='uzsuEvent" + numberOfRow + "' data-mini='true'>" +
+								"<option value='time'>Time</option>" +
+								"<option value='sunrise'>Sunrise</option>" +
+								"<option value='sunset'>Sunset</option>" +
+							"</select>" +
+						"</div>" +
+					"</form>" +
+				"</div>" +
+				"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>+/- min</div>" +
+					"<input type='number' data-clear-btn='false' class='uzsuTimeOffsetInput' id='uzsuTimeOffset" + numberOfRow + "'>" +
+				"</div>" +
+				"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>latest</div>" +
+					"<input type='time' data-clear-btn='false' class='uzsuTimeMaxMinInput' id='uzsuTimeMax" + numberOfRow + "'>" +
+				"</div>" +
+			"</div>";	
+	return tt;
 }
 
 function uzsuBuildTableFooter(designType) {
-	// Anteil der Button zur steuerung des Popups
-	var template = "";
-	// Tabelle der Zeileneinträge abschliessen
-	template += "</table>";
-	// hier der Aktivierungsbutton für die gesamte uzsu
-	template += "<table style = 'border: 0'> <tr> <td> <form> <fieldset data-mini='true'> " + "<input type='checkbox' id='uzsuGeneralActive'> <label for='uzsuGeneralActive'>UZSU Activate</label>"	+ "</fieldset></form> </td>";
-	// jetzt kommen noch die Buttons in der Basisleiste mit rein
-	template += "<td> <div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>";
-	template += "<div data-role = 'button' id = 'uzsuAddTableRow'> Add Entry </div>";
-	template += "<div data-role = 'button' id = 'uzsuSaveQuit'> Save&Quit</div>";
-	if (designType == '0') {
-		template += "<div data-role = 'button' id = 'uzsuSortTime'> Sort Times </div>";
-	}
-	template += "<div data-role = 'button' id = 'uzsuCancel'> Cancel </div> </td>";
-	template += "<td style = 'text-align: right'><h6> v3.1 </h6></td></div></tr></table>";
-	// Abschlus des gesamten span container
-	template += "</span>";
+	var tt = "";
+	// Zeileneinträge abschliessen
+	tt += "</div>";
+	// Aufbau des Footers
+    tt += "<div class='uzsuTableFooter'>" +
+    		"<div class='uzsuRowFooter'>" +
+    			"<div class='uzsuCell'>" +
+    				"<div class='uzsuCellText'>Version: 3.2 Develop</div>" +
+    				"<form>" +
+    					"<fieldset data-mini='true'>" +
+    						"<input type='checkbox' id='uzsuGeneralActive'>" +
+    							"<label for='uzsuGeneralActive'>UZSU Activate</label>" +
+    					"</fieldset>" +
+    				"</form>" +
+    			"</div><div class='uzsuCell'>" +
+    				"<div class='uzsuCellText'>Function</div>" +
+    					"<div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>" +
+    						"<div data-role = 'button' id='uzsuAddTableRow'>Add Entry</div>" +
+    						"<div data-role = 'button' id='uzsuSortTime'>Sort Time</div>" +
+    					"</div>" +
+    				"</div>" +
+    			"<div class='uzsuCell'>" +
+    				"<div class='uzsuCellText'>Finishing</div>" +
+    					"<div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>" +
+    						"<div data-role = 'button' id='uzsuCancel'>Cancel</div>" +
+    						"<div data-role = 'button' id='uzsuSaveQuit'>Save & Quit</div>" +
+    					"</div>" +
+    				"</div>" +
+    			"</div>" +
+    		"</div>";
 	// und der Abschluss des popup divs
-	template += "</div>";
-	return template;
+	tt += "</div></div>";
+	return tt;
 }
 //----------------------------------------------------------------------------
 // Funktionen für das dynamische Handling der Seiteninhalte des Popups
@@ -425,15 +481,15 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 function uzsuAddTableRow(response, designType, valueType, valueParameterList) {
 	// Tabellenzeile einfügen
 	var numberOfNewRow = response.list.length;
-	var template = '';
+	var tt = '';
 	// alten Zustand mal in die Liste rein. da der aktuelle Zustand ja nur im Widget selbst enthalten ist, wird er vor dem Umbau wieder in die Variable response zurückgespeichert.
 	uzsuSaveTable(1, response, designType, valueType, valueParameterList, false);
 	// ich hänge immer an die letzte Zeile dran ! erst einmal das Array erweitern
 	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:''});
 	// dann eine neue HTML Zeile genenrieren
-	template = uzsuBuildTableRow(numberOfNewRow, designType, valueType,	valueParameterList);
+	tt = uzsuBuildTableRow(numberOfNewRow, designType, valueType,	valueParameterList);
 	// Zeile in die Tabelle einbauen
-	$('#uzsuTable').append(template);
+	$('#uzsuTable').append(tt);
 	// hier wichtig: damit die Optimierung jquerymobile auf Tabelle wirkt
 	$.mobile.activePage.trigger('pagecreate');
 	// den delete Handler für die neue Zeile einhängen
@@ -535,13 +591,13 @@ function uzsuSortTime(response, designType, valueType, valueParameterList, e) {
 function uzsuRuntimePopup(response, headline, designType, valueType, valueParameterList, item) {
 	// Steuerung des Popups erst einmal wird der Leeranteil angelegt
 	// erst den Header, dann die Zeilen, dann den Footer 
-	var template = uzsuBuildTableHeader(headline, designType, valueType, valueParameterList);
+	var tt = uzsuBuildTableHeader(headline, designType, valueType, valueParameterList);
 	for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
-		template += uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterList);
+		tt += uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterList);
 	}
-	template += uzsuBuildTableFooter(designType);
+	tt += uzsuBuildTableFooter(designType);
 	// dann hängen wir das an die aktuelle Seite
-	$.mobile.activePage.append(template).trigger('pagecreate');
+	$.mobile.activePage.append(tt).trigger('pagecreate');
 	// dann speichern wir uns für cancel die ursprünglichen im DOM gespeicherten Werte in eine Variable ab
 	var responseCancel = jQuery.extend(true, {}, response);
 	// dann die Werte eintragen.
@@ -596,7 +652,17 @@ function uzsuDomUpdate(event, response) {
 	// ansonsten ist der Status von active gleich dem gesetzten Status
 	var active = response.length > 0 ? response[0].active : false;
 	// Das Icon wird aktiviert, falls Status auf aktiv, ansonsten deaktiviert angezeigt
+	// 
+	// $('#' + this.id + ' img').attr('src',(active ? $(this).attr('data-pic-on') : $(this).attr('data-pic-off')));
+	//
+	
+	// jetzt testen wir mal
 	$('#' + this.id + ' img').attr('src',(active ? $(this).attr('data-pic-on') : $(this).attr('data-pic-off')));
+	
+	
+	
+	
+	
 	// wenn keine Daten vorhanden, dann ist kein item mit den eigenschaften hinterlegt und es wird nichts gemacht
 	if (response.length === 0){
 		alert('DOM Daten für UZSU nicht vorhanden! Item falsch konfiguriert oder nicht vorhanden ! (update-event)');

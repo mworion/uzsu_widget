@@ -4,6 +4,10 @@
 (C) Michael Würtenberger 2014,2015
 
 changelog
+v 3.2
+- umstellung von tabellen auf responsive design mit float
+- anpassung des designs auf diesen sachverhalt für schmalere displays
+
 v 3.1
 - erstanlage
 - bool bekommt wie bei listen analog ebenfalls einen parametersatz mit, mit dem die setzten Werte des Sliders festgelegt werden
