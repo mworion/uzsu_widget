@@ -163,8 +163,17 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	var tt = "";
 	// Liste für die Wochentage, damit ich später per Index darauf zugreifen kann
 	var weekDays = [ 'MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU' ];
-	tt += "<div class='uzsuRow' id='uzsuNumberOfRow" + numberOfRow + "'>";
-	// Jetzt beginnen die Spalten in der Reihenfolge value, time / rrule, active, delete button mit flipswitch (bessere Erkennbarkeit), die Texte können über das Widget gesetzt werden
+	tt += 	"<div class='uzsuRow' id='uzsuNumberOfRow" + numberOfRow + "'>" +
+				"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Weekdays</div>" +
+					"<form>" +
+						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
+							for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
+								tt += "<input type='checkbox' id='checkbox" + numberOfDay	+ "-" + numberOfRow + "'> <label for='checkbox"	+ numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "</label>";
+							}
+	tt +=				"</fieldset>" +
+					"</form>" +
+				"</div>";
 	if (valueType == 'bool') {
 		// Unterscheidung Anzeige und Werte
 		if (valueParameterList[0].split(':')[1] === undefined) {
@@ -220,12 +229,11 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 				"</div>";
 	}
 	if(designType === '0'){
-		// time
-		tt += 	"<div class='uzsuCell'>" +
+	tt+=		"<div class='uzsuCell'>" +
 					"<div class='uzsuCellText'>Time</div>" +
 					"<input type='time' data-clear-btn='false' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>" +
-				"</div>";
-		tt += 	"<div class='uzsuCell'>" +
+				"</div>" +
+				"<div class='uzsuCell'>" +
 					"<div class='uzsuCellText'>Activate</div>" +
 					"<form>" +
 						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
@@ -233,25 +241,14 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 								"<label for='uzsuActive" + numberOfRow + "'>Act</label>" +
 						"</fieldset>" +
 					"</form>" +
-				"</div>";
-		tt += 	"<div class='uzsuCellExpert'>" +
+				"</div>" +
+				"<div class='uzsuCellExpert'>" +
 					"<div class='uzsuCellText'>Expert</div>" +
 					"<button id='uzsuExpert" + numberOfRow + "' data-mini='true' data-icon='arrow-d' data-iconpos='notext'></button>" +
-				"</div>";
-		tt += 	"<div class='uzsuCell'>" +
+				"</div>" +
+				"<div class='uzsuCell'>" +
 					"<div class='uzsuCellText'>Remove</div>" +
 					"<button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button>" +
-				"</div>";
-		// rrule wurde auf die Tage verteilt
-		tt += 	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Weekdays</div>" +
-					"<form>" +
-						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
-							for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
-								tt += "<input type='checkbox' id='checkbox" + numberOfDay	+ "-" + numberOfRow + "'> <label for='checkbox"	+ numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "</label>";
-							}
-		tt += 			"</fieldset>" +
-					"</form>" +
 				"</div>";
 	}
 	else{
@@ -308,7 +305,7 @@ function uzsuBuildTableFooter(designType) {
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
-    							"<label for='uzsuGeneralActive'>UZSU Activate</label>" +
+    							"<label for='uzsuGeneralActive'>UZSU Activ</label>" +
     					"</fieldset>" +
     				"</form>" +
     			"</div><div class='uzsuCell'>" +
