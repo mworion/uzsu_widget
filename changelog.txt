@@ -4,6 +4,9 @@
 (C) Michael Würtenberger 2014,2015
 
 changelog
+v 3.3
+- fixes und design type=1 sollte erst mal laufen
+
 v 3.2
 - umstellung von tabellen auf responsive design mit float
 - anpassung des designs auf diesen sachverhalt für schmalere displays

@@ -2,9 +2,9 @@
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015
 *
-* develop v3.2
+* responsive v3.3
 *
-* läuft zusammen mit dem visu.js ab v3.2 
+* läuft zusammen mit dem visu.js (responsive) ab v3.3 
 *
 * @param unique id for this widget
 * @param a gad/item
@@ -53,6 +53,11 @@
     height:50px;
     margin:5px;
 }
+.uzsuCellType1{  
+    float:left;
+    height:80px;
+    margin:5px;
+}
 .uzsuCellText{  
     height:0.8em;
     font-size:0.7em;
@@ -79,9 +84,10 @@ div.ui-slider-switch{
 .uzsuEvent, .uzsuListInput{
 	margin: .25em 0 !important;
 	width: 100px;
+	padding: 0 !important;
 }
 .uzsuTextWideInput{
-	width: 350px;
+	width: 350px !important;
 }
 @media screen and (max-width: 645px){
     .uzsuRowExpert, .uzsuCellExpert{

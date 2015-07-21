@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release develop v3.2
+// Release responsive v3.3
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -163,18 +163,21 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	var tt = "";
 	// Liste für die Wochentage, damit ich später per Index darauf zugreifen kann
 	var weekDays = [ 'MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU' ];
-	tt += 	"<div class='uzsuRow' id='uzsuNumberOfRow" + numberOfRow + "'>" +
-				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Weekdays</div>" +
+	
+	tt += 	"<div class='uzsuRow' id='uzsuNumberOfRow" + numberOfRow + "'>";
+	if (designType === '0'){
+		tt+=	"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'></div>" +
 					"<form>" +
 						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
 							for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
 								tt += "<input type='checkbox' id='checkbox" + numberOfDay	+ "-" + numberOfRow + "'> <label for='checkbox"	+ numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "</label>";
 							}
-	tt +=				"</fieldset>" +
+		tt +=			"</fieldset>" +
 					"</form>" +
 				"</div>";
-	if (valueType == 'bool') {
+	}
+	if (valueType === 'bool') {
 		// Unterscheidung Anzeige und Werte
 		if (valueParameterList[0].split(':')[1] === undefined) {
 			tt += 	"<div class='uzsuCell'>" +
@@ -187,7 +190,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 		} 
 		else {
 			tt += 	"<div class='uzsuCell'>" +
-						"<div class='uzsuCellText'>Value</div>" +
+						"<div class='uzsuCellText'></div>" +
 						"<select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'>" +
 							"<option value='" + valueParameterList[1].split(':')[1]	+ "'>" + valueParameterList[1].split(':')[0] + "</option>" +
 							"<option value='" + valueParameterList[0].split(':')[1]	+ "'> "	+ valueParameterList[0].split(':')[0] + " </option>" +
@@ -195,22 +198,22 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"</div>";
 		}
 	} 
-	else if (valueType == 'num') {
+	else if (valueType === 'num') {
 		tt += 	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Value</div>" +
+					"<div class='uzsuCellText'></div>" +
 					"<input type='number' " + valueParameterList[0] + " data-clear-btn='false' class='uzsuValueInput' pattern='[0-9]*' id='uzsuValue" + numberOfRow + "'>" +
 				"</div>";
 	} 
-	else if (valueType == 'text') {
+	else if (valueType === 'text') {
 		tt += 	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Value</div>" +
+					"<div class='uzsuCellText'></div>" +
 					"<input type='text' data-clear-btn='false' class='uzsuTextInput' id='uzsuValue" + numberOfRow + "'>" +
 				"</div>";
 	} 
-	else if (valueType == 'list') {
+	else if (valueType === 'list') {
 		// das Listenformat mit select ist sehr trickreich.
 		tt += 	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Value</div>" +
+					"<div class='uzsuCellText'></div>" +
 					"<form>" +
 						"<div data-role='fieldcontain' class='uzsuListInput'>" +
 							"<select name='uzsuValue'" + numberOfRow + "' id='uzsuValue" + numberOfRow + "' data-mini='true'>";
@@ -229,12 +232,12 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 				"</div>";
 	}
 	if(designType === '0'){
-	tt+=		"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Time</div>" +
+		tt+=	"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'></div>" +
 					"<input type='time' data-clear-btn='false' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>" +
 				"</div>" +
 				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Activate</div>" +
+					"<div class='uzsuCellText'></div>" +
 					"<form>" +
 						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
 							"<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'>" +
@@ -247,26 +250,33 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"<button id='uzsuExpert" + numberOfRow + "' data-mini='true' data-icon='arrow-d' data-iconpos='notext'></button>" +
 				"</div>" +
 				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Remove</div>" +
+					"<div class='uzsuCellText'></div>" +
 					"<button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button>" +
 				"</div>";
 	}
 	else{
-		// time
-		tt += "<div class='uzsuCell' ><input type='text' class='uzsuTextWideInput' data-clear-btn='true' id='uzsuTime" + numberOfRow + "'>";
-		// rrule hier wird nur der Textstring übernommen. Prüfungen erfolgen keine !
-		tt += "<input type='text' class='uzsuTextWideInput' data-clear-btn='true' id='uzsuRrule" + numberOfRow + "'></div>";
-		// Aktive Schalter, die einzelne Zeilen der Schaltuhr aktivieren.
-		tt += "<div class='uzsuCell'><form><fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'> " + "<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'> <label for='uzsuActive" + numberOfRow + "'>Act</label>" + "</fieldset></form></div>";
-		// del Button zum Löschen eines Zeileneintrags
-		tt += "<div class='uzsuCell'> <button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button></div>";
+		tt += 	"<div class='uzsuCell'>" +
+					"<form>" +
+						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
+							"<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'> " +
+								"<label for='uzsuActive" + numberOfRow + "'>Act</label>" +
+						"</fieldset>" +
+					"</form>" +
+				"</div>" +
+				"<div class='uzsuCell'> " +
+					"<button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button>" +
+				"</div>" + 
+				"<div class='uzsuCellType1'>" +
+					"<input type='text' class='uzsuTextWideInput' data-clear-btn='true' id='uzsuTime" + numberOfRow + "'>" +
+					"<input type='text' class='uzsuTextWideInput' data-clear-btn='true' id='uzsuRrule" + numberOfRow + "'>" +
+				"</div>";
 	}
 	// Tabelle Reihen abschliessen
 	tt += "</div>";
 	// und jetzt noch die unsichbare Expertenzeile
 	tt += 	"<div class='uzsuRowExpert' id='uzsuExpertLine" + numberOfRow + "' style='display:none;'>" +
 				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>ealiest</div>" +
+					"<div class='uzsuCellText'>earliest</div>" +
 					"<input type='time' data-clear-btn='false' class='uzsuTimeMaxMinInput' id='uzsuTimeMin" + numberOfRow + "'>" +
 				"</div>" +
 				"<div class='uzsuCell'>" +
@@ -301,25 +311,25 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>Version: 3.2 Develop</div>" +
+    				"<div class='uzsuCellText'>v3.3 resp</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
-    							"<label for='uzsuGeneralActive'>UZSU Activ</label>" +
+    							"<label for='uzsuGeneralActive'>Active</label>" +
     					"</fieldset>" +
     				"</form>" +
     			"</div><div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>Function</div>" +
+    				"<div class='uzsuCellText'></div>" +
     					"<div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>" +
-    						"<div data-role = 'button' id='uzsuAddTableRow'>Add Entry</div>" +
-    						"<div data-role = 'button' id='uzsuSortTime'>Sort Time</div>" +
+    						"<div data-role = 'button' id='uzsuAddTableRow'>New</div>" +
+    						"<div data-role = 'button' id='uzsuSortTime'>Sort</div>" +
     					"</div>" +
     				"</div>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>Finishing</div>" +
+    				"<div class='uzsuCellText'></div>" +
     					"<div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>" +
     						"<div data-role = 'button' id='uzsuCancel'>Cancel</div>" +
-    						"<div data-role = 'button' id='uzsuSaveQuit'>Save & Quit</div>" +
+    						"<div data-role = 'button' id='uzsuSaveQuit'>OK</div>" +
     					"</div>" +
     				"</div>" +
     			"</div>" +
