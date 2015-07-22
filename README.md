@@ -73,9 +73,9 @@ Nochmal die Parameter im Widget:
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015
 *
-* master v3.01
+* responsive v3.4
 *
-* läuft zusammen mit dem visu.js ab v2.8 
+* läuft zusammen mit dem visu.js (responsive) ab v3.3 
 *
 * @param unique id for this widget
 * @param a gad/item
@@ -87,6 +87,8 @@ Nochmal die Parameter im Widget:
 * @param valueType (optional), default = bool, supported types are 'bool', 'num', 'text', 'list'
 * @param valueParameterList (optional), default set in js depending on valueType
 */
+
+{% macro uzsu_icon(id, gad_uzsu, gad_headline, gad_designType, pic_on, pic_off, gad_valueType, gad_valueParameterList) %}
 </pre>
 
 Viel Spaß
