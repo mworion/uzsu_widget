@@ -11,8 +11,6 @@ Link: https://github.com/mworion/usu_widget
 
 2. Beide Dateien in das Projektverzeichnis Eurer Visu hineinkopieren. 
 Das müßte unter /www/smartvisu/pages/"name des Projektes" liegen.
-Es gibt auch eine .css, die Ihr benötigt um z.B. beim Chrome Browser die Feldbreite zu vergößern. 
-Muß aber nicht zwingend genutzt werden.
 
 3. Einbinden des Widgets in Eure Seite mit
 <pre>
