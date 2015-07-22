@@ -256,6 +256,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	}
 	else{
 		tt += 	"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'></div>" +
 					"<form>" +
 						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
 							"<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'> " +
@@ -264,6 +265,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"</form>" +
 				"</div>" +
 				"<div class='uzsuCell'> " +
+					"<div class='uzsuCellText'></div>" +
 					"<button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button>" +
 				"</div>" + 
 				"<div class='uzsuCellType1'>" +
