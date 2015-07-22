@@ -190,7 +190,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 		} 
 		else {
 			tt += 	"<div class='uzsuCell'>" +
-						"<div class='uzsuCellText'></div>" +
+						"<div class='uzsuCellText'>Value</div>" +
 						"<select name='UZSU' id='uzsuValue" + numberOfRow + "' data-role='slider' data-value = '1' data-mini='true'>" +
 							"<option value='" + valueParameterList[1].split(':')[1]	+ "'>" + valueParameterList[1].split(':')[0] + "</option>" +
 							"<option value='" + valueParameterList[0].split(':')[1]	+ "'> "	+ valueParameterList[0].split(':')[0] + " </option>" +
@@ -200,20 +200,20 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	} 
 	else if (valueType === 'num') {
 		tt += 	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'></div>" +
+					"<div class='uzsuCellText'>Value</div>" +
 					"<input type='number' " + valueParameterList[0] + " data-clear-btn='false' class='uzsuValueInput' pattern='[0-9]*' id='uzsuValue" + numberOfRow + "'>" +
 				"</div>";
 	} 
 	else if (valueType === 'text') {
 		tt += 	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'></div>" +
+					"<div class='uzsuCellText'>Value</div>" +
 					"<input type='text' data-clear-btn='false' class='uzsuTextInput' id='uzsuValue" + numberOfRow + "'>" +
 				"</div>";
 	} 
 	else if (valueType === 'list') {
 		// das Listenformat mit select ist sehr trickreich.
 		tt += 	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'></div>" +
+					"<div class='uzsuCellText'>Value</div>" +
 					"<form>" +
 						"<div data-role='fieldcontain' class='uzsuListInput'>" +
 							"<select name='uzsuValue'" + numberOfRow + "' id='uzsuValue" + numberOfRow + "' data-mini='true'>";
@@ -233,7 +233,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	}
 	if(designType === '0'){
 		tt+=	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'></div>" +
+					"<div class='uzsuCellText'>Time</div>" +
 					"<input type='time' data-clear-btn='false' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>" +
 				"</div>" +
 				"<div class='uzsuCell'>" +
@@ -543,8 +543,7 @@ function uzsuShowExpertLine(e) {
 		e.stopImmediatePropagation();
 		uzsuHideExpertLine(e);
 	});
-	// Handler, um je nach Event die inputs zu Aktivieren / Deaktiovieren
-	// reagiert auf die Änderung des Pulldown Menüs
+	// Handler, um je nach Event die inputs zu Aktivieren / Deaktivieren reagiert auf die Änderung des Pulldown Menüs
 	$.mobile.activePage.find('#uzsuEvent' + numberOfRow).on('change', function (){
 		uzsuSetTextInputState(numberOfRow);
 	});
@@ -659,17 +658,7 @@ function uzsuDomUpdate(event, response) {
 	// ansonsten ist der Status von active gleich dem gesetzten Status
 	var active = response.length > 0 ? response[0].active : false;
 	// Das Icon wird aktiviert, falls Status auf aktiv, ansonsten deaktiviert angezeigt
-	// 
-	// $('#' + this.id + ' img').attr('src',(active ? $(this).attr('data-pic-on') : $(this).attr('data-pic-off')));
-	//
-	
-	// jetzt testen wir mal
 	$('#' + this.id + ' img').attr('src',(active ? $(this).attr('data-pic-on') : $(this).attr('data-pic-off')));
-	
-	
-	
-	
-	
 	// wenn keine Daten vorhanden, dann ist kein item mit den eigenschaften hinterlegt und es wird nichts gemacht
 	if (response.length === 0){
 		alert('DOM Daten für UZSU nicht vorhanden! Item falsch konfiguriert oder nicht vorhanden ! (update-event)');
