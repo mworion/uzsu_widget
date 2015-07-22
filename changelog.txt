@@ -4,6 +4,10 @@
 (C) Michael Würtenberger 2014,2015
 
 changelog
+v 3.4
+- expert lines are swap. only on expert line is seen at the same time.
+- no separate extries in visu.css needed, all are in widget_uzsu.html
+
 v 3.3
 - fixes und design type=1 sollte erst mal laufen
 

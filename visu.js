@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v3.3
+// Release responsive v3.4
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -311,7 +311,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v3.3 resp</div>" +
+    				"<div class='uzsuCellText'>v3.4 resp</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -487,8 +487,7 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 //----------------------------------------------------------------------------
 function uzsuAddTableRow(response, designType, valueType, valueParameterList) {
 	// Tabellenzeile einfügen
-	var numberOfNewRow = response.list.length;
-	var tt = '';
+	var numberOfNewRow = response.list.length;	
 	// alten Zustand mal in die Liste rein. da der aktuelle Zustand ja nur im Widget selbst enthalten ist, wird er vor dem Umbau wieder in die Variable response zurückgespeichert.
 	uzsuSaveTable(1, response, designType, valueType, valueParameterList, false);
 	// ich hänge immer an die letzte Zeile dran ! erst einmal das Array erweitern
@@ -532,7 +531,9 @@ function uzsuDelTableRow(response, designType, valueType, valueParameterList, e)
 function uzsuShowExpertLine(e) {
 	// Tabellezeile ermitteln, wo augerufen wurde. es ist die 10. Stelle des aufrufenden Objektes
 	var numberOfRow = parseInt(e.currentTarget.id.substr(10));
-	/// Zeile anzeigen
+	// erst einmal alle verschwinden lassen
+	uzsuHideAllExpertLines();
+	// Zeile anzeigen
 	$('#uzsuExpertLine' + numberOfRow).css('display','');
 	// jetzt noch den Button in der Zeile drüber auf arrow up ändern
 	$('#uzsuExpert' + numberOfRow).buttonMarkup({ icon: 'arrow-u' });
@@ -550,7 +551,7 @@ function uzsuShowExpertLine(e) {
 }
 
 function uzsuHideExpertLine(e) {
-	// Tabellezeile ermitteln, wo augerufen wurde. es ist die 10. Stelle des aufrufenden Objektes
+	// Tabellezeile ermitteln, wo aufgerufen wurde. es ist die 10. Stelle des aufrufenden Objektes
 	var numberOfRow = parseInt(e.currentTarget.id.substr(10));
 	// tabellenzeile löschen
 	if ($('#uzsuExpertLine'+numberOfRow)) {
@@ -567,6 +568,26 @@ function uzsuHideExpertLine(e) {
 		});
 	}
 }
+
+function uzsuHideAllExpertLines() {
+	var numberOfEntries = $('.uzsuRowExpert').length;
+	// tabellenzeile löschen
+	for (var numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
+		// jetzt die Tabelle kürzen im Popup
+		$('#uzsuExpertLine'+numberOfRow).css('display','none');
+		// jetzt noch den Button in der Zeile drüber ändern auf arrow down
+		$('#uzsuExpert'+ numberOfRow).buttonMarkup({ icon: 'arrow-d' });
+		// und den Callback ändern
+		$.mobile.activePage.find('#uzsuExpert'+ numberOfRow).unbind('tap');
+		$.mobile.activePage.find('#uzsuExpert'+ numberOfRow).bind('tap', function(e) {
+			// Propagation stoppen, sonst wird die Zeile gleich wieder aufgemacht
+			e.stopImmediatePropagation();
+			uzsuShowExpertLine(e);
+		});
+	}
+}
+
+
 //----------------------------------------------------------------------------
 // Funktionen für das Sortrieren der Tabelleneinträge
 //----------------------------------------------------------------------------
