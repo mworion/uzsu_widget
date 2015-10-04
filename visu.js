@@ -744,7 +744,7 @@ function uzsuDomClick(event) {
 				if ((response.list[numberOfRow].rrule.indexOf('FREQ=WEEKLY;BYDAY=') !== 0) && (response.list[numberOfRow].rrule.length > 0)) {
 					if (!confirm('Fehler: Parameter designType ist "0", aber gespeicherte RRULE String in UZSU "' + response.list[numberOfRow].rrule + '" entspricht nicht default Format FREQ=WEEKLY;BYDAY=MO... bei Item ' + item	+ '. Soll dieser Eintrag überschrieben werden ?')) {
 						// direkter Abbruch bei der Entscheidung !
-						numberOfRow = numberOfEntries;
+						numberOfRow = numberOfEntries; 
 						popupOk = false; 
 					}
 				}
