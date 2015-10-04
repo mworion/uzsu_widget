@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v3.4
+// Release responsive v3.41
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -313,7 +313,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v3.4 resp</div>" +
+    				"<div class='uzsuCellText'>v3.41 resp</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -706,65 +706,63 @@ function uzsuDomClick(event) {
 	// auf diese Daten zugreifen wollen !
 	if(response.list === undefined){ 
 		alert('DOM Daten für UZSU nicht vorhanden! Item falsch konfiguriert oder nicht vorhanden ! (click-event)');
-		popupOk = false;
 	}
-	else
-	{
+	else{
 		// jetzt erweitern wir die dicts pro Eintrag, um dem dort einhaltenen Timestring die enthaltenen Einzelteile zu bekommen
 		uzsuExpandTimestring(response);
-	}
- 	// Auswertung der Übergabeparameter
-	var headline = $(this).attr('data-headline');
-	var designType = $(this).attr('data-designType');
-	var valueType = $(this).attr('data-valueType');
-	// hier wird die komplette Liste übergeben. widget.explode kehrt das implode aus der Webseite wieder um
-	var valueParameterList = widget.explode($(this).attr('data-valueParameterList'));
-	// default Werte setzen fuer valueParameterList
-	if(valueParameterList.length === 0){
-		if(valueType === 'bool') valueParameterList = ['On','Off'];
-		else if (valueType === 'num') valueParameterList = [''];
-		else if (valueType === 'text') valueParameterList = [''];
-		else if (valueType === 'list') valueParameterList = [''];
-	}
-	// data-item ist der sh.py item, in dem alle Attribute lagern, die für die Steuerung notwendig ist ist ja vom typ dict. das item, was tatsächlich per
-	// Schaltuhr verwendet wird ist nur als attribut (child) enthalten und wird ausschliesslich vom Plugin verwendet. wird für das rückschreiben der Daten an smarthome.py benötigt
-	var item = $(this).attr('data-item');
-	// jetzt kommt noch die Liste von Prüfungen, damit hinterher keine Fehler passieren, zunächst fehlerhafter designType (unbekannt)
-	if ((designType !== '0') && (designType !== '1')) {
-		alert('Fehlerhafter Parameter: "' + designType + '" im Feld designType bei Item ' + item);
-		popupOk = false;
-	}
-	// fehlerhafter valueType (unbekannt)
-	if ((valueType !== 'bool') && (valueType !== 'num')	&& (valueType !== 'text') && (valueType !== 'list')) {
-		alert('Fehlerhafter Parameter: "' + valueType + '" im Feld valueType bei Item ' + item);
-		popupOk = false;
-	}
-	// bei designType '0' wird rrule nach Wochentagen umgewandelt und ein festes Format vogegegeben hier sollte nichts versehentlich überschrieben werden
-	if (designType == '0') {
-		var numberOfEntries = response.list.length;
-		for (var numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
-			// test, ob die RRULE fehlerhaft ist
-			if ((response.list[numberOfRow].rrule.indexOf('FREQ=WEEKLY;BYDAY=') !== 0) && (response.list[numberOfRow].rrule.length > 0)) {
-				if (!confirm('Fehler: Parameter designType ist "0", aber gespeicherte RRULE String in UZSU "' + response.list[numberOfRow].rrule + '" entspricht nicht default Format FREQ=WEEKLY;BYDAY=MO... bei Item ' + item	+ '. Soll dieser Eintrag überschrieben werden ?')) {
-					// direkter Abbruch bei der Entscheidung !
-					numberOfRow = numberOfEntries;
-					popupOk = false; 
+	 	// Auswertung der Übergabeparameter
+		var headline = $(this).attr('data-headline');
+		var designType = $(this).attr('data-designType');
+		var valueType = $(this).attr('data-valueType');
+		// hier wird die komplette Liste übergeben. widget.explode kehrt das implode aus der Webseite wieder um
+		var valueParameterList = widget.explode($(this).attr('data-valueParameterList'));
+		// default Werte setzen fuer valueParameterList
+		if(valueParameterList.length === 0){
+			if(valueType === 'bool') valueParameterList = ['On','Off'];
+			else if (valueType === 'num') valueParameterList = [''];
+			else if (valueType === 'text') valueParameterList = [''];
+			else if (valueType === 'list') valueParameterList = [''];
+		}
+		// data-item ist der sh.py item, in dem alle Attribute lagern, die für die Steuerung notwendig ist ist ja vom typ dict. das item, was tatsächlich per
+		// Schaltuhr verwendet wird ist nur als attribut (child) enthalten und wird ausschliesslich vom Plugin verwendet. wird für das rückschreiben der Daten an smarthome.py benötigt
+		var item = $(this).attr('data-item');
+		// jetzt kommt noch die Liste von Prüfungen, damit hinterher keine Fehler passieren, zunächst fehlerhafter designType (unbekannt)
+		if ((designType !== '0') && (designType !== '1')) {
+			alert('Fehlerhafter Parameter: "' + designType + '" im Feld designType bei Item ' + item);
+			popupOk = false;
+		}
+		// fehlerhafter valueType (unbekannt)
+		if ((valueType !== 'bool') && (valueType !== 'num')	&& (valueType !== 'text') && (valueType !== 'list')) {
+			alert('Fehlerhafter Parameter: "' + valueType + '" im Feld valueType bei Item ' + item);
+			popupOk = false;
+		}
+		// bei designType '0' wird rrule nach Wochentagen umgewandelt und ein festes Format vogegegeben hier sollte nichts versehentlich überschrieben werden
+		if (designType == '0') {
+			var numberOfEntries = response.list.length;
+			for (var numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
+				// test, ob die RRULE fehlerhaft ist
+				if ((response.list[numberOfRow].rrule.indexOf('FREQ=WEEKLY;BYDAY=') !== 0) && (response.list[numberOfRow].rrule.length > 0)) {
+					if (!confirm('Fehler: Parameter designType ist "0", aber gespeicherte RRULE String in UZSU "' + response.list[numberOfRow].rrule + '" entspricht nicht default Format FREQ=WEEKLY;BYDAY=MO... bei Item ' + item	+ '. Soll dieser Eintrag überschrieben werden ?')) {
+						// direkter Abbruch bei der Entscheidung !
+						numberOfRow = numberOfEntries;
+						popupOk = false; 
+					}
 				}
 			}
 		}
-	}
-	// wenn bei designType = 'list' und 'bool' ein Split angegeben wird, dann muss er immer angegeben sein
-	if (((valueType == 'list') || (valueType == 'bool')) && (valueParameterList[0].split(':')[1] !== undefined)) {
-		for (var numberOfTextEntries = 0; numberOfTextEntries < valueParameterList.length; numberOfTextEntries++) {
-			if (valueParameterList[numberOfTextEntries].split(':')[1] === undefined) {
-				alert('Fehlerhafte Einträge im Parameter valueParameterList !');
-				popupOk = false;
+		// wenn bei designType = 'list' und 'bool' ein Split angegeben wird, dann muss er immer angegeben sein
+		if (((valueType == 'list') || (valueType == 'bool')) && (valueParameterList[0].split(':')[1] !== undefined)) {
+			for (var numberOfTextEntries = 0; numberOfTextEntries < valueParameterList.length; numberOfTextEntries++) {
+				if (valueParameterList[numberOfTextEntries].split(':')[1] === undefined) {
+					alert('Fehlerhafte Einträge im Parameter valueParameterList !');
+					popupOk = false;
+				}
 			}
 		}
-	}
-	if (popupOk) {
-		// Öffnen des Popups bei clicken des icons und Ausführung der Eingabefunktion
-		uzsuRuntimePopup(response, headline, designType, valueType, valueParameterList, item);
+		if (popupOk) {
+			// Öffnen des Popups bei clicken des icons und Ausführung der Eingabefunktion
+			uzsuRuntimePopup(response, headline, designType, valueType, valueParameterList, item);
+		}
 	}
 }
 // Verankerung als Callback in den DOM Elementen
