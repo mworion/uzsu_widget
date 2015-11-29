@@ -4,6 +4,10 @@
 (C) Michael Würtenberger 2014,2015
 
 changelog
+v 3.99
+- umstellung auf smartvisu v2.8 mit SVG
+- release candidate
+
 v 3.4
 - expert lines are swap. only on expert line is seen at the same time.
 - no separate extries in visu.css needed, all are in widget_uzsu.html

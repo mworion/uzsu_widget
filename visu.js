@@ -2,7 +2,8 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v3.41
+// Release responsive v3.99
+// läuft nur mit smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -152,8 +153,9 @@ function uzsuBuildTableHeader(headline, designType, valueType, valueParameterLis
 	var tt = "";
 	// hier kommt der Popup Container mit der Beschreibung ein Eigenschaften
 	tt += 	"<div data-role='popup' data-overlay-theme='b' data-theme='a' class='messagePopup' id='uzsuPopupContent' data-dismissible = 'false'>" +
-			"<div data-rel='back' data-role='button' data-icon='delete' data-iconpos='notext' class='ui-btn-right' id='uzsuClose'></div>" +
-				"<div class='uzsuClear'><div class='uzsuPopupHeader'>" + headline + "</div>" +
+				"<div data-rel='back' data-role='button' data-icon='delete' data-iconpos='notext' class='ui-btn-right' id='uzsuClose'></div>" +
+				"<div class='uzsuClear'>" +
+					"<div class='uzsuPopupHeader'>" + headline + "</div>" +
 					"<div class='uzsuTableMain' id='uzsuTable'>";
 	return tt;
 }
@@ -211,7 +213,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 				"</div>";
 	} 
 	else if (valueType === 'list') {
-		// das Listenformat mit select ist sehr trickreich.
+		// das Listenformat mit select ist sehr umfangreich nur einzubauen.
 		tt += 	"<div class='uzsuCell'>" +
 					"<div class='uzsuCellText'>Value</div>" +
 					"<form>" +
@@ -273,7 +275,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"<input type='text' class='uzsuTextWideInput' data-clear-btn='true' id='uzsuRrule" + numberOfRow + "'>" +
 				"</div>";
 	}
-	// Tabelle Reihen abschliessen
+	// Tabelle Reihen abschliessen 
 	tt += "</div>";
 	// und jetzt noch die unsichbare Expertenzeile
 	tt += 	"<div class='uzsuRowExpert' id='uzsuExpertLine" + numberOfRow + "' style='display:none;'>" +
@@ -307,13 +309,13 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 
 function uzsuBuildTableFooter(designType) {
 	var tt = "";
-	// Zeileneinträge abschliessen
+	// Zeileneinträge abschliessen und damit die uzsuTableMain
 	tt += "</div>";
 	// Aufbau des Footers
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v3.41 resp</div>" +
+    				"<div class='uzsuCellText'>v3.99 resp</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -336,13 +338,14 @@ function uzsuBuildTableFooter(designType) {
     				"</div>" +
     			"</div>" +
     		"</div>";
-	// und der Abschluss des popup divs
+	// und der Abschluss des uzsuClear als Rahmen für den float:left und des uzsuPopup divs
 	tt += "</div></div>";
 	return tt;
 }
 //----------------------------------------------------------------------------
 // Funktionen für das dynamische Handling der Seiteninhalte des Popups
 //----------------------------------------------------------------------------
+// Expertenzeile sichbar / unsichbar
 function uzsuSetTextInputState(numberOfRow){
 	// status der eingaben setzen, das brauchen wir an mehreren stellen
 	if ($('#uzsuEvent' + numberOfRow).val() === 'time'){
@@ -352,6 +355,11 @@ function uzsuSetTextInputState(numberOfRow){
 		// und den Zeit auf 00:00 stellen wenn von sunrise auf time umgeschaltet wird
 		if($('#uzsuTimeCron' + numberOfRow).length !== 0){
 			$('#uzsuTimeCron' + numberOfRow).textinput('enable');
+			// test farbe des input feldes auf normal setzen - bitte mit closest div, wegen der einbettung jquery
+			$('#uzsuTimeCron' + numberOfRow).closest('div').removeClass('uzsuTimeCronExpert');
+			// experten button abanfalls auf norma setzen
+			$('#uzsuExpert' + numberOfRow).closest('div').removeClass('uzsuTimeCronExpert');
+			//
 			if($('#uzsuTimeCron' + numberOfRow).val().indexOf('sun')===0)
 				$('#uzsuTimeCron' + numberOfRow).val('00:00');
 		}
@@ -363,6 +371,10 @@ function uzsuSetTextInputState(numberOfRow){
 		// und den Text event auf sunrise bzw. sunset setzen, damit man ihn erkennt !
 		if($('#uzsuTimeCron' + numberOfRow).length !== 0){
 			$('#uzsuTimeCron' + numberOfRow).textinput('disable');
+			// test farbe auf rot setzen
+			$('#uzsuTimeCron' + numberOfRow).closest('div').addClass('uzsuTimeCronExpert');
+			// experten button abanfalls auf norma setzen
+			$('#uzsuExpert' + numberOfRow).closest('div').addClass('uzsuTimeCronExpert');
 			$('#uzsuTimeCron' + numberOfRow).val($('#uzsuEvent' + numberOfRow).val());
 		}
 	}
@@ -433,7 +445,7 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 			}
 		}
 		else{
-			// wenn Experte, dann einfach nur den String
+			// wenn designType = 1, dann einfach nur den String
 			$('#uzsuRrule' + numberOfRow).val(response.list[numberOfRow].rrule);
 		}
 	}
@@ -588,8 +600,6 @@ function uzsuHideAllExpertLines() {
 		});
 	}
 }
-
-
 //----------------------------------------------------------------------------
 // Funktionen für das Sortrieren der Tabelleneinträge
 //----------------------------------------------------------------------------
@@ -679,9 +689,23 @@ function uzsuRuntimePopup(response, headline, designType, valueType, valueParame
 function uzsuDomUpdate(event, response) {
 	// Initialisierung zunächst wird festgestellt, ob Item mit Eigenschaft vorhanden. Wenn nicht: active = false
 	// ansonsten ist der Status von active gleich dem gesetzten Status
-	var active = response.length > 0 ? response[0].active : false;
+	var active;
+	// erst einmal prüfen, ob ein Objekt tasächlich vohanden ist
+	if(response.length > 0) {
+		active = response[0].active;
+	} 
+	else{
+		active = false;
+	}	
 	// Das Icon wird aktiviert, falls Status auf aktiv, ansonsten deaktiviert angezeigt
-	$('#' + this.id + ' img').attr('src',(active ? $(this).attr('data-pic-on') : $(this).attr('data-pic-off')));
+	if(active === true) {
+		$('#' + this.id + '-off').hide();
+		$('#' + this.id + '-on').show();
+	}
+	else {
+		$('#' + this.id + '-on').hide();
+		$('#' + this.id + '-off').show();
+	}	
 	// wenn keine Daten vorhanden, dann ist kein item mit den eigenschaften hinterlegt und es wird nichts gemacht
 	if (response.length === 0){
 		alert('DOM Daten für UZSU nicht vorhanden! Item falsch konfiguriert oder nicht vorhanden ! (update-event)');
@@ -744,7 +768,7 @@ function uzsuDomClick(event) {
 				if ((response.list[numberOfRow].rrule.indexOf('FREQ=WEEKLY;BYDAY=') !== 0) && (response.list[numberOfRow].rrule.length > 0)) {
 					if (!confirm('Fehler: Parameter designType ist "0", aber gespeicherte RRULE String in UZSU "' + response.list[numberOfRow].rrule + '" entspricht nicht default Format FREQ=WEEKLY;BYDAY=MO... bei Item ' + item	+ '. Soll dieser Eintrag überschrieben werden ?')) {
 						// direkter Abbruch bei der Entscheidung !
-						numberOfRow = numberOfEntries; 
+						numberOfRow = numberOfEntries;
 						popupOk = false; 
 					}
 				}

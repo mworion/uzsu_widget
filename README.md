@@ -3,7 +3,9 @@
 ###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
 (C) Michael Würtenberger 2014,2015
 
-Stand: responsive v 3.4
+Stand: responsive v 3.99
+Umstellung auf smartvisu v2.8 und damit svg. Spielt nicht mehr mit versionen darunter !
+Anlehnung an Umsetzung von aschwith
 
 Installation:
 1. Download von visu.js und widget_uzsu.html aus Github
@@ -73,9 +75,10 @@ Nochmal die Parameter im Widget:
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015
 *
-* responsive v3.4
+* responsive v3.99
 *
-* läuft zusammen mit dem visu.js (responsive) ab v3.3 
+* läuft zusammen mit dem visu.js (responsive) ab v3.99
+* umstellung auf smartvisu v2.8
 *
 * @param unique id for this widget
 * @param a gad/item
@@ -86,9 +89,10 @@ Nochmal die Parameter im Widget:
 * @param pic off (optional), default icon is a clock
 * @param valueType (optional), default = bool, supported types are 'bool', 'num', 'text', 'list'
 * @param valueParameterList (optional), default set in js depending on valueType
+* @param optional color
 */
 
-{% macro uzsu_icon(id, gad_uzsu, gad_headline, gad_designType, pic_on, pic_off, gad_valueType, gad_valueParameterList) %}
+{% macro uzsu_icon(id, gad_uzsu, gad_headline, gad_designType, pic_on, pic_off, gad_valueType, gad_valueParameterList, gad_color) %}
 </pre>
 
 Viel Spaß

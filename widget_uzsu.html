@@ -2,9 +2,10 @@
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015
 *
-* responsive v3.4
+* responsive v3.99
 *
-* läuft zusammen mit dem visu.js (responsive) ab v3.3 
+* läuft zusammen mit dem visu.js (responsive) ab v3.99
+* umstellung auf smartvisu v2.8
 *
 * @param unique id for this widget
 * @param a gad/item
@@ -15,9 +16,10 @@
 * @param pic off (optional), default icon is a clock
 * @param valueType (optional), default = bool, supported types are 'bool', 'num', 'text', 'list'
 * @param valueParameterList (optional), default set in js depending on valueType
+* @param optional color
 */
 
-{% macro uzsu_icon(id, gad_uzsu, gad_headline, gad_designType, pic_on, pic_off, gad_valueType, gad_valueParameterList) %}
+{% macro uzsu_icon(id, gad_uzsu, gad_headline, gad_designType, pic_on, pic_off, gad_valueType, gad_valueParameterList, gad_color) %}
 /**
 * styles in das widget, damit solange das widget nicht integriert ist, alles in einer datei verbleibt
 */
@@ -81,6 +83,12 @@ div.ui-slider-switch{
 .uzsuCellExpert div.ui-btn{
 	top:3px !important;
 }
+.uzsuTimeCronExpert .ui-icon{
+  	background-color: #ff0000 !important;
+}
+.ui-disable{
+	opacity: 0.7 !important;
+}
 .uzsuEvent, .uzsuListInput{
 	margin: .25em 0 !important;
 	width: 100px;
@@ -94,7 +102,7 @@ div.ui-slider-switch{
         display: none;    
     }
 }
-html[data-useragent*='Chrome'] .uzsuTimeInput{
+html[data-useragent*='Chrome'] .uzsuTimeInput, .uzsuTimeMaxMinInput, .uzsuTimeOffsetInput, .uzsuValueInput{
 	width:70px !important;
 }
 </style>
@@ -105,11 +113,21 @@ html[data-useragent*='Chrome'] .uzsuTimeInput{
 		data-item="{{ gad_uzsu }}" 
 		data-headline="{{ gad_headline|default('UZSU') }}" 
 		data-designType="{{ gad_designType | default('0') }}"
-		data-pic-on="{{ pic_on|default(icon1~'time_clock.png') }}" 
-		data-pic-off="{{ pic_off|default(icon0~'time_clock.png') }}"
+		data-pic-on="{{ pic_on|deficon('time_timer_switch.svg') }}" 
+		data-pic-off="{{ pic_off|deficon('time_timer_switch.svg')}}"
 		data-valueType="{{ gad_valueType|default('bool') }}"
 		data-valueParameterList="{{ implode(gad_valueParameterList) }}"
-		class="switch"><a><img class="icon" src="{{ pic_off|default(icon0~'time_clock.png') }}" /></a>
+		class="switch icon">
+		<a>
+			<img id="{{ uid(page, id) }}-off" class="icon" src="{{ pic_off|deficon('time_timer_switch.svg') }}" />
+			{% if gad_color is empty  %}
+       				<img id="{{ uid(page, id) }}-on" class="icon icon1 hide" src="{{ pic_on|deficon('time_timer_switch.svg') }}" />
+			{% elseif gad_color == 'icon1' %}
+				<img id="{{ uid(page, id) }}-on" class="icon icon1 hide" src="{{ pic_on|deficon('time_timer_switch.svg') }}" />
+			{% else %}
+				<img id="{{ uid(page, id) }}-on" class="icon icon1 hide" style="stroke:{{ color }}; fill:{{ color }};" src="{{ pic_on|deficon('time_timer_switch.svg') }}" />
+			{% endif %}
+		</a>
 	</span>
 	
 {% endmacro %}
