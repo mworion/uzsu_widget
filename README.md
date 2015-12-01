@@ -1,11 +1,12 @@
 #UZSU Widget
 
-###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
+###JAVA Script Widget for use in smartvisu environment in combination with uzsu plugin for smarthome or FHEM environment
 (C) Michael Würtenberger 2014,2015
 
-Stand: responsive v 3.99
-Umstellung auf smartvisu v2.8 und damit svg. Spielt nicht mehr mit versionen darunter !
+Stand: v3.99rc1
+Umstellung auf smartvisu v2.8 und damit svg. Spielt nicht mehr mit Versionen darunter !
 Anlehnung an Umsetzung von aschwith
+Erweitert um das Setzen von Conditions im FHEM Umfeld
 
 Installation:
 1. Download von visu.js und widget_uzsu.html aus Github
@@ -13,6 +14,7 @@ Link: https://github.com/mworion/usu_widget
 
 2. Beide Dateien in das Projektverzeichnis Eurer Visu hineinkopieren. 
 Das müßte unter /www/smartvisu/pages/"name des Projektes" liegen.
+Bei der Installation für FHEM, bitte dortiges Wiki bemühen
 
 3. Einbinden des Widgets in Eure Seite mit
 <pre>
@@ -75,9 +77,9 @@ Nochmal die Parameter im Widget:
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015
 *
-* responsive v3.99
+* responsive v3.99rc1
 *
-* läuft zusammen mit dem visu.js (responsive) ab v3.99
+* läuft zusammen mit dem visu.js (responsive) ab v3.99rc1
 * umstellung auf smartvisu v2.8
 *
 * @param unique id for this widget
