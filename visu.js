@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v3.99
+// Release responsive v3.99 rc1
 // läuft nur mit smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
@@ -304,6 +304,40 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"<input type='time' data-clear-btn='false' class='uzsuTimeMaxMinInput' id='uzsuTimeMax" + numberOfRow + "'>" +
 				"</div>" +
 			"</div>";	
+	// und jetzt noch die unsichbare Condition Zeile
+	tt += 	"<div class='uzsuRowCondition' id='uzsuConditionLine" + numberOfRow + "' style='display:none;'>" +
+				"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Device</div>" +
+					"<input type='time' data-clear-btn='false' class='uzsuConditionDeviceInput' id='uzsuConditionDevice" + numberOfRow + "'>" +
+				"</div>" +
+				"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Condition</div>" +
+					"<form>" +
+						"<div data-role='fieldcontain' class='uzsuEvent' >" +
+							"<select name='uzsuCondition" + numberOfRow + "' id='uzsuCondition" + numberOfRow + "' data-mini='true'>" +
+								"<option value='='>=</option>" +
+								"<option value='<'><</option>" +
+								"<option value='>'>></option>" +
+								"<option value='>='>>=</option>" +
+								"<option value='<='><=</option>" +
+							"</select>" +
+						"</div>" +
+					"</form>" +
+				"</div>" +
+				"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Value</div>" +
+					"<input type='text' data-clear-btn='false' class='uzsuConditionValueInput' id='uzsuConditionValue" + numberOfRow + "'>" +
+				"</div>" +
+				"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'></div>" +
+					"<form>" +
+						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
+							"<input type='checkbox' id='uzsuConditionActive"	+ numberOfRow + "'>" +
+								"<label for='uzsuConditionActive" + numberOfRow + "'>Act</label>" +
+						"</fieldset>" +
+					"</form>" +
+				"</div>" +
+			"</div>";
 	return tt;
 }
 
@@ -315,7 +349,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v3.99 resp</div>" +
+    				"<div class='uzsuCellText'>v3.99rc1 resp</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -345,7 +379,7 @@ function uzsuBuildTableFooter(designType) {
 //----------------------------------------------------------------------------
 // Funktionen für das dynamische Handling der Seiteninhalte des Popups
 //----------------------------------------------------------------------------
-// Expertenzeile sichbar / unsichbar
+// Expertenzeile mit Eingaben auf der Hauptzeile benutzbar machen oder sperren
 function uzsuSetTextInputState(numberOfRow){
 	// status der eingaben setzen, das brauchen wir an mehreren stellen
 	if ($('#uzsuEvent' + numberOfRow).val() === 'time'){
@@ -357,7 +391,7 @@ function uzsuSetTextInputState(numberOfRow){
 			$('#uzsuTimeCron' + numberOfRow).textinput('enable');
 			// test farbe des input feldes auf normal setzen - bitte mit closest div, wegen der einbettung jquery
 			$('#uzsuTimeCron' + numberOfRow).closest('div').removeClass('uzsuTimeCronExpert');
-			// experten button abanfalls auf norma setzen
+			// experten button abanfalls auf normal setzen
 			$('#uzsuExpert' + numberOfRow).closest('div').removeClass('uzsuTimeCronExpert');
 			//
 			if($('#uzsuTimeCron' + numberOfRow).val().indexOf('sun')===0)
@@ -373,7 +407,7 @@ function uzsuSetTextInputState(numberOfRow){
 			$('#uzsuTimeCron' + numberOfRow).textinput('disable');
 			// test farbe auf rot setzen
 			$('#uzsuTimeCron' + numberOfRow).closest('div').addClass('uzsuTimeCronExpert');
-			// experten button abanfalls auf norma setzen
+			// experten button abanfalls auf normal setzen
 			$('#uzsuExpert' + numberOfRow).closest('div').addClass('uzsuTimeCronExpert');
 			$('#uzsuTimeCron' + numberOfRow).val($('#uzsuEvent' + numberOfRow).val());
 		}
@@ -548,7 +582,9 @@ function uzsuShowExpertLine(e) {
 	// erst einmal alle verschwinden lassen
 	uzsuHideAllExpertLines();
 	// Zeile anzeigen
-	$('#uzsuExpertLine' + numberOfRow).css('display','');
+	$('#uzsuExpertLine'+numberOfRow).css('display','');
+	// auch für die Conditions
+	$('#uzsuConditionLine'+numberOfRow).css('display','');		
 	// jetzt noch den Button in der Zeile drüber auf arrow up ändern
 	$('#uzsuExpert' + numberOfRow).buttonMarkup({ icon: 'arrow-u' });
 	// und den Callback ändern
@@ -571,6 +607,8 @@ function uzsuHideExpertLine(e) {
 	if ($('#uzsuExpertLine'+numberOfRow)) {
 		// jetzt die Tabelle kürzen im Popup
 		$('#uzsuExpertLine'+numberOfRow).css('display','none');
+		// auch für die Conditions
+		$('#uzsuConditionLine'+numberOfRow).css('display','none');		
 		// jetzt noch den Button in der Zeile drüber ändern auf arrow down
 		$('#uzsuExpert'+ numberOfRow).buttonMarkup({ icon: 'arrow-d' });
 		// und den Callback ändern
@@ -589,6 +627,8 @@ function uzsuHideAllExpertLines() {
 	for (var numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
 		// jetzt die Tabelle kürzen im Popup
 		$('#uzsuExpertLine'+numberOfRow).css('display','none');
+		// auch für die Conditions
+		$('#uzsuConditionLine'+numberOfRow).css('display','none');		
 		// jetzt noch den Button in der Zeile drüber ändern auf arrow down
 		$('#uzsuExpert'+ numberOfRow).buttonMarkup({ icon: 'arrow-d' });
 		// und den Callback ändern
@@ -697,7 +737,7 @@ function uzsuDomUpdate(event, response) {
 	else{
 		active = false;
 	}	
-	// Das Icon wird aktiviert, falls Status auf aktiv, ansonsten deaktiviert angezeigt
+	// Das Icon wird aktiviert, falls Status auf aktiv, ansonsten deaktiviert angezeigt. Basiert auf der Implementierung von aschwith
 	if(active === true) {
 		$('#' + this.id + '-off').hide();
 		$('#' + this.id + '-on').show();

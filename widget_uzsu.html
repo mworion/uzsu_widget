@@ -2,7 +2,7 @@
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015
 *
-* responsive v3.99
+* responsive v3.99rc1
 *
 * läuft zusammen mit dem visu.js (responsive) ab v3.99
 * umstellung auf smartvisu v2.8
@@ -37,7 +37,7 @@
     clear:both;
     height:60px;
 }
-.uzsuRowExpert{
+.uzsuRowExpert, .uzsuRowCondition{
     clear:both;
     height:60px;
     border:1px dotted;
@@ -89,7 +89,7 @@ div.ui-slider-switch{
 .ui-disable{
 	opacity: 0.7 !important;
 }
-.uzsuEvent, .uzsuListInput{
+.uzsuEvent, .uzsuConditionActive, .uzsuListInput{
 	margin: .25em 0 !important;
 	width: 100px;
 	padding: 0 !important;
@@ -98,7 +98,7 @@ div.ui-slider-switch{
 	width: 350px !important;
 }
 @media screen and (max-width: 625px){
-    .uzsuRowExpert, .uzsuCellExpert{
+    .uzsuRowExpert, .uzsuRowCondition, .uzsuCellExpert{
         display: none;    
     }
 }
