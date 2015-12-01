@@ -4,6 +4,8 @@
 (C) Michael Würtenberger 2014,2015
 
 changelog
+v 3.2 
+- neues Master release
 v 3.1
 - erstanlage
 - bool bekommt wie bei listen analog ebenfalls einen parametersatz mit, mit dem die setzten Werte des Sliders festgelegt werden
