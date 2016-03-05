@@ -2,12 +2,12 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v3.99 rc1
+// Release responsive v4 rc1
 // läuft nur mit smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
-// (c) Michael Würtenberger 2014,2015
+// (c) Michael Würtenberger 2014,2015, 2016
 // 
 //  APL 2.0 Lizenz
 //
@@ -349,7 +349,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v3.99rc1 resp</div>" +
+    				"<div class='uzsuCellText'>v4 rc1</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -584,7 +584,8 @@ function uzsuShowExpertLine(e) {
 	// Zeile anzeigen
 	$('#uzsuExpertLine'+numberOfRow).css('display','');
 	// auch für die Conditions
-	$('#uzsuConditionLine'+numberOfRow).css('display','');		
+	// erst einmal nicht für das v4 release
+	// $('#uzsuConditionLine'+numberOfRow).css('display','');		
 	// jetzt noch den Button in der Zeile drüber auf arrow up ändern
 	$('#uzsuExpert' + numberOfRow).buttonMarkup({ icon: 'arrow-u' });
 	// und den Callback ändern
