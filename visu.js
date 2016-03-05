@@ -2,12 +2,12 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v4 rc1
+// Release responsive v4.1
 // läuft nur mit smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
-// (c) Michael Würtenberger 2014,2015, 2016
+// (c) Michael Würtenberger 2014,2015,2016
 // 
 //  APL 2.0 Lizenz
 //
@@ -27,6 +27,26 @@
 // und den Elementen der Seite. Die Expertenzeilen werden immer sofort mit angelegt, sind aber zu Beginn nicht sichtbar.
 // Beim verlassen des Popups werden die dynamisch angelegten DOM Elemente wieder gelöscht (remove).
 //
+// Datenmodell: Austausch über JSON Element
+// 				{ 	"active" 	: bool, 
+//					"list" 		: 					Liste von einträgen mit schaltzeiten
+//					[	"active"	:false,			Ist der einzelne Eintrag darin aktiv ?
+//						"rrule"		:'',			Wochen / Tag Programmstring
+//						"time"		:'00:00',		Uhrzeitstring des Schaltpunktes / configuration
+//						"value"		:0,				Wert, der gesetzt wird
+//						"event":	'time',			Erweiterung zur Laufzeit: Zeitevent oder SUN
+//						"timeMin"	:'',			Untere Schranke SUN
+//						"timeMax"	:'',			Oberere Schranke SUN
+//						"timeCron"	:'00:00',		Schaltzeitpunkt
+//						"timeOffset":''				Offset für Schaltzeitpunkt
+//						"condition"	: 	{			Ein Struct für die Verwendung mit FHEM conditions, weil dort einige Option mehr angeboten werden
+//											"conditionDevicePerl"	: text
+//											"conditionType"			: text
+//											"conditionValue"		: text
+//											"conditionActive"		: bool
+//										}
+//					] 
+//				}
 // ----------------------------------------------------------------------------
 // set browser and platform identification variables
 // ----------------------------------------------------------------------------
@@ -307,19 +327,21 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	// und jetzt noch die unsichbare Condition Zeile
 	tt += 	"<div class='uzsuRowCondition' id='uzsuConditionLine" + numberOfRow + "' style='display:none;'>" +
 				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Device</div>" +
-					"<input type='time' data-clear-btn='false' class='uzsuConditionDeviceInput' id='uzsuConditionDevice" + numberOfRow + "'>" +
+					"<div class='uzsuCellText'>Device / Perl String</div>" +
+					"<input type='text' data-clear-btn='false' class='uzsuConditionDevicePerlInput' id='uzsuConditionDevicePerl" + numberOfRow + "'>" +
 				"</div>" +
 				"<div class='uzsuCell'>" +
 					"<div class='uzsuCellText'>Condition</div>" +
 					"<form>" +
 						"<div data-role='fieldcontain' class='uzsuEvent' >" +
-							"<select name='uzsuCondition" + numberOfRow + "' id='uzsuCondition" + numberOfRow + "' data-mini='true'>" +
+							"<select name='uzsuCondition" + numberOfRow + "' id='uzsuConditionType" + numberOfRow + "' data-mini='true'>" +
 								"<option value='='>=</option>" +
 								"<option value='<'><</option>" +
 								"<option value='>'>></option>" +
 								"<option value='>='>>=</option>" +
 								"<option value='<='><=</option>" +
+								"<option value='!='>!=</option>" +
+								"<option value='Perl'>Perl</option>" +
 							"</select>" +
 						"</div>" +
 					"</form>" +
@@ -349,7 +371,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v4 rc1</div>" +
+    				"<div class='uzsuCellText'>v4.1</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -389,8 +411,6 @@ function uzsuSetTextInputState(numberOfRow){
 		// und den Zeit auf 00:00 stellen wenn von sunrise auf time umgeschaltet wird
 		if($('#uzsuTimeCron' + numberOfRow).length !== 0){
 			$('#uzsuTimeCron' + numberOfRow).textinput('enable');
-			// test farbe des input feldes auf normal setzen - bitte mit closest div, wegen der einbettung jquery
-			$('#uzsuTimeCron' + numberOfRow).closest('div').removeClass('uzsuTimeCronExpert');
 			// experten button abanfalls auf normal setzen
 			$('#uzsuExpert' + numberOfRow).closest('div').removeClass('uzsuTimeCronExpert');
 			//
@@ -405,9 +425,7 @@ function uzsuSetTextInputState(numberOfRow){
 		// und den Text event auf sunrise bzw. sunset setzen, damit man ihn erkennt !
 		if($('#uzsuTimeCron' + numberOfRow).length !== 0){
 			$('#uzsuTimeCron' + numberOfRow).textinput('disable');
-			// test farbe auf rot setzen
-			$('#uzsuTimeCron' + numberOfRow).closest('div').addClass('uzsuTimeCronExpert');
-			// experten button abanfalls auf normal setzen
+			// experten button ebenfalls auf rot setzen
 			$('#uzsuExpert' + numberOfRow).closest('div').addClass('uzsuTimeCronExpert');
 			$('#uzsuTimeCron' + numberOfRow).val($('#uzsuEvent' + numberOfRow).val());
 		}
@@ -451,6 +469,20 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		}
 		// Values in der Zeile setzen
 		$('#uzsuActive' + numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");
+	    // hier die conditions, wenn sie im json angelegt worden sind und zwar pro zeile !
+	    if(response.list[numberOfRow].condition !== undefined){
+	    	$('#uzsuConditionDevicePerl'+numberOfRow).val(response.list[numberOfRow].condition.conditionDevicePerl);
+	    	$('#uzsuConditionType'+numberOfRow).val(response.list[numberOfRow].condition.conditionType);
+	    	$('#uzsuConditionType'+numberOfRow).selectmenu('refresh', true);
+	    	$('#uzsuConditionValue'+numberOfRow).val(response.list[numberOfRow].condition.conditionValue);
+	    	$('#uzsuConditionActive'+numberOfRow).prop('checked',response.list[numberOfRow].condition.conditionActive).checkboxradio("refresh");
+			// experten button ebenfalls auf rot setzen
+			$('#uzsuExpert' + numberOfRow).closest('div').addClass('uzsuConditionExpert');
+	    }
+	    // ansonsten werden die Anzeigeklassen einfach entfernt
+	    else{
+	    	$('#uzsuConditionLine'+numberOfRow).remove();	
+	    }
 		$('#uzsuTime' + numberOfRow).val(response.list[numberOfRow].time);
 	    $('#uzsuTimeMin'+numberOfRow).val(response.list[numberOfRow].timeMin);
 	    $('#uzsuTimeOffset'+numberOfRow).val(parseInt(response.list[numberOfRow].timeOffset));
@@ -496,6 +528,13 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 	for (var numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
 		response.list[numberOfRow].value = $('#uzsuValue' + numberOfRow).val();
 		response.list[numberOfRow].active = $('#uzsuActive' + numberOfRow).is(':checked');
+		// hier die conditions, wenn im json angelegt
+		if(response.list[numberOfRow].condition !== undefined){
+			response.list[numberOfRow].condition.conditionDevicePerl = $('#uzsuConditionDevicePerl'+numberOfRow).val();
+			response.list[numberOfRow].condition.conditionType = $('#uzsuConditionType'+numberOfRow).val();
+			response.list[numberOfRow].condition.conditionValue = $('#uzsuConditionValue'+numberOfRow).val();
+			response.list[numberOfRow].condition.conditionActive = $('#uzsuConditionActive'+numberOfRow).is(':checked');
+		}
 		response.list[numberOfRow].time = $('#uzsuTime'+numberOfRow).val();
 		response.list[numberOfRow].timeMin = $('#uzsuTimeMin'+numberOfRow).val();
 		response.list[numberOfRow].timeOffset = $('#uzsuTimeOffset'+numberOfRow).val();
@@ -583,9 +622,10 @@ function uzsuShowExpertLine(e) {
 	uzsuHideAllExpertLines();
 	// Zeile anzeigen
 	$('#uzsuExpertLine'+numberOfRow).css('display','');
-	// auch für die Conditions
-	// erst einmal nicht für das v4 release
-	// $('#uzsuConditionLine'+numberOfRow).css('display','');		
+	// Zeile für conditions anzeigen, wenn sie existieren
+	if($('#uzsuConditionLine'+numberOfRow).length){
+		$('#uzsuConditionLine'+numberOfRow).css('display','');		
+	}
 	// jetzt noch den Button in der Zeile drüber auf arrow up ändern
 	$('#uzsuExpert' + numberOfRow).buttonMarkup({ icon: 'arrow-u' });
 	// und den Callback ändern
@@ -609,7 +649,9 @@ function uzsuHideExpertLine(e) {
 		// jetzt die Tabelle kürzen im Popup
 		$('#uzsuExpertLine'+numberOfRow).css('display','none');
 		// auch für die Conditions
-		$('#uzsuConditionLine'+numberOfRow).css('display','none');		
+		if($('#uzsuConditionLine'+numberOfRow).length){
+			$('#uzsuConditionLine'+numberOfRow).css('display','none');		
+		}
 		// jetzt noch den Button in der Zeile drüber ändern auf arrow down
 		$('#uzsuExpert'+ numberOfRow).buttonMarkup({ icon: 'arrow-d' });
 		// und den Callback ändern
@@ -629,7 +671,9 @@ function uzsuHideAllExpertLines() {
 		// jetzt die Tabelle kürzen im Popup
 		$('#uzsuExpertLine'+numberOfRow).css('display','none');
 		// auch für die Conditions
-		$('#uzsuConditionLine'+numberOfRow).css('display','none');		
+		if($('#uzsuConditionLine'+numberOfRow).length){
+			$('#uzsuConditionLine'+numberOfRow).css('display','none');		
+		}
 		// jetzt noch den Button in der Zeile drüber ändern auf arrow down
 		$('#uzsuExpert'+ numberOfRow).buttonMarkup({ icon: 'arrow-d' });
 		// und den Callback ändern
@@ -767,12 +811,16 @@ function uzsuDomClick(event) {
 	// erst gehen wir davon aus, dass die Prüfungen positiv und ein Popup angezeigt wird
 	var popupOk = true;
 	// Fehlerbehandlung für ein nicht vorhandenes DOM Objekt. Das response Objekt ist erst da, wenn es mit update angelegt wurde. Da diese
-	// Schritte asynchron erfolgen, kann es sein, dass das Icon bereits da ist, clickbar, aber nocht keine Daten angekommen. Dann darf ich nicht
-	// auf diese Daten zugreifen wollen !
+	// Schritte asynchron erfolgen, kann es sein, dass das Icon bereits da ist, clickbar, aber nocht keine Daten angekommen. Dann darf ich nicht auf diese Daten zugreifen wollen !
 	if(response.list === undefined){ 
 		alert('DOM Daten für UZSU nicht vorhanden! Item falsch konfiguriert oder nicht vorhanden ! (click-event)');
 	}
 	else{
+		//
+		// test
+		//
+		//response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{conditionDevicePerl:'TestDevice',conditionType:'!=',conditionValue:'TestValue',conditionActive:true}});
+		
 		// jetzt erweitern wir die dicts pro Eintrag, um dem dort einhaltenen Timestring die enthaltenen Einzelteile zu bekommen
 		uzsuExpandTimestring(response);
 	 	// Auswertung der Übergabeparameter

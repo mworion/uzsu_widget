@@ -1,9 +1,12 @@
 #UZSU Widget
 
 ###JAVA Script Widget for use in smarthome / smartvisu environment in combination with uzsu plugin
-(C) Michael Würtenberger 2014,2015
+(C) Michael Würtenberger 2014,2015,2016
 
 changelog
+v 4.1
+- start conditions für fhem nutzer
+
 v 4 rc 1
 - umstellung auf svg zu smartvisu 2.8
 

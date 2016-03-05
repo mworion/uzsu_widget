@@ -3,9 +3,7 @@
 ###JAVA Script Widget for use in smartvisu environment in combination with uzsu plugin for smarthome or FHEM environment
 (C) Michael Würtenberger 2014,2015,2016
 
-Stand: v4 rc1
-Umstellung auf smartvisu v2.8 und damit svg. Spielt nicht mehr mit Versionen darunter !
-Anlehnung an Umsetzung von aschwith
+Stand: v4.1 
 Erweitert um das Setzen von Conditions im FHEM Umfeld
 
 Installation:
