@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v4.1
+// Release responsive v4.2
 // läuft nur mit smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
@@ -60,7 +60,7 @@ var browserIdentificationVariable = document.documentElement;
 function uzsuCollapseTimestring(response, designType){
 	for (var numberOfEntry = 0; numberOfEntry < response.list.length; numberOfEntry++) {
 		// und den string setzen, bei designtype = 1 bleibt er bestehen, wird nicht geändert
-		if(designType === '0'){
+		if((designType == '0') || (designType == '2')){
 			// zeitstring wieder zusammenbauen, falls Event <> 'time', damit wir den richtigen Zusammenbau im zeitstring haben
 			var timeString = '';
 			if(response.list[numberOfEntry].event === 'time'){
@@ -187,7 +187,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	var weekDays = [ 'MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU' ];
 	
 	tt += 	"<div class='uzsuRow' id='uzsuNumberOfRow" + numberOfRow + "'>";
-	if (designType === '0'){
+	if ((designType == '0') || (designType == '2')){
 		tt+=	"<div class='uzsuCell'>" +
 					"<div class='uzsuCellText'></div>" +
 					"<form>" +
@@ -253,7 +253,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"</form>" +
 				"</div>";
 	}
-	if(designType === '0'){
+	if((designType == '0') || (designType == '2')){
 		tt+=	"<div class='uzsuCell'>" +
 					"<div class='uzsuCellText'>Time</div>" +
 					"<input type='time' data-clear-btn='false' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>" +
@@ -325,41 +325,43 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 				"</div>" +
 			"</div>";	
 	// und jetzt noch die unsichbare Condition Zeile
-	tt += 	"<div class='uzsuRowCondition' id='uzsuConditionLine" + numberOfRow + "' style='display:none;'>" +
-				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Device / Perl String</div>" +
-					"<input type='text' data-clear-btn='false' class='uzsuConditionDevicePerlInput' id='uzsuConditionDevicePerl" + numberOfRow + "'>" +
-				"</div>" +
-				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Condition</div>" +
-					"<form>" +
-						"<div data-role='fieldcontain' class='uzsuEvent' >" +
-							"<select name='uzsuCondition" + numberOfRow + "' id='uzsuConditionType" + numberOfRow + "' data-mini='true'>" +
-								"<option value='='>=</option>" +
-								"<option value='<'><</option>" +
-								"<option value='>'>></option>" +
-								"<option value='>='>>=</option>" +
-								"<option value='<='><=</option>" +
-								"<option value='!='>!=</option>" +
-								"<option value='Perl'>Perl</option>" +
-							"</select>" +
-						"</div>" +
-					"</form>" +
-				"</div>" +
-				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Value</div>" +
-					"<input type='text' data-clear-btn='false' class='uzsuConditionValueInput' id='uzsuConditionValue" + numberOfRow + "'>" +
-				"</div>" +
-				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'></div>" +
-					"<form>" +
-						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
-							"<input type='checkbox' id='uzsuConditionActive"	+ numberOfRow + "'>" +
-								"<label for='uzsuConditionActive" + numberOfRow + "'>Act</label>" +
-						"</fieldset>" +
-					"</form>" +
-				"</div>" +
-			"</div>";
+	if(designType == '2'){
+		tt += 	"<div class='uzsuRowCondition' id='uzsuConditionLine" + numberOfRow + "' style='display:none;'>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'>Device / Perl String</div>" +
+						"<input type='text' data-clear-btn='false' class='uzsuConditionDevicePerlInput' id='uzsuConditionDevicePerl" + numberOfRow + "'>" +
+					"</div>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'>Condition Type</div>" +
+						"<form>" +
+							"<div data-role='fieldcontain' class='uzsuEvent' >" +
+								"<select name='uzsuCondition" + numberOfRow + "' id='uzsuConditionType" + numberOfRow + "' data-mini='true'>" +
+									"<option value='='>=</option>" +
+									"<option value='<'><</option>" +
+									"<option value='>'>></option>" +
+									"<option value='>='>>=</option>" +
+									"<option value='<='><=</option>" +
+									"<option value='!='>!=</option>" +
+									"<option value='Perl'>Perl</option>" +
+								"</select>" +
+							"</div>" +
+						"</form>" +
+					"</div>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'>Value</div>" +
+						"<input type='text' data-clear-btn='false' class='uzsuConditionValueInput' id='uzsuConditionValue" + numberOfRow + "'>" +
+					"</div>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'></div>" +
+						"<form>" +
+							"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
+								"<input type='checkbox' id='uzsuConditionActive"	+ numberOfRow + "'>" +
+									"<label for='uzsuConditionActive" + numberOfRow + "'>Act</label>" +
+							"</fieldset>" +
+						"</form>" +
+					"</div>" +
+				"</div>";
+	}
 	return tt;
 }
 
@@ -371,7 +373,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v4.1</div>" +
+    				"<div class='uzsuCellText'>v4.2</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -470,7 +472,7 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		// Values in der Zeile setzen
 		$('#uzsuActive' + numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");
 	    // hier die conditions, wenn sie im json angelegt worden sind und zwar pro zeile !
-	    if(response.list[numberOfRow].condition !== undefined){
+	    if(designType == '2'){
 	    	$('#uzsuConditionDevicePerl'+numberOfRow).val(response.list[numberOfRow].condition.conditionDevicePerl);
 	    	$('#uzsuConditionType'+numberOfRow).val(response.list[numberOfRow].condition.conditionType);
 	    	$('#uzsuConditionType'+numberOfRow).selectmenu('refresh', true);
@@ -479,11 +481,7 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 			// experten button ebenfalls auf rot setzen
 			$('#uzsuExpert' + numberOfRow).closest('div').addClass('uzsuConditionExpert');
 	    }
-	    // ansonsten werden die Anzeigeklassen einfach entfernt
-	    else{
-	    	$('#uzsuConditionLine'+numberOfRow).remove();	
-	    }
-		$('#uzsuTime' + numberOfRow).val(response.list[numberOfRow].time);
+		//$('#uzsuTime' + numberOfRow).val(response.list[numberOfRow].time);
 	    $('#uzsuTimeMin'+numberOfRow).val(response.list[numberOfRow].timeMin);
 	    $('#uzsuTimeOffset'+numberOfRow).val(parseInt(response.list[numberOfRow].timeOffset));
 	    $('#uzsuTimeMax'+numberOfRow).val(response.list[numberOfRow].timeMax);
@@ -494,7 +492,7 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		$('#uzsuEvent'+numberOfRow).selectmenu('refresh', true);
 		// Fallunterscheidung für den Expertenmodus
 		uzsuSetTextInputState(numberOfRow);
-		if(designType === '0'){
+		if((designType == '0') || (designType === '2')){
 			// in der Tabelle die Werte der rrule, dabei gehe ich von dem Standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU aus und setze für jeden Eintrag den Button.
 			var rrule = response.list[numberOfRow].rrule;
 			if (typeof rrule == "undefined") {
@@ -517,8 +515,7 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 	}
 }
 
-function uzsuSaveTable(item, response, designType, valueType, valueParameterList,
-		saveSmarthome) {
+function uzsuSaveTable(item, response, designType, valueType, valueParameterList, saveSmarthome) {
 	// Tabelle auslesen und speichern
 	var numberOfEntries = response.list.length;
 	var weekDays = [ 'MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU' ];
@@ -529,19 +526,19 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 		response.list[numberOfRow].value = $('#uzsuValue' + numberOfRow).val();
 		response.list[numberOfRow].active = $('#uzsuActive' + numberOfRow).is(':checked');
 		// hier die conditions, wenn im json angelegt
-		if(response.list[numberOfRow].condition !== undefined){
+		if(designType == '2'){
 			response.list[numberOfRow].condition.conditionDevicePerl = $('#uzsuConditionDevicePerl'+numberOfRow).val();
 			response.list[numberOfRow].condition.conditionType = $('#uzsuConditionType'+numberOfRow).val();
 			response.list[numberOfRow].condition.conditionValue = $('#uzsuConditionValue'+numberOfRow).val();
 			response.list[numberOfRow].condition.conditionActive = $('#uzsuConditionActive'+numberOfRow).is(':checked');
 		}
-		response.list[numberOfRow].time = $('#uzsuTime'+numberOfRow).val();
+		//response.list[numberOfRow].time = $('#uzsuTime'+numberOfRow).val();
 		response.list[numberOfRow].timeMin = $('#uzsuTimeMin'+numberOfRow).val();
 		response.list[numberOfRow].timeOffset = $('#uzsuTimeOffset'+numberOfRow).val();
 		response.list[numberOfRow].timeMax = $('#uzsuTimeMax'+numberOfRow).val();
 		response.list[numberOfRow].timeCron = $('#uzsuTimeCron'+numberOfRow).val();
 		response.list[numberOfRow].event = $('#uzsuEvent'+numberOfRow).val();
-	    if(designType === '0'){
+	    if((designType === '0') || (designType === '2')){
 			// in der Tabelle die Werte der rrule, dabei gehe ich von dem Standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU aus und setze für jeden Eintrag den Button. Setzen der Werte.
 			var first = true;
 			var rrule = '';
@@ -578,7 +575,7 @@ function uzsuAddTableRow(response, designType, valueType, valueParameterList) {
 	// alten Zustand mal in die Liste rein. da der aktuelle Zustand ja nur im Widget selbst enthalten ist, wird er vor dem Umbau wieder in die Variable response zurückgespeichert.
 	uzsuSaveTable(1, response, designType, valueType, valueParameterList, false);
 	// ich hänge immer an die letzte Zeile dran ! erst einmal das Array erweitern
-	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:''});
+	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{conditionDevicePerl:'',conditionType:'Perl',conditionValue:'',conditionActive:false}});
 	// dann eine neue HTML Zeile genenrieren
 	tt = uzsuBuildTableRow(numberOfNewRow, designType, valueType,	valueParameterList);
 	// Zeile in die Tabelle einbauen
@@ -816,11 +813,6 @@ function uzsuDomClick(event) {
 		alert('DOM Daten für UZSU nicht vorhanden! Item falsch konfiguriert oder nicht vorhanden ! (click-event)');
 	}
 	else{
-		//
-		// test
-		//
-		//response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{conditionDevicePerl:'TestDevice',conditionType:'!=',conditionValue:'TestValue',conditionActive:true}});
-		
 		// jetzt erweitern wir die dicts pro Eintrag, um dem dort einhaltenen Timestring die enthaltenen Einzelteile zu bekommen
 		uzsuExpandTimestring(response);
 	 	// Auswertung der Übergabeparameter
@@ -840,7 +832,7 @@ function uzsuDomClick(event) {
 		// Schaltuhr verwendet wird ist nur als attribut (child) enthalten und wird ausschliesslich vom Plugin verwendet. wird für das rückschreiben der Daten an smarthome.py benötigt
 		var item = $(this).attr('data-item');
 		// jetzt kommt noch die Liste von Prüfungen, damit hinterher keine Fehler passieren, zunächst fehlerhafter designType (unbekannt)
-		if ((designType !== '0') && (designType !== '1')) {
+		if ((designType !== '0') && (designType !== '1') && (designType !== '2')) {
 			alert('Fehlerhafter Parameter: "' + designType + '" im Feld designType bei Item ' + item);
 			popupOk = false;
 		}
@@ -851,8 +843,7 @@ function uzsuDomClick(event) {
 		}
 		// bei designType '0' wird rrule nach Wochentagen umgewandelt und ein festes Format vogegegeben hier sollte nichts versehentlich überschrieben werden
 		if (designType == '0') {
-			var numberOfEntries = response.list.length;
-			for (var numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
+			for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
 				// test, ob die RRULE fehlerhaft ist
 				if ((response.list[numberOfRow].rrule.indexOf('FREQ=WEEKLY;BYDAY=') !== 0) && (response.list[numberOfRow].rrule.length > 0)) {
 					if (!confirm('Fehler: Parameter designType ist "0", aber gespeicherte RRULE String in UZSU "' + response.list[numberOfRow].rrule + '" entspricht nicht default Format FREQ=WEEKLY;BYDAY=MO... bei Item ' + item	+ '. Soll dieser Eintrag überschrieben werden ?')) {
@@ -863,7 +854,7 @@ function uzsuDomClick(event) {
 				}
 			}
 		}
-		// wenn bei designType = 'list' und 'bool' ein Split angegeben wird, dann muss er immer angegeben sein
+		// wenn bei valueType = 'list' und 'bool' ein Split angegeben wird, dann muss er immer angegeben sein
 		if (((valueType == 'list') || (valueType == 'bool')) && (valueParameterList[0].split(':')[1] !== undefined)) {
 			for (var numberOfTextEntries = 0; numberOfTextEntries < valueParameterList.length; numberOfTextEntries++) {
 				if (valueParameterList[numberOfTextEntries].split(':')[1] === undefined) {
@@ -872,11 +863,21 @@ function uzsuDomClick(event) {
 				}
 			}
 		}
+		// wenn designType = '2' und damit fhem auslegung ist muss der JSON String auf die entsprechenden eintäge erwietert werden (falls nichts vorhanden)
+		if (designType == '2') {
+			for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
+				// test, ob die einträge vorhanden sind
+				if (response.list[numberOfRow].condition === undefined){
+					response.list[numberOfRow].condition = {conditionDevicePerl:'',conditionType:'',conditionValue:'',conditionActive:false};
+					}
+				}
+			}
+		}
+		
 		if (popupOk) {
 			// Öffnen des Popups bei clicken des icons und Ausführung der Eingabefunktion
 			uzsuRuntimePopup(response, headline, designType, valueType, valueParameterList, item);
 		}
-	}
 }
 // Verankerung als Callback in den DOM Elementen
 $(document).on('update','[data-widget="uzsu.uzsu_icon"]', uzsuDomUpdate);

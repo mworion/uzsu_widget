@@ -4,6 +4,9 @@
 (C) Michael Würtenberger 2014,2015,2016
 
 changelog
+v 4.2
+- umstellung auf designType = 2 für fhem
+
 v 4.1
 - start conditions für fhem nutzer
 
