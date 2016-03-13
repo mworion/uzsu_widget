@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v4.2
+// Release responsive v4.3
 // läuft nur mit smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
@@ -44,6 +44,10 @@
 //											"conditionType"			: text
 //											"conditionValue"		: text
 //											"conditionActive"		: bool
+//										}
+//						"holiday":		{
+//											"weekend" 	: bool
+//											"work"		: bool
 //										}
 //					] 
 //				}
@@ -187,15 +191,27 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	var weekDays = [ 'MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU' ];
 	
 	tt += 	"<div class='uzsuRow' id='uzsuNumberOfRow" + numberOfRow + "'>";
-	if ((designType == '0') || (designType == '2')){
+	if ((designType === '0') || (designType === '2')){
 		tt+=	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'></div>" +
+					"<div class='uzsuCellText'>Weekday</div>" +
 					"<form>" +
 						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
 							for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
 								tt += "<input type='checkbox' id='checkbox" + numberOfDay	+ "-" + numberOfRow + "'> <label for='checkbox"	+ numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "</label>";
 							}
 		tt +=			"</fieldset>" +
+					"</form>" +
+				"</div>";
+	}
+	// hier die Einträge für holiday weekend oder nicht
+	if (designType === '2'){
+		tt+=	"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Holiday</div>" +
+					"<form>" +
+						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
+		 					"<input type='checkbox' id='holidayWeekend" + numberOfRow + "'> <label for='holidayWeekend" + numberOfRow + "'>WE</label>" +
+							"<input type='checkbox' id='holidayWork" + numberOfRow + "'> <label for='holidayWork" + numberOfRow + "'>!WE</label>" +
+						"</fieldset>" +
 					"</form>" +
 				"</div>";
 	}
@@ -269,7 +285,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 				"</div>" +
 				"<div class='uzsuCellExpert'>" +
 					"<div class='uzsuCellText'>Expert</div>" +
-					"<button id='uzsuExpert" + numberOfRow + "' data-mini='true' data-icon='arrow-d' data-iconpos='notext'></button>" +
+					"<button id='uzsuExpert" + numberOfRow + "' data-mini='true' data-icon='arrow-d' data-iconpos='notext' class='ui-icon-shadow'></button>" +
 				"</div>" +
 				"<div class='uzsuCell'>" +
 					"<div class='uzsuCellText'></div>" +
@@ -373,7 +389,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v4.2</div>" +
+    				"<div class='uzsuCellText'>v4.3</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -414,7 +430,7 @@ function uzsuSetTextInputState(numberOfRow){
 		if($('#uzsuTimeCron' + numberOfRow).length !== 0){
 			$('#uzsuTimeCron' + numberOfRow).textinput('enable');
 			// experten button abanfalls auf normal setzen
-			$('#uzsuExpert' + numberOfRow).closest('div').removeClass('uzsuTimeCronExpert');
+			$('#uzsuExpert' + numberOfRow).closest('div').removeClass('ui-checkbox-off');
 			//
 			if($('#uzsuTimeCron' + numberOfRow).val().indexOf('sun')===0)
 				$('#uzsuTimeCron' + numberOfRow).val('00:00');
@@ -428,7 +444,7 @@ function uzsuSetTextInputState(numberOfRow){
 		if($('#uzsuTimeCron' + numberOfRow).length !== 0){
 			$('#uzsuTimeCron' + numberOfRow).textinput('disable');
 			// experten button ebenfalls auf rot setzen
-			$('#uzsuExpert' + numberOfRow).closest('div').addClass('uzsuTimeCronExpert');
+			$('#uzsuExpert' + numberOfRow).closest('div').addClass('ui-checkbox-on');
 			$('#uzsuTimeCron' + numberOfRow).val($('#uzsuEvent' + numberOfRow).val());
 		}
 	}
@@ -447,10 +463,10 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 			$('#uzsuValue' + numberOfRow).val(response.list[numberOfRow].value).slider("refresh");
 		}
 		// mit int Value für die num Variante
-		else if ((valueType == 'num') || (valueType == 'text')) {
+		else if ((valueType === 'num') || (valueType === 'text')) {
 			$('#uzsuValue' + numberOfRow).val(response.list[numberOfRow].value);
 		} 
-		else if (valueType == 'list') {
+		else if (valueType === 'list') {
 			// hier ist es etwas schwieriger, denn ich muß den Wert mit der Liste vergleichen und dann setzen
 			for (var numberOfListEntry = 0; numberOfListEntry < valueParameterList.length; numberOfListEntry++) {
 				// wenn ich den Eintrag gefunden haben, dann setze ich den Eintrag auf die richtige Stelle ansonsten wird einfach der erste Eintrag genomme.
@@ -472,14 +488,14 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		// Values in der Zeile setzen
 		$('#uzsuActive' + numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");
 	    // hier die conditions, wenn sie im json angelegt worden sind und zwar pro zeile !
-	    if(designType == '2'){
+	    if(designType === '2'){
 	    	$('#uzsuConditionDevicePerl'+numberOfRow).val(response.list[numberOfRow].condition.conditionDevicePerl);
 	    	$('#uzsuConditionType'+numberOfRow).val(response.list[numberOfRow].condition.conditionType);
 	    	$('#uzsuConditionType'+numberOfRow).selectmenu('refresh', true);
 	    	$('#uzsuConditionValue'+numberOfRow).val(response.list[numberOfRow].condition.conditionValue);
 	    	$('#uzsuConditionActive'+numberOfRow).prop('checked',response.list[numberOfRow].condition.conditionActive).checkboxradio("refresh");
 			// experten button ebenfalls auf rot setzen
-			$('#uzsuExpert' + numberOfRow).closest('div').addClass('uzsuConditionExpert');
+			$('#uzsuExpert' + numberOfRow).closest('div').addClass('ui-checkbox-on');
 	    }
 		//$('#uzsuTime' + numberOfRow).val(response.list[numberOfRow].time);
 	    $('#uzsuTimeMin'+numberOfRow).val(response.list[numberOfRow].timeMin);
@@ -492,10 +508,10 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		$('#uzsuEvent'+numberOfRow).selectmenu('refresh', true);
 		// Fallunterscheidung für den Expertenmodus
 		uzsuSetTextInputState(numberOfRow);
-		if((designType == '0') || (designType === '2')){
+		if((designType === '0') || (designType === '2')){
 			// in der Tabelle die Werte der rrule, dabei gehe ich von dem Standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU aus und setze für jeden Eintrag den Button.
 			var rrule = response.list[numberOfRow].rrule;
-			if (typeof rrule == "undefined") {
+			if (typeof rrule === "undefined") {
 				rrule = '';
 			}
 			var ind = rrule.indexOf('BYDAY');
@@ -511,6 +527,11 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		else{
 			// wenn designType = 1, dann einfach nur den String
 			$('#uzsuRrule' + numberOfRow).val(response.list[numberOfRow].rrule);
+		}
+		// jetzt die holiday themem für fhem
+		if(designType === '2'){
+			$('#holidayWeekend' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.Weekend).checkboxradio("refresh");			
+			$('#holidayWork' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.Work).checkboxradio("refresh");			
 		}
 	}
 }
@@ -559,6 +580,11 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 			// hier wird der String direkt übergeben
 			response.list[numberOfRow].rrule = $('#uzsuRrule' + numberOfRow).val();
 		}
+		// jetzt die holiday themem für fhem
+		if(designType === '2'){
+			response.list[numberOfRow].holiday.Weekend = $('#holidayWeekend' + numberOfRow).is(':checked');
+			response.list[numberOfRow].holiday.Work = $('#holidayWork' + numberOfRow).is(':checked');
+		}
 	}
 	// über json Interface / Treiber herausschreiben
 	if (saveSmarthome) {
@@ -575,7 +601,7 @@ function uzsuAddTableRow(response, designType, valueType, valueParameterList) {
 	// alten Zustand mal in die Liste rein. da der aktuelle Zustand ja nur im Widget selbst enthalten ist, wird er vor dem Umbau wieder in die Variable response zurückgespeichert.
 	uzsuSaveTable(1, response, designType, valueType, valueParameterList, false);
 	// ich hänge immer an die letzte Zeile dran ! erst einmal das Array erweitern
-	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{conditionDevicePerl:'',conditionType:'Perl',conditionValue:'',conditionActive:false}});
+	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{conditionDevicePerl:'',conditionType:'Perl',conditionValue:'',conditionActive:false},holiday:{weekend:false,work:false}});
 	// dann eine neue HTML Zeile genenrieren
 	tt = uzsuBuildTableRow(numberOfNewRow, designType, valueType,	valueParameterList);
 	// Zeile in die Tabelle einbauen
@@ -866,18 +892,21 @@ function uzsuDomClick(event) {
 		// wenn designType = '2' und damit fhem auslegung ist muss der JSON String auf die entsprechenden eintäge erwietert werden (falls nichts vorhanden)
 		if (designType == '2') {
 			for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
-				// test, ob die einträge vorhanden sind
+				// test, ob die einträge für conditions vorhanden sind
 				if (response.list[numberOfRow].condition === undefined){
 					response.list[numberOfRow].condition = {conditionDevicePerl:'',conditionType:'',conditionValue:'',conditionActive:false};
-					}
+				}
+				// test, ob die einträge für holiday gesetzt sind
+				if (response.list[numberOfRow].holiday === undefined){
+					response.list[numberOfRow].holiday = {weekend:false,work:false};
 				}
 			}
-		}
-		
+		}		
 		if (popupOk) {
 			// Öffnen des Popups bei clicken des icons und Ausführung der Eingabefunktion
 			uzsuRuntimePopup(response, headline, designType, valueType, valueParameterList, item);
 		}
+	}
 }
 // Verankerung als Callback in den DOM Elementen
 $(document).on('update','[data-widget="uzsu.uzsu_icon"]', uzsuDomUpdate);

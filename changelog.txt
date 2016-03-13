@@ -4,6 +4,10 @@
 (C) Michael Würtenberger 2014,2015,2016
 
 changelog
+v 4.3
+- erweiterung um die holiday funktion bei fhem
+- farbwahl expert button entsproch der aktiv farbe des themes
+
 v 4.2
 - umstellung auf designType = 2 für fhem
 

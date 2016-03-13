@@ -3,8 +3,9 @@
 ###JAVA Script Widget for use in smartvisu environment in combination with uzsu plugin for smarthome or FHEM environment
 (C) Michael Würtenberger 2014,2015,2016
 
-Stand: v4.1 
-Erweitert um das Setzen von Conditions im FHEM Umfeld
+Stand: v4.3
+Erweitert um das Setzen von Conditions und Holiday Funktion im FHEM Umfeld
+Für FHEM wird künftig der designType = '2' verwendet. Darstellung entspicht default, erweitert um die Funktionen für FHEM
 
 Installation:
 1. Download von visu.js und widget_uzsu.html aus Github
