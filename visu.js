@@ -530,8 +530,8 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		}
 		// jetzt die holiday themem für fhem
 		if(designType === '2'){
-			$('#holidayWeekend' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.Weekend).checkboxradio("refresh");			
-			$('#holidayWork' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.Work).checkboxradio("refresh");			
+			$('#holidayWeekend' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.weekend).checkboxradio("refresh");			
+			$('#holidayWork' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.work).checkboxradio("refresh");			
 		}
 	}
 }
@@ -582,8 +582,8 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 		}
 		// jetzt die holiday themem für fhem
 		if(designType === '2'){
-			response.list[numberOfRow].holiday.Weekend = $('#holidayWeekend' + numberOfRow).is(':checked');
-			response.list[numberOfRow].holiday.Work = $('#holidayWork' + numberOfRow).is(':checked');
+			response.list[numberOfRow].holiday.weekend = $('#holidayWeekend' + numberOfRow).is(':checked');
+			response.list[numberOfRow].holiday.work = $('#holidayWork' + numberOfRow).is(':checked');
 		}
 	}
 	// über json Interface / Treiber herausschreiben
