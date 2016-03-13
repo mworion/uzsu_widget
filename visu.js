@@ -46,8 +46,8 @@
 //											"conditionActive"		: bool
 //										}
 //						"holiday":		{
-//											"weekend" 	: bool
 //											"work"		: bool
+//											"weekend" 	: bool
 //										}
 //					] 
 //				}
@@ -209,8 +209,8 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"<div class='uzsuCellText'>Holiday</div>" +
 					"<form>" +
 						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
-		 					"<input type='checkbox' id='holidayWeekend" + numberOfRow + "'> <label for='holidayWeekend" + numberOfRow + "'>WE</label>" +
 							"<input type='checkbox' id='holidayWork" + numberOfRow + "'> <label for='holidayWork" + numberOfRow + "'>!WE</label>" +
+		 					"<input type='checkbox' id='holidayWeekend" + numberOfRow + "'> <label for='holidayWeekend" + numberOfRow + "'>WE</label>" +
 						"</fieldset>" +
 					"</form>" +
 				"</div>";
@@ -530,8 +530,8 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		}
 		// jetzt die holiday themem für fhem
 		if(designType === '2'){
-			$('#holidayWeekend' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.Weekend).checkboxradio("refresh");			
 			$('#holidayWork' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.Work).checkboxradio("refresh");			
+			$('#holidayWeekend' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.Weekend).checkboxradio("refresh");			
 		}
 	}
 }
@@ -582,8 +582,8 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 		}
 		// jetzt die holiday themem für fhem
 		if(designType === '2'){
-			response.list[numberOfRow].holiday.Weekend = $('#holidayWeekend' + numberOfRow).is(':checked');
 			response.list[numberOfRow].holiday.Work = $('#holidayWork' + numberOfRow).is(':checked');
+			response.list[numberOfRow].holiday.Weekend = $('#holidayWeekend' + numberOfRow).is(':checked');
 		}
 	}
 	// über json Interface / Treiber herausschreiben
@@ -601,7 +601,7 @@ function uzsuAddTableRow(response, designType, valueType, valueParameterList) {
 	// alten Zustand mal in die Liste rein. da der aktuelle Zustand ja nur im Widget selbst enthalten ist, wird er vor dem Umbau wieder in die Variable response zurückgespeichert.
 	uzsuSaveTable(1, response, designType, valueType, valueParameterList, false);
 	// ich hänge immer an die letzte Zeile dran ! erst einmal das Array erweitern
-	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{conditionDevicePerl:'',conditionType:'Perl',conditionValue:'',conditionActive:false},holiday:{weekend:false,work:false}});
+	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{conditionDevicePerl:'',conditionType:'Perl',conditionValue:'',conditionActive:false},holiday:{work:false,weekend:false}});
 	// dann eine neue HTML Zeile genenrieren
 	tt = uzsuBuildTableRow(numberOfNewRow, designType, valueType,	valueParameterList);
 	// Zeile in die Tabelle einbauen
@@ -898,7 +898,7 @@ function uzsuDomClick(event) {
 				}
 				// test, ob die einträge für holiday gesetzt sind
 				if (response.list[numberOfRow].holiday === undefined){
-					response.list[numberOfRow].holiday = {weekend:false,work:false};
+					response.list[numberOfRow].holiday = {work:false,weekend:false};
 				}
 			}
 		}		
