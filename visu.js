@@ -352,12 +352,12 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 						"<form>" +
 							"<div data-role='fieldcontain' class='uzsuEvent' >" +
 								"<select name='uzsuCondition" + numberOfRow + "' id='uzsuConditionType" + numberOfRow + "' data-mini='true'>" +
-									"<option value='='>=</option>" +
+									"<option value='eq'>=</option>" +
 									"<option value='<'><</option>" +
 									"<option value='>'>></option>" +
 									"<option value='>='>>=</option>" +
 									"<option value='<='><=</option>" +
-									"<option value='!='>!=</option>" +
+									"<option value='ne'>!=</option>" +
 									"<option value='Perl'>Perl</option>" +
 								"</select>" +
 							"</div>" +
