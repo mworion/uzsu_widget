@@ -40,10 +40,16 @@
 //						"timeCron"	:'00:00',		Schaltzeitpunkt
 //						"timeOffset":''				Offset für Schaltzeitpunkt
 //						"condition"	: 	{			Ein Struct für die Verwendung mit FHEM conditions, weil dort einige Option mehr angeboten werden
-//											"conditionDevicePerl"	: text
-//											"conditionType"			: text
-//											"conditionValue"		: text
-//											"conditionActive"		: bool
+//											"devicePerl"	: text
+//											"type"			: text
+//											"value"			: text
+//											"active"		: bool
+//										}
+//						"delayedExec"	: 	{		Ein Struct für die Verwendung mit FHEM conditions, weil dort einige Option mehr angeboten werden
+//											"devicePerl"	: text
+//											"type"			: text
+//											"value"			: text
+//											"active"		: bool
 //										}
 //						"holiday":		{
 //											"work"		: bool
@@ -340,7 +346,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"<input type='time' data-clear-btn='false' class='uzsuTimeMaxMinInput' id='uzsuTimeMax" + numberOfRow + "'>" +
 				"</div>" +
 			"</div>";	
-	// und jetzt noch die unsichbare Condition Zeile
+	// und jetzt noch die unsichbare Condition und delayed Exec Zeile
 	if(designType == '2'){
 		tt += 	"<div class='uzsuRowCondition' id='uzsuConditionLine" + numberOfRow + "' style='display:none;'>" +
 					"<div class='uzsuCell'>" +
@@ -377,6 +383,42 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 						"</form>" +
 					"</div>" +
 				"</div>";
+		// delayed exec zeile
+		tt += 	"<div class='uzsuRowDelayedExec' id='uzsuDelayedExecLine" + numberOfRow + "' style='display:none;'>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'>Device / Perl String</div>" +
+						"<input type='text' data-clear-btn='false' class='uzsuDelayedExecDevicePerlInput' id='uzsuDelayedExecDevicePerl" + numberOfRow + "'>" +
+					"</div>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'>DelayedExec Type</div>" +
+						"<form>" +
+							"<div data-role='fieldcontain' class='uzsuEvent' >" +
+								"<select name='uzsuDelayedExec" + numberOfRow + "' id='uzsuDelayedExecType" + numberOfRow + "' data-mini='true'>" +
+									"<option value='eq'>=</option>" +
+									"<option value='<'><</option>" +
+									"<option value='>'>></option>" +
+									"<option value='>='>>=</option>" +
+									"<option value='<='><=</option>" +
+									"<option value='ne'>!=</option>" +
+									"<option value='Perl'>Perl</option>" +
+								"</select>" +
+							"</div>" +
+						"</form>" +
+					"</div>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'>Value</div>" +
+						"<input type='text' data-clear-btn='false' class='uzsuDelayedExecValueInput' id='uzsuDelayedExecValue" + numberOfRow + "'>" +
+					"</div>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'></div>" +
+						"<form>" +
+							"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
+								"<input type='checkbox' id='uzsuDelayedExecActive"	+ numberOfRow + "'>" +
+									"<label for='uzsuDelayedExecActive" + numberOfRow + "'>Act</label>" +
+							"</fieldset>" +
+						"</form>" +
+					"</div>" +
+				"</div>";
 	}
 	return tt;
 }
@@ -389,7 +431,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v4.3</div>" +
+    				"<div class='uzsuCellText'>v4.4</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -489,12 +531,20 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		$('#uzsuActive' + numberOfRow).prop('checked',response.list[numberOfRow].active).checkboxradio("refresh");
 	    // hier die conditions, wenn sie im json angelegt worden sind und zwar pro zeile !
 	    if(designType === '2'){
-	    	$('#uzsuConditionDevicePerl'+numberOfRow).val(response.list[numberOfRow].condition.conditionDevicePerl);
-	    	$('#uzsuConditionType'+numberOfRow).val(response.list[numberOfRow].condition.conditionType);
+	    	// Condition
+	    	$('#uzsuConditionDevicePerl'+numberOfRow).val(response.list[numberOfRow].condition.devicePerl);
+	    	$('#uzsuConditionType'+numberOfRow).val(response.list[numberOfRow].condition.type);
 	    	$('#uzsuConditionType'+numberOfRow).selectmenu('refresh', true);
-	    	$('#uzsuConditionValue'+numberOfRow).val(response.list[numberOfRow].condition.conditionValue);
-	    	$('#uzsuConditionActive'+numberOfRow).prop('checked',response.list[numberOfRow].condition.conditionActive).checkboxradio("refresh");
-			// experten button ebenfalls auf rot setzen
+	    	$('#uzsuConditionValue'+numberOfRow).val(response.list[numberOfRow].condition.value);
+	    	$('#uzsuConditionActive'+numberOfRow).prop('checked',response.list[numberOfRow].condition.active).checkboxradio("refresh");
+	    	// Delayed Exec Zeile
+	    	$('#uzsuDelayedExecDevicePerl'+numberOfRow).val(response.list[numberOfRow].delayedExec.devicePerl);
+	    	$('#uzsuDelayedExecType'+numberOfRow).val(response.list[numberOfRow].delayedExec.type);
+	    	$('#uzsuDelayedExecType'+numberOfRow).selectmenu('refresh', true);
+	    	$('#uzsuDelayedExecValue'+numberOfRow).val(response.list[numberOfRow].delayedExec.value);
+	    	$('#uzsuDelayedExecActive'+numberOfRow).prop('checked',response.list[numberOfRow].delayedExec.active).checkboxradio("refresh");
+	    	
+	    	// experten button ebenfalls auf rot setzen
 			$('#uzsuExpert' + numberOfRow).closest('div').addClass('ui-checkbox-on');
 	    }
 		//$('#uzsuTime' + numberOfRow).val(response.list[numberOfRow].time);
@@ -548,10 +598,16 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 		response.list[numberOfRow].active = $('#uzsuActive' + numberOfRow).is(':checked');
 		// hier die conditions, wenn im json angelegt
 		if(designType == '2'){
-			response.list[numberOfRow].condition.conditionDevicePerl = $('#uzsuConditionDevicePerl'+numberOfRow).val();
-			response.list[numberOfRow].condition.conditionType = $('#uzsuConditionType'+numberOfRow).val();
-			response.list[numberOfRow].condition.conditionValue = $('#uzsuConditionValue'+numberOfRow).val();
-			response.list[numberOfRow].condition.conditionActive = $('#uzsuConditionActive'+numberOfRow).is(':checked');
+			// conditions
+			response.list[numberOfRow].condition.devicePerl = $('#uzsuConditionDevicePerl'+numberOfRow).val();
+			response.list[numberOfRow].condition.type = $('#uzsuConditionType'+numberOfRow).val();
+			response.list[numberOfRow].condition.value = $('#uzsuConditionValue'+numberOfRow).val();
+			response.list[numberOfRow].condition.active = $('#uzsuConditionActive'+numberOfRow).is(':checked');
+			// deleayed exec
+			response.list[numberOfRow].delayedExec.devicePerl = $('#uzsuDelayedExecDevicePerl'+numberOfRow).val();
+			response.list[numberOfRow].delayedExec.type = $('#uzsuDelayedExecType'+numberOfRow).val();
+			response.list[numberOfRow].delayedExec.value = $('#uzsuDelayedExecValue'+numberOfRow).val();
+			response.list[numberOfRow].delayedExec.active = $('#uzsuDelayedExecActive'+numberOfRow).is(':checked');
 		}
 		//response.list[numberOfRow].time = $('#uzsuTime'+numberOfRow).val();
 		response.list[numberOfRow].timeMin = $('#uzsuTimeMin'+numberOfRow).val();
@@ -601,7 +657,7 @@ function uzsuAddTableRow(response, designType, valueType, valueParameterList) {
 	// alten Zustand mal in die Liste rein. da der aktuelle Zustand ja nur im Widget selbst enthalten ist, wird er vor dem Umbau wieder in die Variable response zurückgespeichert.
 	uzsuSaveTable(1, response, designType, valueType, valueParameterList, false);
 	// ich hänge immer an die letzte Zeile dran ! erst einmal das Array erweitern
-	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{conditionDevicePerl:'',conditionType:'Perl',conditionValue:'',conditionActive:false},holiday:{work:false,weekend:false}});
+	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{devicePerl:'',type:'Perl',value:'',active:false},delayedExec:{devicePerl:'',type:'Perl',value:'',active:false},holiday:{work:false,weekend:false}});
 	// dann eine neue HTML Zeile genenrieren
 	tt = uzsuBuildTableRow(numberOfNewRow, designType, valueType,	valueParameterList);
 	// Zeile in die Tabelle einbauen
@@ -649,6 +705,10 @@ function uzsuShowExpertLine(e) {
 	if($('#uzsuConditionLine'+numberOfRow).length){
 		$('#uzsuConditionLine'+numberOfRow).css('display','');		
 	}
+	// Zeile für delayedExec anzeigen, wenn sie existieren
+	if($('#uzsuDelayedExecLine'+numberOfRow).length){
+		$('#uzsuDelayedExecLine'+numberOfRow).css('display','');		
+	}
 	// jetzt noch den Button in der Zeile drüber auf arrow up ändern
 	$('#uzsuExpert' + numberOfRow).buttonMarkup({ icon: 'arrow-u' });
 	// und den Callback ändern
@@ -675,6 +735,10 @@ function uzsuHideExpertLine(e) {
 		if($('#uzsuConditionLine'+numberOfRow).length){
 			$('#uzsuConditionLine'+numberOfRow).css('display','none');		
 		}
+		// und auch für den delayed exec
+		if($('#uzsuDelayedExecLine'+numberOfRow).length){
+			$('#uzsuDelayedExecLine'+numberOfRow).css('display','none');		
+		}
 		// jetzt noch den Button in der Zeile drüber ändern auf arrow down
 		$('#uzsuExpert'+ numberOfRow).buttonMarkup({ icon: 'arrow-d' });
 		// und den Callback ändern
@@ -696,6 +760,10 @@ function uzsuHideAllExpertLines() {
 		// auch für die Conditions
 		if($('#uzsuConditionLine'+numberOfRow).length){
 			$('#uzsuConditionLine'+numberOfRow).css('display','none');		
+		}
+		// und auch für den delayed exec
+		if($('#uzsuDelayedExecLine'+numberOfRow).length){
+			$('#uzsuDelayedExecLine'+numberOfRow).css('display','none');		
 		}
 		// jetzt noch den Button in der Zeile drüber ändern auf arrow down
 		$('#uzsuExpert'+ numberOfRow).buttonMarkup({ icon: 'arrow-d' });
@@ -894,7 +962,11 @@ function uzsuDomClick(event) {
 			for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
 				// test, ob die einträge für conditions vorhanden sind
 				if (response.list[numberOfRow].condition === undefined){
-					response.list[numberOfRow].condition = {conditionDevicePerl:'',conditionType:'',conditionValue:'',conditionActive:false};
+					response.list[numberOfRow].condition = {devicePerl:'',type:'Perl',value:'',active:false};
+				}
+				// test, ob die einträge für delayed exec vorhanden sind
+				if (response.list[numberOfRow].delayedExec === undefined){
+					response.list[numberOfRow].delayedExec = {devicePerl:'',type:'Perl',value:'',active:false};
 				}
 				// test, ob die einträge für holiday gesetzt sind
 				if (response.list[numberOfRow].holiday === undefined){

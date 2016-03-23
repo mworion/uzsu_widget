@@ -4,6 +4,8 @@
 (C) Michael Würtenberger 2014,2015,2016
 
 changelog
+v 4.4
+- erweiterung für fhem auf delayedExec
 v 4.3
 - erweiterung um die holiday funktion bei fhem
 - farbwahl expert button entsproch der aktiv farbe des themes

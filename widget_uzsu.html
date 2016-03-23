@@ -2,9 +2,9 @@
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015, 2016
 *
-* responsive v4.3
+* responsive v4.4
 *
-* läuft zusammen mit dem visu.js (responsive) ab v4.3
+* läuft zusammen mit dem visu.js (responsive) ab v4.4
 * umstellung auf smartvisu v2.8
 *
 * @param unique id for this widget
@@ -38,7 +38,7 @@
     clear:both;
     height:60px;
 }
-.uzsuRowExpert, .uzsuRowCondition{
+.uzsuRowExpert, .uzsuRowCondition, .uzsuRowDelayedExec{
     clear:both;
     height:60px;
     border:1px dotted;
@@ -74,11 +74,11 @@
     width: 50px !important;
     padding: 0.1em !important;
 }
-.uzsuConditionValueInput{
+.uzsuConditionValueInput, .uzsuDelayedExecValueInput{
     width: 70px !important;
     padding: 0.1em !important;
 }
-.uzsuConditionDevicePerlInput{
+.uzsuConditionDevicePerlInput, .uzsuDelayedExecDevicePerlInput{
     width: 250px !important;
     padding: 0.1em !important;
 }
@@ -95,7 +95,7 @@ div.ui-slider-switch{
 .ui-disable{
 	opacity: 0.7 !important;
 }
-.uzsuEvent, .uzsuConditionActive, .uzsuListInput{
+.uzsuEvent, .uzsuConditionActive, .uzsuDelayedExecActive, .uzsuListInput{
 	margin: .25em 0 !important;
 	width: 100px;
 	padding: 0 !important;
@@ -104,7 +104,7 @@ div.ui-slider-switch{
 	width: 350px !important;
 }
 @media screen and (max-width: 625px){
-    .uzsuRowExpert, .uzsuRowCondition, .uzsuCellExpert{
+    .uzsuRowExpert, .uzsuRowCondition, .uzsuRowDelayedExec, .uzsuCellExpert{
         display: none;    
     }
 }

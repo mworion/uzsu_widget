@@ -3,7 +3,7 @@
 ###JAVA Script Widget for use in smartvisu environment in combination with uzsu plugin for smarthome or FHEM environment
 (C) Michael Würtenberger 2014,2015,2016
 
-Stand: v4.3
+Stand: v4.4
 Erweitert um das Setzen von Conditions und Holiday Funktion im FHEM Umfeld
 Für FHEM wird künftig der designType = '2' verwendet. Darstellung entspicht default, erweitert um die Funktionen für FHEM
 
@@ -76,9 +76,9 @@ Nochmal die Parameter im Widget:
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015, 2016
 *
-* responsive v4 rc1
+* responsive v4.4
 *
-* läuft zusammen mit dem visu.js (responsive) ab v4 rc1
+* läuft zusammen mit dem visu.js (responsive) ab v4.4
 * umstellung auf smartvisu v2.8
 *
 * @param unique id for this widget
@@ -86,6 +86,7 @@ Nochmal die Parameter im Widget:
 * @param headline for popup (optional), default UZSZ
 * @param designType for popup design (optional), default = '0', 
 *												 expert mode = '1'  (value, time, rrule direct input)
+*                                                fhem mode = '2'
 * @param pic on (optional), default icon is a clock
 * @param pic off (optional), default icon is a clock
 * @param valueType (optional), default = bool, supported types are 'bool', 'num', 'text', 'list'
