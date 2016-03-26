@@ -2,16 +2,15 @@
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015, 2016
 *
-* responsive v4.4
+* responsive v4.5
 *
-* läuft zusammen mit dem visu.js (responsive) ab v4.4
+* läuft zusammen mit dem visu.js (responsive) ab v4.5
 * umstellung auf smartvisu v2.8
 *
 * @param unique id for this widget
 * @param a gad/item
 * @param headline for popup (optional), default UZSZ
 * @param designType for popup design (optional), default = '0', 
-*												 expert mode = '1'  (value, time, rrule direct input)
 *												 FHEM = '2', like default
 * @param pic on (optional), default icon is a clock
 * @param pic off (optional), default icon is a clock
@@ -45,6 +44,15 @@
     margin-bottom:20px;
     margin-left:20px;
     margin-right:20px;
+}
+.uzsuRowExpertText, .uzsuRowConditionText, .uzsuRowDelayedExecText{
+	height: 0em;
+    font-size: 0.7em;
+    position: relative; 
+    top: 5em; 
+    left: -1.5em; 
+    transform: rotate(270deg);  
+	transform-origin:0em 0em; 
 }
 .uzsuRowFooter{
     clear:both;

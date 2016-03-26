@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v4.3
+// Release responsive v4.5
 // läuft nur mit smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
@@ -69,31 +69,28 @@ var browserIdentificationVariable = document.documentElement;
 //----------------------------------------------------------------------------
 function uzsuCollapseTimestring(response, designType){
 	for (var numberOfEntry = 0; numberOfEntry < response.list.length; numberOfEntry++) {
-		// und den string setzen, bei designtype = 1 bleibt er bestehen, wird nicht geändert
-		if((designType == '0') || (designType == '2')){
-			// zeitstring wieder zusammenbauen, falls Event <> 'time', damit wir den richtigen Zusammenbau im zeitstring haben
-			var timeString = '';
-			if(response.list[numberOfEntry].event === 'time'){
-				// wenn der eintrag time ist, dann kommt die zeit rein
-				response.list[numberOfEntry].time = response.list[numberOfEntry].timeCron;
+		// zeitstring wieder zusammenbauen, falls Event <> 'time', damit wir den richtigen Zusammenbau im zeitstring haben
+		var timeString = '';
+		if(response.list[numberOfEntry].event === 'time'){
+			// wenn der eintrag time ist, dann kommt die zeit rein
+			response.list[numberOfEntry].time = response.list[numberOfEntry].timeCron;
+		}
+		else{
+			// ansonsten wird er aus der bestandteilen zusammengebaut
+			if(response.list[numberOfEntry].timeMin.length > 0){ 
+				timeString = timeString + response.list[numberOfEntry].timeMin + '<';
 			}
-			else{
-				// ansonsten wird er aus der bestandteilen zusammengebaut
-				if(response.list[numberOfEntry].timeMin.length > 0){ 
-					timeString = timeString + response.list[numberOfEntry].timeMin + '<';
-				}
-				timeString += response.list[numberOfEntry].event;
-				if(response.list[numberOfEntry].timeOffset > 0){
-					timeString = timeString + '+' + response.list[numberOfEntry].timeOffset + 'm';
-				}
-				else if(response.list[numberOfEntry].timeOffset < 0){
-					timeString = timeString + response.list[numberOfEntry].timeOffset + 'm';
-				}
-				if(response.list[numberOfEntry].timeMax.length > 0){
-					timeString = timeString + '<' + response.list[numberOfEntry].timeMax;
-				}
-				response.list[numberOfEntry].time = timeString;
+			timeString += response.list[numberOfEntry].event;
+			if(response.list[numberOfEntry].timeOffset > 0){
+				timeString = timeString + '+' + response.list[numberOfEntry].timeOffset + 'm';
 			}
+			else if(response.list[numberOfEntry].timeOffset < 0){
+				timeString = timeString + response.list[numberOfEntry].timeOffset + 'm';
+			}
+			if(response.list[numberOfEntry].timeMax.length > 0){
+				timeString = timeString + '<' + response.list[numberOfEntry].timeMax;
+			}
+			response.list[numberOfEntry].time = timeString;
 		}
 	}
 }
@@ -196,19 +193,17 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	// Liste für die Wochentage, damit ich später per Index darauf zugreifen kann
 	var weekDays = [ 'MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU' ];
 	
-	tt += 	"<div class='uzsuRow' id='uzsuNumberOfRow" + numberOfRow + "'>";
-	if ((designType === '0') || (designType === '2')){
-		tt+=	"<div class='uzsuCell'>" +
+	tt += 	"<div class='uzsuRow' id='uzsuNumberOfRow" + numberOfRow + "'>" +
+				"<div class='uzsuCell'>" +
 					"<div class='uzsuCellText'>Weekday</div>" +
-					"<form>" +
-						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
+						"<form>" +
+							"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>";
 							for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
 								tt += "<input type='checkbox' id='checkbox" + numberOfDay	+ "-" + numberOfRow + "'> <label for='checkbox"	+ numberOfDay + "-" + numberOfRow + "'>" + weekDays[numberOfDay] + "</label>";
 							}
-		tt +=			"</fieldset>" +
-					"</form>" +
-				"</div>";
-	}
+	tt +=					"</fieldset>" +
+						"</form>" +
+					"</div>";
 	// hier die Einträge für holiday weekend oder nicht
 	if (designType === '2'){
 		tt+=	"<div class='uzsuCell'>" +
@@ -275,52 +270,32 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"</form>" +
 				"</div>";
 	}
-	if((designType == '0') || (designType == '2')){
-		tt+=	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Time</div>" +
-					"<input type='time' data-clear-btn='false' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>" +
-				"</div>" +
-				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'></div>" +
-					"<form>" +
-						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
-							"<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'>" +
-								"<label for='uzsuActive" + numberOfRow + "'>Act</label>" +
-						"</fieldset>" +
-					"</form>" +
-				"</div>" +
-				"<div class='uzsuCellExpert'>" +
-					"<div class='uzsuCellText'>Expert</div>" +
-					"<button id='uzsuExpert" + numberOfRow + "' data-mini='true' data-icon='arrow-d' data-iconpos='notext' class='ui-icon-shadow'></button>" +
-				"</div>" +
-				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'></div>" +
-					"<button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button>" +
-				"</div>";
-	}
-	else{
-		tt += 	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'></div>" +
-					"<form>" +
-						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
-							"<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'> " +
-								"<label for='uzsuActive" + numberOfRow + "'>Act</label>" +
-						"</fieldset>" +
-					"</form>" +
-				"</div>" +
-				"<div class='uzsuCell'> " +
-					"<div class='uzsuCellText'></div>" +
-					"<button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button>" +
-				"</div>" + 
-				"<div class='uzsuCellType1'>" +
-					"<input type='text' class='uzsuTextWideInput' data-clear-btn='true' id='uzsuTime" + numberOfRow + "'>" +
-					"<input type='text' class='uzsuTextWideInput' data-clear-btn='true' id='uzsuRrule" + numberOfRow + "'>" +
-				"</div>";
-	}
-	// Tabelle Reihen abschliessen 
+	tt+=	"<div class='uzsuCell'>" +
+				"<div class='uzsuCellText'>Time</div>" +
+				"<input type='time' data-clear-btn='false' class='uzsuTimeInput' id='uzsuTimeCron" + numberOfRow + "'>" +
+			"</div>" +
+			"<div class='uzsuCell'>" +
+				"<div class='uzsuCellText'></div>" +
+				"<form>" +
+					"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
+						"<input type='checkbox' id='uzsuActive"	+ numberOfRow + "'>" +
+							"<label for='uzsuActive" + numberOfRow + "'>Act</label>" +
+					"</fieldset>" +
+				"</form>" +
+			"</div>" +
+			"<div class='uzsuCellExpert'>" +
+				"<div class='uzsuCellText'>Expert</div>" +
+				"<button id='uzsuExpert" + numberOfRow + "' data-mini='true' data-icon='arrow-d' data-iconpos='notext' class='ui-icon-shadow'></button>" +
+			"</div>" +
+			"<div class='uzsuCell'>" +
+				"<div class='uzsuCellText'></div>" +
+				"<button id='uzsuDelTableRow" + numberOfRow + "' data-mini='true'>Del</button>" +
+			"</div>";
+	// Tabelle Zeile abschliessen 
 	tt += "</div>";
 	// und jetzt noch die unsichbare Expertenzeile
 	tt += 	"<div class='uzsuRowExpert' id='uzsuExpertLine" + numberOfRow + "' style='display:none;'>" +
+				"<div class='uzsuRowExpertText'>SUN</div>" +
 				"<div class='uzsuCell'>" +
 					"<div class='uzsuCellText'>earliest</div>" +
 					"<input type='time' data-clear-btn='false' class='uzsuTimeMaxMinInput' id='uzsuTimeMin" + numberOfRow + "'>" +
@@ -349,6 +324,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	// und jetzt noch die unsichbare Condition und delayed Exec Zeile
 	if(designType == '2'){
 		tt += 	"<div class='uzsuRowCondition' id='uzsuConditionLine" + numberOfRow + "' style='display:none;'>" +
+					"<div class='uzsuRowConditionText'>Condition</div>" +
 					"<div class='uzsuCell'>" +
 						"<div class='uzsuCellText'>Device / Perl String</div>" +
 						"<input type='text' data-clear-btn='false' class='uzsuConditionDevicePerlInput' id='uzsuConditionDevicePerl" + numberOfRow + "'>" +
@@ -385,6 +361,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 				"</div>";
 		// delayed exec zeile
 		tt += 	"<div class='uzsuRowDelayedExec' id='uzsuDelayedExecLine" + numberOfRow + "' style='display:none;'>" +
+					"<div class='uzsuRowDelayedExecText'>DelayedExec</div>" +
 					"<div class='uzsuCell'>" +
 						"<div class='uzsuCellText'>Device / Perl String</div>" +
 						"<input type='text' data-clear-btn='false' class='uzsuDelayedExecDevicePerlInput' id='uzsuDelayedExecDevicePerl" + numberOfRow + "'>" +
@@ -431,7 +408,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v4.4</div>" +
+    				"<div class='uzsuCellText'>v4.5</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -558,25 +535,19 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		$('#uzsuEvent'+numberOfRow).selectmenu('refresh', true);
 		// Fallunterscheidung für den Expertenmodus
 		uzsuSetTextInputState(numberOfRow);
-		if((designType === '0') || (designType === '2')){
-			// in der Tabelle die Werte der rrule, dabei gehe ich von dem Standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU aus und setze für jeden Eintrag den Button.
-			var rrule = response.list[numberOfRow].rrule;
-			if (typeof rrule === "undefined") {
-				rrule = '';
-			}
-			var ind = rrule.indexOf('BYDAY');
-			// wenn der Standard drin ist
-			if (ind > 0) {
-				var days = rrule.substring(ind);
-				// Setzen der Werte
-				for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
-					$('#checkbox' + numberOfDay + '-' + numberOfRow).prop('checked', days.indexOf(weekDays[numberOfDay]) > 0).checkboxradio("refresh");
-				}
-			}
+		// in der Tabelle die Werte der rrule, dabei gehe ich von dem Standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU aus und setze für jeden Eintrag den Button.
+		var rrule = response.list[numberOfRow].rrule;
+		if (typeof rrule === "undefined") {
+			rrule = '';
 		}
-		else{
-			// wenn designType = 1, dann einfach nur den String
-			$('#uzsuRrule' + numberOfRow).val(response.list[numberOfRow].rrule);
+		var ind = rrule.indexOf('BYDAY');
+		// wenn der Standard drin ist
+		if (ind > 0) {
+			var days = rrule.substring(ind);
+			// Setzen der Werte
+			for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
+				$('#checkbox' + numberOfDay + '-' + numberOfRow).prop('checked', days.indexOf(weekDays[numberOfDay]) > 0).checkboxradio("refresh");
+			}
 		}
 		// jetzt die holiday themem für fhem
 		if(designType === '2'){
@@ -615,27 +586,21 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 		response.list[numberOfRow].timeMax = $('#uzsuTimeMax'+numberOfRow).val();
 		response.list[numberOfRow].timeCron = $('#uzsuTimeCron'+numberOfRow).val();
 		response.list[numberOfRow].event = $('#uzsuEvent'+numberOfRow).val();
-	    if((designType === '0') || (designType === '2')){
-			// in der Tabelle die Werte der rrule, dabei gehe ich von dem Standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU aus und setze für jeden Eintrag den Button. Setzen der Werte.
-			var first = true;
-			var rrule = '';
-			for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
-				if ($('#checkbox' + numberOfDay + '-' + numberOfRow).is(':checked')) {
-					if (first) {
-						first = false;
-						rrule = 'FREQ=WEEKLY;BYDAY=' + weekDays[numberOfDay];
-					} 
-					else {
-						rrule += ',' + weekDays[numberOfDay];
-					}
+		// in der Tabelle die Werte der rrule, dabei gehe ich von dem Standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU aus und setze für jeden Eintrag den Button. Setzen der Werte.
+		var first = true;
+		var rrule = '';
+		for (var numberOfDay = 0; numberOfDay < 7; numberOfDay++) {
+			if ($('#checkbox' + numberOfDay + '-' + numberOfRow).is(':checked')) {
+				if (first) {
+					first = false;
+					rrule = 'FREQ=WEEKLY;BYDAY=' + weekDays[numberOfDay];
+				} 
+				else {
+					rrule += ',' + weekDays[numberOfDay];
 				}
 			}
-			response.list[numberOfRow].rrule = rrule;
 		}
-		else{
-			// hier wird der String direkt übergeben
-			response.list[numberOfRow].rrule = $('#uzsuRrule' + numberOfRow).val();
-		}
+		response.list[numberOfRow].rrule = rrule;
 		// jetzt die holiday themem für fhem
 		if(designType === '2'){
 			response.list[numberOfRow].holiday.work = $('#holidayWork' + numberOfRow).is(':checked');
@@ -884,7 +849,7 @@ function uzsuDomUpdate(event, response) {
 	}	
 	// wenn keine Daten vorhanden, dann ist kein item mit den eigenschaften hinterlegt und es wird nichts gemacht
 	if (response.length === 0){
-		alert('DOM Daten für UZSU nicht vorhanden! Item falsch konfiguriert oder nicht vorhanden ! (update-event)');
+		alert('DOM Daten für UZSU nicht vorhanden! Item-ID auf HTML Seite falsch konfiguriert oder nicht vorhanden ! (update-event)');
 		return;
 	}
 	// Wenn ein Update erfolgt, dann werden die Daten erneut in die Variable uzsu geladen damit sind die UZSU objekte auch in der click Funktion verfügbar
@@ -904,7 +869,7 @@ function uzsuDomClick(event) {
 	// Fehlerbehandlung für ein nicht vorhandenes DOM Objekt. Das response Objekt ist erst da, wenn es mit update angelegt wurde. Da diese
 	// Schritte asynchron erfolgen, kann es sein, dass das Icon bereits da ist, clickbar, aber nocht keine Daten angekommen. Dann darf ich nicht auf diese Daten zugreifen wollen !
 	if(response.list === undefined){ 
-		alert('DOM Daten für UZSU nicht vorhanden! Item falsch konfiguriert oder nicht vorhanden ! (click-event)');
+		alert('DOM Daten für UZSU nicht vorhanden! Item-ID auf HTML Seite falsch konfiguriert oder nicht vorhanden ! (click-event)');
 	}
 	else{
 		// jetzt erweitern wir die dicts pro Eintrag, um dem dort einhaltenen Timestring die enthaltenen Einzelteile zu bekommen
@@ -926,13 +891,13 @@ function uzsuDomClick(event) {
 		// Schaltuhr verwendet wird ist nur als attribut (child) enthalten und wird ausschliesslich vom Plugin verwendet. wird für das rückschreiben der Daten an smarthome.py benötigt
 		var item = $(this).attr('data-item');
 		// jetzt kommt noch die Liste von Prüfungen, damit hinterher keine Fehler passieren, zunächst fehlerhafter designType (unbekannt)
-		if ((designType !== '0') && (designType !== '1') && (designType !== '2')) {
-			alert('Fehlerhafter Parameter: "' + designType + '" im Feld designType bei Item ' + item);
+		if ((designType !== '0') && (designType !== '2')) {
+			alert('Fehlerhafter Parameter: "' + designType + '" im Feld designType bei Item ' + item + '. Design Type wird nicht unterstützt !');
 			popupOk = false;
 		}
 		// fehlerhafter valueType (unbekannt)
 		if ((valueType !== 'bool') && (valueType !== 'num')	&& (valueType !== 'text') && (valueType !== 'list')) {
-			alert('Fehlerhafter Parameter: "' + valueType + '" im Feld valueType bei Item ' + item);
+			alert('Fehlerhafter Parameter: "' + valueType + '" im Feld valueType bei Item ' + item + '. Value Type wird nicht unterstützt !');
 			popupOk = false;
 		}
 		// bei designType '0' wird rrule nach Wochentagen umgewandelt und ein festes Format vogegegeben hier sollte nichts versehentlich überschrieben werden
