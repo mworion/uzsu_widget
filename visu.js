@@ -640,7 +640,7 @@ function uzsuAddTableRow(response, designType, valueType, valueParameterList) {
 	// alten Zustand mal in die Liste rein. da der aktuelle Zustand ja nur im Widget selbst enthalten ist, wird er vor dem Umbau wieder in die Variable response zurückgespeichert.
 	uzsuSaveTable(1, response, designType, valueType, valueParameterList, false);
 	// ich hänge immer an die letzte Zeile dran ! erst einmal das Array erweitern
-	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{devicePerl:'',type:'Perl',value:'',active:false},delayedExec:{devicePerl:'',type:'Perl',value:'',active:false},holiday:{work:false,weekend:false}});
+	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{deviceString:'',type:'String',value:'',active:false},delayedExec:{deviceString:'',type:'String',value:'',active:false},holiday:{work:false,weekend:false}});
 	// dann eine neue HTML Zeile genenrieren
 	tt = uzsuBuildTableRow(numberOfNewRow, designType, valueType,	valueParameterList);
 	// Zeile in die Tabelle einbauen
