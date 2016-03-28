@@ -204,18 +204,6 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	tt +=					"</fieldset>" +
 						"</form>" +
 					"</div>";
-	// hier die Einträge für holiday weekend oder nicht
-	if (designType === '2'){
-		tt+=	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Holiday</div>" +
-					"<form>" +
-						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
-							"<input type='checkbox' id='holidayWork" + numberOfRow + "'> <label for='holidayWork" + numberOfRow + "'>!WE</label>" +
-		 					"<input type='checkbox' id='holidayWeekend" + numberOfRow + "'> <label for='holidayWeekend" + numberOfRow + "'>WE</label>" +
-						"</fieldset>" +
-					"</form>" +
-				"</div>";
-	}
 	if (valueType === 'bool') {
 		// Unterscheidung Anzeige und Werte
 		if (valueParameterList[0].split(':')[1] === undefined) {
@@ -327,8 +315,20 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 								"<label for='uzsuSunActive" + numberOfRow + "'>Act</label>" +
 						"</fieldset>" +
 					"</form>" +
-				"</div>" +
-			"</div>";	
+				"</div>";
+				// hier die Einträge für holiday weekend oder nicht
+	if (designType === '2'){
+		tt+=	"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'>Holiday</div>" +
+					"<form>" +
+						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
+							"<input type='checkbox' id='holidayWork" + numberOfRow + "'> <label for='holidayWork" + numberOfRow + "'>!WE</label>" +
+		 					"<input type='checkbox' id='holidayWeekend" + numberOfRow + "'> <label for='holidayWeekend" + numberOfRow + "'>WE</label>" +
+						"</fieldset>" +
+					"</form>" +
+				"</div>";
+				}
+		tt+="</div>";	
 	// und jetzt noch die unsichbare Condition und delayed Exec Zeile
 	if(designType == '2'){
 		tt += 	"<div class='uzsuRowCondition' id='uzsuConditionLine" + numberOfRow + "' style='display:none;'>" +
@@ -461,11 +461,12 @@ function uzsuSetExpertColor(numberOfRow){
 function uzsuSetSunActiveState(numberOfRow){
 	// status der eingaben setzen, das brauchen wir an mehreren stellen
 	if ($('#uzsuSunActive' + numberOfRow).is(':checked')){
-		$('#uzsuTimeCron' + numberOfRow).val('SUN');
+		$('#uzsuTimeCron' + numberOfRow).val($('#uzsuEvent' + numberOfRow).val());
 		$('#uzsuTimeCron' + numberOfRow).textinput('disable');
 		$('#uzsuTimeMin' + numberOfRow).textinput('enable');
 		$('#uzsuTimeOffset' + numberOfRow).textinput('enable');
 		$('#uzsuTimeMax' + numberOfRow).textinput('enable');
+		$('#uzsuEvent' + numberOfRow).selectmenu("enable");
 	}
 	else{
 		$('#uzsuTimeCron' + numberOfRow).val('00:00');
@@ -473,6 +474,37 @@ function uzsuSetSunActiveState(numberOfRow){
 		$('#uzsuTimeMin' + numberOfRow).textinput('disable');
 		$('#uzsuTimeOffset' + numberOfRow).textinput('disable');
 		$('#uzsuTimeMax' + numberOfRow).textinput('disable');
+		$('#uzsuEvent' + numberOfRow).selectmenu("disable");
+	}
+}
+
+//Toggelt die eingabemöglichkeit für Condition Elemente in Abhängigkeit der Aktivschaltung 
+function uzsuSetConditionActiveState(numberOfRow){
+	// status der eingaben setzen, das brauchen wir an mehreren stellen
+	if ($('#uzsuConditionActive' + numberOfRow).is(':checked')){
+		$('#uzsuConditionDeviceString' + numberOfRow).textinput('enable');
+		$('#uzsuConditionValue' + numberOfRow).textinput('enable');
+		$('#uzsuConditionType' + numberOfRow).selectmenu("enable");
+	}
+	else{	
+		$('#uzsuConditionDeviceString' + numberOfRow).textinput('disable');
+		$('#uzsuConditionValue' + numberOfRow).textinput('disable');
+		$('#uzsuConditionType' + numberOfRow).selectmenu("disable");
+	}
+}
+
+//Toggelt die eingabemöglichkeit für Delayed Exec Elemente in Abhängigkeit der Aktivschaltung 
+function uzsuSetDelayedExecActiveState(numberOfRow){
+	// status der eingaben setzen, das brauchen wir an mehreren stellen
+	if ($('#uzsuDelayedExecActive' + numberOfRow).is(':checked')){
+		$('#uzsuDelayedExecDeviceString' + numberOfRow).textinput('enable');
+		$('#uzsuDelayedExecValue' + numberOfRow).textinput('enable');
+		$('#uzsuDelayedExecType' + numberOfRow).selectmenu("enable");
+	}
+	else{	
+		$('#uzsuDelayedExecDeviceString' + numberOfRow).textinput('disable');
+		$('#uzsuDelayedExecValue' + numberOfRow).textinput('disable');
+		$('#uzsuDelayedExecType' + numberOfRow).selectmenu("disable");
 	}
 }
 
@@ -546,6 +578,8 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		$('#uzsuEvent'+numberOfRow).selectmenu('refresh', true);
 		// Fallunterscheidung für den Expertenmodus
 		uzsuSetSunActiveState(numberOfRow);
+		uzsuSetConditionActiveState(numberOfRow);
+		uzsuSetDelayedExecActiveState(numberOfRow);
 		uzsuSetExpertColor(numberOfRow);
 		// in der Tabelle die Werte der rrule, dabei gehe ich von dem Standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU aus und setze für jeden Eintrag den Button.
 		var rrule = response.list[numberOfRow].rrule;
@@ -670,8 +704,13 @@ function uzsuDelTableRow(response, designType, valueType, valueParameterList, e)
 		uzsuSaveTable(1, response, designType, valueType, valueParameterList, false);
 		// erst mal das Array entsprechen kürzen
 		response.list.splice(numberOfRowToDelete, 1);
-		// jetzt die Tabelle kürzen im Popup
-		$('#uzsuNumberOfRow' + (numberOfEntries - 1)).remove();
+		// jetzt die Tabelle kürzen im Popup und die vorhandene expertenzeile sowie bei design Type 2 die condition und delayed exec Zeile
+		$('#uzsuNumberOfRow' + (numberOfRowToDelete)).remove();
+		$('#uzsuExpertLine' + (numberOfRowToDelete)).remove();
+		if (designType === '2'){
+			$('#uzsuConditionLine' + (numberOfRowToDelete)).remove();
+			$('#uzsuDelayedExecLine' + (numberOfRowToDelete)).remove();
+		}
 		// und Daten wieder ausfüllen
 		uzsuFillTable(response, designType, valueType, valueParameterList);
 	}
@@ -708,13 +747,25 @@ function uzsuShowExpertLine(e) {
 		uzsuSetSunActiveState(numberOfRow);
 		uzsuSetExpertColor(numberOfRow);
 	});
-	// Handler, um den expertebutton Status zu setzen
+	// Handler, um je nach Active State der Condition die inputs zu Aktivieren / Deaktivieren
+	$.mobile.activePage.find('#uzsuConditionActive' + numberOfRow).on('change', function (){
+		uzsuSetConditionActiveState(numberOfRow);
+	});
+	// Handler, um je nach Active State der DelayedExec die inputs zu Aktivieren / Deaktivieren
+	$.mobile.activePage.find('#uzsuDelayedExecActive' + numberOfRow).on('change', function (){
+		uzsuSetDelayedExecActiveState(numberOfRow);
+	});
+	// Handler, um den expert button Status zu setzen
 	$.mobile.activePage.find('#uzsuConditionActive' + numberOfRow).on('change', function (){
 		uzsuSetExpertColor(numberOfRow);
 	});
-	// Handler, um den expertebutton Status zu setzen
+	// Handler, um den expert button Status zu setzen
 	$.mobile.activePage.find('#uzsuDelayedExecActive' + numberOfRow).on('change', function (){
 		uzsuSetExpertColor(numberOfRow);
+	});
+	// Handler, um den Status anhand des Pulldowns SUN zu setzen
+	$.mobile.activePage.find('#uzsuEvent' + numberOfRow).on('change', function (){
+		uzsuSetSunActiveState(numberOfRow);
 	});
 }
 
