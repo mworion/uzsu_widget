@@ -4,6 +4,13 @@
 (C) Michael Würtenberger 2014,2015,2016
 
 changelog
+v 4.8
+- design überarbeitung
+- bugfixes
+
+v 4.7
+- bugfixes
+
 v 4.6
 - Einführung Active auch bei den Sunrise / Sunset Themen der Konsistenz
 - Umstellung der Bezeichnungen von 'Perl' auf String, da künftig nicht mehr FHEM spezifisch

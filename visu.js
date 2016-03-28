@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v4.7
+// Release responsive v4.8
 // notwendig smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
@@ -34,26 +34,35 @@
 //						"rrule"		:'',			Wochen / Tag Programmstring
 //						"time"		:'00:00',		Uhrzeitstring des Schaltpunktes / configuration
 //						"value"		:0,				Wert, der gesetzt wird
+//
+//						nachfolgende werden im Struct aufgelöst :
 //						"event":	'time',			Erweiterung zur Laufzeit: Zeitevent oder SUN
 //						"timeMin"	:'',			Untere Schranke SUN
 //						"timeMax"	:'',			Oberere Schranke SUN
 //						"timeCron"	:'00:00',		Schaltzeitpunkt
 //						"timeOffset":''				Offset für Schaltzeitpunkt
-//						"condition"	: 	{			Ein Struct für die Verwendung mit FHEM conditions, weil dort einige Option mehr angeboten werden
-//											"deviceString"	: text
-//											"type"			: text
-//											"value"			: text
-//											"active"		: bool
+//
+//						"sun" :			{	timeMin :	text	Untere Schranke SUN
+//											timeMax :	text	Oberere Schranke SUN
+//											timeOffset:	text	Offset für Schaltzeitpunkt
+//											event :		text	Event (ist sunrise oder sunset)
+//											active :	bool	Aktiviert ja/nein
 //										}
-//						"delayedExec"	: 	{		Ein Struct für die Verwendung mit FHEM conditions, weil dort einige Option mehr angeboten werden
-//											"deviceString"	: text
-//											"type"			: text
-//											"value"			: text
-//											"active"		: bool
+//						"condition"	: 	{	Ein Struct für die Verwendung mit conditions (aktuell nur FHEM), weil dort einige Option mehr angeboten werden
+//											"deviceString"	: text	Bezeichnung des Devices oder Auswertestring
+//											"type"			: text	Auswertetype (logische Verknüpfung oder Auswahl String)
+//											"value"			: text	Vergleichwert
+//											"active"		: bool	Aktiviert ja/nein
+//										}
+//						"delayedExec": 	{	Ein Struct für die Verwendung mit delayed exec (aktuell nur FHEM), weil dort einige Option mehr angeboten werden
+//											"deviceString"	: text	Bezeichnung des Devices oder Auswertestring
+//											"type"			: text	Auswertetype (logische Verknüpfung oder Auswahl String)
+//											"value"			: text	Vergleichwert
+//											"active"		: bool	Aktiviert ja/nein
 //										}
 //						"holiday":		{
-//											"work"		: bool
-//											"weekend" 	: bool
+//											"workday"	: bool	Aktiviert ja/nein
+//											"weekend" 	: bool	Aktiviert ja/nein
 //										}
 //					] 
 //				}
@@ -282,53 +291,58 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	// Tabelle Zeile abschliessen 
 	tt += "</div>";
 	// und jetzt noch die unsichbare Expertenzeile
-	tt += 	"<div class='uzsuRowExpert' id='uzsuExpertLine" + numberOfRow + "' style='display:none;'>" +
-				"<div class='uzsuRowExpertText'>Sun/Holiday</div>" +
-				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>earliest</div>" +
-					"<input type='time' data-clear-btn='false' class='uzsuTimeMaxMinInput' id='uzsuTimeMin" + numberOfRow + "'>" +
-				"</div>" +
-				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Event</div>" +
-					"<form>" +
-						"<div data-role='fieldcontain' class='uzsuEvent' >" +
-							"<select name='uzsuEvent" + numberOfRow + "' id='uzsuEvent" + numberOfRow + "' data-mini='true'>" +
-								"<option value='sunrise'>Sunrise</option>" +
-								"<option value='sunset'>Sunset</option>" +
-							"</select>" +
+	tt += 	"<div class='uzsuRowExpHoli'>" +
+				"<div class='uzsuRowExpert' id='uzsuExpertLine" + numberOfRow + "' style='display:none;float: left;'>" +
+					"<div class='uzsuRowExpertText'>Sun</div>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'>earliest</div>" +
+						"<input type='time' data-clear-btn='false' class='uzsuTimeMaxMinInput' id='uzsuTimeMin" + numberOfRow + "'>" +
+					"</div>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'>Event</div>" +
+						"<form>" +
+							"<div data-role='fieldcontain' class='uzsuEvent' >" +
+								"<select name='uzsuEvent" + numberOfRow + "' id='uzsuEvent" + numberOfRow + "' data-mini='true'>" +
+									"<option value='sunrise'>Sunrise</option>" +
+									"<option value='sunset'>Sunset</option>" +
+								"</select>" +
+							"</div>" +
+						"</form>" +
+					"</div>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'>+/- min</div>" +
+						"<input type='number' data-clear-btn='false' class='uzsuTimeOffsetInput' id='uzsuTimeOffset" + numberOfRow + "'>" +
+					"</div>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'>latest</div>" +
+						"<input type='time' data-clear-btn='false' class='uzsuTimeMaxMinInput' id='uzsuTimeMax" + numberOfRow + "'>" +
+					"</div>" +
+					"<div class='uzsuCell'>" +
+						"<div class='uzsuCellText'></div>" +
+						"<form>" +
+							"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
+								"<input type='checkbox' id='uzsuSunActive"	+ numberOfRow + "'>" +
+									"<label for='uzsuSunActive" + numberOfRow + "'>Act</label>" +
+							"</fieldset>" +
+						"</form>" +
+					"</div>" +
+				"</div>";
+					// hier die Einträge für holiday weekend oder nicht
+		if (designType === '2'){
+			tt += 	"<div class='uzsuRowHoliday' id='uzsuHolidayLine" + numberOfRow + "' style='display:none;float: left;'>" +
+						"<div class='uzsuRowHolidayText'>Holiday</div>" +
+						"<div class='uzsuCell'>" +
+							"<div class='uzsuCellText'>Holiday</div>" +
+							"<form>" +
+								"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
+									"<input type='checkbox' id='uzsuHolidayWorkday" + numberOfRow + "'> <label for='uzsuHolidayWorkday" + numberOfRow + "'>!WE</label>" +
+				 					"<input type='checkbox' id='uzsuHolidayWeekend" + numberOfRow + "'> <label for='uzsuHolidayWeekend" + numberOfRow + "'>WE</label>" +
+								"</fieldset>" +
+							"</form>" +
 						"</div>" +
-					"</form>" +
-				"</div>" +
-				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>+/- min</div>" +
-					"<input type='number' data-clear-btn='false' class='uzsuTimeOffsetInput' id='uzsuTimeOffset" + numberOfRow + "'>" +
-				"</div>" +
-				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>latest</div>" +
-					"<input type='time' data-clear-btn='false' class='uzsuTimeMaxMinInput' id='uzsuTimeMax" + numberOfRow + "'>" +
-				"</div>" +
-				"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'></div>" +
-					"<form>" +
-						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
-							"<input type='checkbox' id='uzsuSunActive"	+ numberOfRow + "'>" +
-								"<label for='uzsuSunActive" + numberOfRow + "'>Act</label>" +
-						"</fieldset>" +
-					"</form>" +
-				"</div>";
-				// hier die Einträge für holiday weekend oder nicht
-	if (designType === '2'){
-		tt+=	"<div class='uzsuCell'>" +
-					"<div class='uzsuCellText'>Holiday</div>" +
-					"<form>" +
-						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
-							"<input type='checkbox' id='uzsuHolidayWork" + numberOfRow + "'> <label for='uzsuHolidayWork" + numberOfRow + "'>!WE</label>" +
-		 					"<input type='checkbox' id='uzsuHolidayWeekend" + numberOfRow + "'> <label for='uzsuHolidayWeekend" + numberOfRow + "'>WE</label>" +
-						"</fieldset>" +
-					"</form>" +
-				"</div>";
-				}
-		tt+="</div>";	
+					"</div>";
+		}
+		tt+= 	"</div>";
 	// und jetzt noch die unsichbare Condition und delayed Exec Zeile
 	if(designType == '2'){
 		tt += 	"<div class='uzsuRowCondition' id='uzsuConditionLine" + numberOfRow + "' style='display:none;'>" +
@@ -416,7 +430,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v4.7</div>" +
+    				"<div class='uzsuCellText'>v4.8</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -449,7 +463,7 @@ function uzsuBuildTableFooter(designType) {
 
 // Setzt die Farbe des Expertenbuttons, je nach dem, ob eine der Optionen aktiv geschaltet wurde
 function uzsuSetExpertColor(numberOfRow){
-	if ($('#uzsuSunActive' + numberOfRow).is(':checked') || $('#uzsuConditionActive' + numberOfRow).is(':checked') || $('#uzsuDelayedExecActive' + numberOfRow).is(':checked') || $('#uzsuHolidayWork' + numberOfRow).is(':checked') || $('#uzsuHolidayWeekend' + numberOfRow).is(':checked')){
+	if ($('#uzsuSunActive' + numberOfRow).is(':checked') || $('#uzsuConditionActive' + numberOfRow).is(':checked') || $('#uzsuDelayedExecActive' + numberOfRow).is(':checked') || $('#uzsuHolidayWorkday' + numberOfRow).is(':checked') || $('#uzsuHolidayWeekend' + numberOfRow).is(':checked')){
 		$('#uzsuExpert' + numberOfRow).closest('div').addClass('ui-checkbox-on');
 	}
 	else{
@@ -598,7 +612,7 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		}
 		// jetzt die holiday themem für fhem
 		if(designType === '2'){
-			$('#uzsuHolidayWork' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.work).checkboxradio("refresh");			
+			$('#uzsuHolidayWorkday' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.workday).checkboxradio("refresh");			
 			$('#uzsuHolidayWeekend' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.weekend).checkboxradio("refresh");			
 		}
 	}
@@ -656,7 +670,7 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 		response.list[numberOfRow].rrule = rrule;
 		// jetzt die holiday themem für fhem
 		if(designType === '2'){
-			response.list[numberOfRow].holiday.work = $('#uzsuHolidayWork' + numberOfRow).is(':checked');
+			response.list[numberOfRow].holiday.workday = $('#uzsuHolidayWorkday' + numberOfRow).is(':checked');
 			response.list[numberOfRow].holiday.weekend = $('#uzsuHolidayWeekend' + numberOfRow).is(':checked');
 		}
 	}
@@ -675,7 +689,7 @@ function uzsuAddTableRow(response, designType, valueType, valueParameterList) {
 	// alten Zustand mal in die Liste rein. da der aktuelle Zustand ja nur im Widget selbst enthalten ist, wird er vor dem Umbau wieder in die Variable response zurückgespeichert.
 	uzsuSaveTable(1, response, designType, valueType, valueParameterList, false);
 	// ich hänge immer an die letzte Zeile dran ! erst einmal das Array erweitern
-	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{deviceString:'',type:'String',value:'',active:false},delayedExec:{deviceString:'',type:'String',value:'',active:false},holiday:{work:false,weekend:false}});
+	response.list.push({active:false,rrule:'',time:'00:00',value:0,event:'time',timeMin:'',timeMax:'',timeCron:'00:00',timeOffset:'',condition:{deviceString:'',type:'String',value:'',active:false},delayedExec:{deviceString:'',type:'String',value:'',active:false},holiday:{workday:false,weekend:false}});
 	// dann eine neue HTML Zeile genenrieren
 	tt = uzsuBuildTableRow(numberOfNewRow, designType, valueType,	valueParameterList);
 	// Zeile in die Tabelle einbauen
@@ -726,6 +740,9 @@ function uzsuShowExpertLine(e) {
 	uzsuHideAllExpertLines();
 	// Zeile anzeigen
 	$('#uzsuExpertLine'+numberOfRow).css('display','');
+	if($('#uzsuHolidayLine'+numberOfRow).length){
+		$('#uzsuHolidayLine'+numberOfRow).css('display','');
+	}
 	// Zeile für conditions anzeigen, wenn sie existieren
 	if($('#uzsuConditionLine'+numberOfRow).length){
 		$('#uzsuConditionLine'+numberOfRow).css('display','');		
@@ -753,7 +770,7 @@ function uzsuShowExpertLine(e) {
 		uzsuSetExpertColor(numberOfRow);
 	});
 	// Handler, um je nach Event die inputs zu Aktivieren / Deaktivieren reagiert auf die Änderung des Buttons
-	$.mobile.activePage.find('#uzsuHolidayWork' + numberOfRow).on('change', function (){
+	$.mobile.activePage.find('#uzsuHolidayWorkday' + numberOfRow).on('change', function (){
 		uzsuSetExpertColor(numberOfRow);
 	});
 	// Handler, um je nach Active State der Condition die inputs zu Aktivieren / Deaktivieren
@@ -785,6 +802,9 @@ function uzsuHideExpertLine(e) {
 	if ($('#uzsuExpertLine'+numberOfRow)) {
 		// jetzt die Tabelle kürzen im Popup
 		$('#uzsuExpertLine'+numberOfRow).css('display','none');
+		if($('#uzsuHolidayLine'+numberOfRow).length){
+			$('#uzsuHolidayLine'+numberOfRow).css('display','none');
+		}
 		// auch für die Conditions
 		if($('#uzsuConditionLine'+numberOfRow).length){
 			$('#uzsuConditionLine'+numberOfRow).css('display','none');		
@@ -811,6 +831,9 @@ function uzsuHideAllExpertLines() {
 	for (var numberOfRow = 0; numberOfRow < numberOfEntries; numberOfRow++) {
 		// jetzt die Tabelle kürzen im Popup
 		$('#uzsuExpertLine'+numberOfRow).css('display','none');
+		if($('#uzsuHolidayLine'+numberOfRow).length){
+			$('#uzsuHolidayLine'+numberOfRow).css('display','none');
+		}
 		// auch für die Conditions
 		if($('#uzsuConditionLine'+numberOfRow).length){
 			$('#uzsuConditionLine'+numberOfRow).css('display','none');		
@@ -1024,7 +1047,7 @@ function uzsuDomClick(event) {
 				}
 				// test, ob die einträge für holiday gesetzt sind
 				if (response.list[numberOfRow].holiday === undefined){
-					response.list[numberOfRow].holiday = {work:false, weekend:false};
+					response.list[numberOfRow].holiday = {workday:false, weekend:false};
 				}
 			}
 		}		

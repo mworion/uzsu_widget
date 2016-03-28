@@ -2,9 +2,9 @@
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015, 2016
 *
-* responsive v4.6
+* responsive v4.8
 *
-* läuft zusammen mit dem visu.js (responsive) ab v4.6
+* läuft zusammen mit dem visu.js (responsive) ab v4.8
 * umstellung auf smartvisu v2.8
 *
 * @param unique id for this widget
@@ -34,18 +34,23 @@
     margin-bottom:20px;
 }
 .uzsuRow{
-    clear:both;
+	clear: both;
     height:60px;
 }
-.uzsuRowExpert, .uzsuRowCondition, .uzsuRowDelayedExec{
-    clear:both;
+.uzsuRowExpert, .uzsuRowHoliday, .uzsuRowCondition, .uzsuRowDelayedExec{
     height:60px;
     border:1px dotted;
     margin-bottom:20px;
     margin-left:20px;
     margin-right:20px;
 }
-.uzsuRowExpertText, .uzsuRowConditionText, .uzsuRowDelayedExecText{
+.uzsuRowExpHoli:after{
+	clear: both;
+	content: " ";
+   	display: block; 
+   	height: 0;
+}
+.uzsuRowExpertText, .uzsuRowHolidayText, .uzsuRowConditionText, .uzsuRowDelayedExecText{
 	height: 0em;
     font-size: 0.7em;
     position: relative; 
@@ -112,7 +117,7 @@ div.ui-slider-switch{
 	width: 350px !important;
 }
 @media screen and (max-width: 625px){
-    .uzsuRowExpert, .uzsuRowCondition, .uzsuRowDelayedExec, .uzsuCellExpert{
+    .uzsuRowExpert, .uzsuRowHoliday, .uzsuRowCondition, .uzsuRowDelayedExec, .uzsuCellExpert{
         display: none;    
     }
 }
