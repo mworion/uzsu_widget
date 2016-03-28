@@ -334,7 +334,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 		tt += 	"<div class='uzsuRowCondition' id='uzsuConditionLine" + numberOfRow + "' style='display:none;'>" +
 					"<div class='uzsuRowConditionText'>Condition</div>" +
 					"<div class='uzsuCell'>" +
-						"<div class='uzsuCellText'>Device / Perl String</div>" +
+						"<div class='uzsuCellText'>Device / String</div>" +
 						"<input type='text' data-clear-btn='false' class='uzsuConditionDeviceStringInput' id='uzsuConditionDeviceString" + numberOfRow + "'>" +
 					"</div>" +
 					"<div class='uzsuCell'>" +
@@ -371,7 +371,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 		tt += 	"<div class='uzsuRowDelayedExec' id='uzsuDelayedExecLine" + numberOfRow + "' style='display:none;'>" +
 					"<div class='uzsuRowDelayedExecText'>DelayedExec</div>" +
 					"<div class='uzsuCell'>" +
-						"<div class='uzsuCellText'>Device / Perl String</div>" +
+						"<div class='uzsuCellText'>Device / String</div>" +
 						"<input type='text' data-clear-btn='false' class='uzsuDelayedExecDeviceStringInput' id='uzsuDelayedExecDeviceString" + numberOfRow + "'>" +
 					"</div>" +
 					"<div class='uzsuCell'>" +
@@ -469,7 +469,8 @@ function uzsuSetSunActiveState(numberOfRow){
 		$('#uzsuEvent' + numberOfRow).selectmenu("enable");
 	}
 	else{
-		$('#uzsuTimeCron' + numberOfRow).val('00:00');
+		if($('#uzsuTimeCron' + numberOfRow).val().indexOf('sun')===0)
+			$('#uzsuTimeCron' + numberOfRow).val('00:00');
 		$('#uzsuTimeCron' + numberOfRow).textinput('enable');
 		$('#uzsuTimeMin' + numberOfRow).textinput('disable');
 		$('#uzsuTimeOffset' + numberOfRow).textinput('disable');
@@ -716,7 +717,7 @@ function uzsuDelTableRow(response, designType, valueType, valueParameterList, e)
 	}
 }
 
-//Expertenzeile mit Eingaben auf der Hauptzeile benutzbar machen oder sperren
+//Expertenzeile mit Eingaben auf der Hauptzeile benutzbar machen oder sperren bzw. die Statusupdates in die Zeile eintragen
 
 function uzsuShowExpertLine(e) {
 	// Tabellezeile ermitteln, wo augerufen wurde. es ist die 10. Stelle des aufrufenden Objektes
