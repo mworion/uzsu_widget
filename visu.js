@@ -2,8 +2,8 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v4.5
-// läuft nur mit smartvisu ab v2.8 (svg umstellung)
+// Release responsive v4.6
+// notwendig smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
 // Umsetzung
@@ -40,13 +40,13 @@
 //						"timeCron"	:'00:00',		Schaltzeitpunkt
 //						"timeOffset":''				Offset für Schaltzeitpunkt
 //						"condition"	: 	{			Ein Struct für die Verwendung mit FHEM conditions, weil dort einige Option mehr angeboten werden
-//											"devicePerl"	: text
+//											"deviceString"	: text
 //											"type"			: text
 //											"value"			: text
 //											"active"		: bool
 //										}
 //						"delayedExec"	: 	{		Ein Struct für die Verwendung mit FHEM conditions, weil dort einige Option mehr angeboten werden
-//											"devicePerl"	: text
+//											"deviceString"	: text
 //											"type"			: text
 //											"value"			: text
 //											"active"		: bool
@@ -305,7 +305,6 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"<form>" +
 						"<div data-role='fieldcontain' class='uzsuEvent' >" +
 							"<select name='uzsuEvent" + numberOfRow + "' id='uzsuEvent" + numberOfRow + "' data-mini='true'>" +
-								"<option value='time'>Time</option>" +
 								"<option value='sunrise'>Sunrise</option>" +
 								"<option value='sunset'>Sunset</option>" +
 							"</select>" +
@@ -320,6 +319,15 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"<div class='uzsuCellText'>latest</div>" +
 					"<input type='time' data-clear-btn='false' class='uzsuTimeMaxMinInput' id='uzsuTimeMax" + numberOfRow + "'>" +
 				"</div>" +
+				"<div class='uzsuCell'>" +
+					"<div class='uzsuCellText'></div>" +
+					"<form>" +
+						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
+							"<input type='checkbox' id='uzsuSunActive"	+ numberOfRow + "'>" +
+								"<label for='uzsuSunActive" + numberOfRow + "'>Act</label>" +
+						"</fieldset>" +
+					"</form>" +
+				"</div>" +
 			"</div>";	
 	// und jetzt noch die unsichbare Condition und delayed Exec Zeile
 	if(designType == '2'){
@@ -327,7 +335,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"<div class='uzsuRowConditionText'>Condition</div>" +
 					"<div class='uzsuCell'>" +
 						"<div class='uzsuCellText'>Device / Perl String</div>" +
-						"<input type='text' data-clear-btn='false' class='uzsuConditionDevicePerlInput' id='uzsuConditionDevicePerl" + numberOfRow + "'>" +
+						"<input type='text' data-clear-btn='false' class='uzsuConditionDeviceStringInput' id='uzsuConditionDeviceString" + numberOfRow + "'>" +
 					"</div>" +
 					"<div class='uzsuCell'>" +
 						"<div class='uzsuCellText'>Condition Type</div>" +
@@ -340,7 +348,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 									"<option value='>='>>=</option>" +
 									"<option value='<='><=</option>" +
 									"<option value='ne'>!=</option>" +
-									"<option value='Perl'>Perl</option>" +
+									"<option value='String'>String</option>" +
 								"</select>" +
 							"</div>" +
 						"</form>" +
@@ -364,7 +372,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"<div class='uzsuRowDelayedExecText'>DelayedExec</div>" +
 					"<div class='uzsuCell'>" +
 						"<div class='uzsuCellText'>Device / Perl String</div>" +
-						"<input type='text' data-clear-btn='false' class='uzsuDelayedExecDevicePerlInput' id='uzsuDelayedExecDevicePerl" + numberOfRow + "'>" +
+						"<input type='text' data-clear-btn='false' class='uzsuDelayedExecDeviceStringInput' id='uzsuDelayedExecDeviceString" + numberOfRow + "'>" +
 					"</div>" +
 					"<div class='uzsuCell'>" +
 						"<div class='uzsuCellText'>DelayedExec Type</div>" +
@@ -377,7 +385,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 									"<option value='>='>>=</option>" +
 									"<option value='<='><=</option>" +
 									"<option value='ne'>!=</option>" +
-									"<option value='Perl'>Perl</option>" +
+									"<option value='String'>String</option>" +
 								"</select>" +
 							"</div>" +
 						"</form>" +
@@ -408,7 +416,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v4.5</div>" +
+    				"<div class='uzsuCellText'>v4.6</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -438,34 +446,33 @@ function uzsuBuildTableFooter(designType) {
 //----------------------------------------------------------------------------
 // Funktionen für das dynamische Handling der Seiteninhalte des Popups
 //----------------------------------------------------------------------------
-// Expertenzeile mit Eingaben auf der Hauptzeile benutzbar machen oder sperren
-function uzsuSetTextInputState(numberOfRow){
-	// status der eingaben setzen, das brauchen wir an mehreren stellen
-	if ($('#uzsuEvent' + numberOfRow).val() === 'time'){
-		$('#uzsuTimeMin' + numberOfRow).textinput('disable');
-		$('#uzsuTimeOffset' + numberOfRow).textinput('disable');
-		$('#uzsuTimeMax' + numberOfRow).textinput('disable');
-		// und den Zeit auf 00:00 stellen wenn von sunrise auf time umgeschaltet wird
-		if($('#uzsuTimeCron' + numberOfRow).length !== 0){
-			$('#uzsuTimeCron' + numberOfRow).textinput('enable');
-			// experten button abanfalls auf normal setzen
-			$('#uzsuExpert' + numberOfRow).closest('div').removeClass('ui-checkbox-off');
-			//
-			if($('#uzsuTimeCron' + numberOfRow).val().indexOf('sun')===0)
-				$('#uzsuTimeCron' + numberOfRow).val('00:00');
-		}
+
+// Setzt die Farbe des Expertenbuttons, je nach dem, ob eine der Optionen aktive geschaltet wurde
+function uzsuSetExpertColor(numberOfRow){
+	if ($('#uzsuSunActive' + numberOfRow).is(':checked') || $('#uzsuConditionActive' + numberOfRow).is(':checked') || $('#uzsuDelayedExecActive' + numberOfRow).is(':checked')){
+		$('#uzsuExpert' + numberOfRow).closest('div').addClass('ui-checkbox-on');
 	}
 	else{
+		$('#uzsuExpert' + numberOfRow).closest('div').removeClass('ui-checkbox-on');
+	}
+}
+
+// Toggelt die eingabemöglichkeit für SUN Elemente in Abhängigkeit der Aktivschaltung 
+function uzsuSetSunActiveState(numberOfRow){
+	// status der eingaben setzen, das brauchen wir an mehreren stellen
+	if ($('#uzsuSunActive' + numberOfRow).is(':checked')){
+		$('#uzsuTimeCron' + numberOfRow).val('SUN');
+		$('#uzsuTimeCron' + numberOfRow).textinput('disable');
 		$('#uzsuTimeMin' + numberOfRow).textinput('enable');
 		$('#uzsuTimeOffset' + numberOfRow).textinput('enable');
 		$('#uzsuTimeMax' + numberOfRow).textinput('enable');
-		// und den Text event auf sunrise bzw. sunset setzen, damit man ihn erkennt !
-		if($('#uzsuTimeCron' + numberOfRow).length !== 0){
-			$('#uzsuTimeCron' + numberOfRow).textinput('disable');
-			// experten button ebenfalls auf rot setzen
-			$('#uzsuExpert' + numberOfRow).closest('div').addClass('ui-checkbox-on');
-			$('#uzsuTimeCron' + numberOfRow).val($('#uzsuEvent' + numberOfRow).val());
-		}
+	}
+	else{
+		$('#uzsuTimeCron' + numberOfRow).val('00:00');
+		$('#uzsuTimeCron' + numberOfRow).textinput('enable');
+		$('#uzsuTimeMin' + numberOfRow).textinput('disable');
+		$('#uzsuTimeOffset' + numberOfRow).textinput('disable');
+		$('#uzsuTimeMax' + numberOfRow).textinput('disable');
 	}
 }
 
@@ -509,32 +516,37 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 	    // hier die conditions, wenn sie im json angelegt worden sind und zwar pro zeile !
 	    if(designType === '2'){
 	    	// Condition
-	    	$('#uzsuConditionDevicePerl'+numberOfRow).val(response.list[numberOfRow].condition.devicePerl);
+	    	$('#uzsuConditionDeviceString'+numberOfRow).val(response.list[numberOfRow].condition.deviceString);
 	    	$('#uzsuConditionType'+numberOfRow).val(response.list[numberOfRow].condition.type);
 	    	$('#uzsuConditionType'+numberOfRow).selectmenu('refresh', true);
 	    	$('#uzsuConditionValue'+numberOfRow).val(response.list[numberOfRow].condition.value);
 	    	$('#uzsuConditionActive'+numberOfRow).prop('checked',response.list[numberOfRow].condition.active).checkboxradio("refresh");
 	    	// Delayed Exec Zeile
-	    	$('#uzsuDelayedExecDevicePerl'+numberOfRow).val(response.list[numberOfRow].delayedExec.devicePerl);
+	    	$('#uzsuDelayedExecDeviceString'+numberOfRow).val(response.list[numberOfRow].delayedExec.deviceString);
 	    	$('#uzsuDelayedExecType'+numberOfRow).val(response.list[numberOfRow].delayedExec.type);
 	    	$('#uzsuDelayedExecType'+numberOfRow).selectmenu('refresh', true);
 	    	$('#uzsuDelayedExecValue'+numberOfRow).val(response.list[numberOfRow].delayedExec.value);
 	    	$('#uzsuDelayedExecActive'+numberOfRow).prop('checked',response.list[numberOfRow].delayedExec.active).checkboxradio("refresh");
-	    	
-	    	// experten button ebenfalls auf rot setzen
+	    	// experten button ebenfalls auf die avtive farbe setzen
 			$('#uzsuExpert' + numberOfRow).closest('div').addClass('ui-checkbox-on');
 	    }
-		//$('#uzsuTime' + numberOfRow).val(response.list[numberOfRow].time);
 	    $('#uzsuTimeMin'+numberOfRow).val(response.list[numberOfRow].timeMin);
 	    $('#uzsuTimeOffset'+numberOfRow).val(parseInt(response.list[numberOfRow].timeOffset));
 	    $('#uzsuTimeMax'+numberOfRow).val(response.list[numberOfRow].timeMax);
 	    $('#uzsuTimeCron'+numberOfRow).val(response.list[numberOfRow].timeCron);
-	    // und die pull down Menüs richtig, damit die Einträge wieder stimmen
-	    $('#uzsuEvent'+numberOfRow).val(response.list[numberOfRow].event).attr('selected',true).siblings('option').removeAttr('selected');
+	    // und die pull down Menüs richtig, damit die Einträge wieder stimmen und auch der active state gesetzt wird
+	    if(response.list[numberOfRow].event === 'time'){
+	    	$('#uzsuSunActive'+numberOfRow).prop('checked',false).checkboxradio("refresh");	
+	    }
+	    else{
+	    	$('#uzsuSunActive'+numberOfRow).prop('checked',true).checkboxradio("refresh");
+	    	$('#uzsuEvent'+numberOfRow).val(response.list[numberOfRow].event).attr('selected',true).siblings('option').removeAttr('selected');
+	    }
 	    // und der Refresh, damit es angezeigt wird
 		$('#uzsuEvent'+numberOfRow).selectmenu('refresh', true);
 		// Fallunterscheidung für den Expertenmodus
-		uzsuSetTextInputState(numberOfRow);
+		uzsuSetSunActiveState(numberOfRow);
+		uzsuSetExpertColor(numberOfRow);
 		// in der Tabelle die Werte der rrule, dabei gehe ich von dem Standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU aus und setze für jeden Eintrag den Button.
 		var rrule = response.list[numberOfRow].rrule;
 		if (typeof rrule === "undefined") {
@@ -570,12 +582,12 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 		// hier die conditions, wenn im json angelegt
 		if(designType == '2'){
 			// conditions
-			response.list[numberOfRow].condition.devicePerl = $('#uzsuConditionDevicePerl'+numberOfRow).val();
+			response.list[numberOfRow].condition.deviceString = $('#uzsuConditionDeviceString'+numberOfRow).val();
 			response.list[numberOfRow].condition.type = $('#uzsuConditionType'+numberOfRow).val();
 			response.list[numberOfRow].condition.value = $('#uzsuConditionValue'+numberOfRow).val();
 			response.list[numberOfRow].condition.active = $('#uzsuConditionActive'+numberOfRow).is(':checked');
 			// deleayed exec
-			response.list[numberOfRow].delayedExec.devicePerl = $('#uzsuDelayedExecDevicePerl'+numberOfRow).val();
+			response.list[numberOfRow].delayedExec.deviceString = $('#uzsuDelayedExecDeviceString'+numberOfRow).val();
 			response.list[numberOfRow].delayedExec.type = $('#uzsuDelayedExecType'+numberOfRow).val();
 			response.list[numberOfRow].delayedExec.value = $('#uzsuDelayedExecValue'+numberOfRow).val();
 			response.list[numberOfRow].delayedExec.active = $('#uzsuDelayedExecActive'+numberOfRow).is(':checked');
@@ -585,7 +597,13 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 		response.list[numberOfRow].timeOffset = $('#uzsuTimeOffset'+numberOfRow).val();
 		response.list[numberOfRow].timeMax = $('#uzsuTimeMax'+numberOfRow).val();
 		response.list[numberOfRow].timeCron = $('#uzsuTimeCron'+numberOfRow).val();
-		response.list[numberOfRow].event = $('#uzsuEvent'+numberOfRow).val();
+		// event etwas komplizierter, da übergangslösung
+	    if($('#uzsuSunActive'+numberOfRow).is(':checked')){
+			response.list[numberOfRow].event = $('#uzsuEvent'+numberOfRow).val();
+	    }
+	    else{
+			response.list[numberOfRow].event = 'time';
+	    }		
 		// in der Tabelle die Werte der rrule, dabei gehe ich von dem Standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU aus und setze für jeden Eintrag den Button. Setzen der Werte.
 		var first = true;
 		var rrule = '';
@@ -659,6 +677,8 @@ function uzsuDelTableRow(response, designType, valueType, valueParameterList, e)
 	}
 }
 
+//Expertenzeile mit Eingaben auf der Hauptzeile benutzbar machen oder sperren
+
 function uzsuShowExpertLine(e) {
 	// Tabellezeile ermitteln, wo augerufen wurde. es ist die 10. Stelle des aufrufenden Objektes
 	var numberOfRow = parseInt(e.currentTarget.id.substr(10));
@@ -683,9 +703,18 @@ function uzsuShowExpertLine(e) {
 		e.stopImmediatePropagation();
 		uzsuHideExpertLine(e);
 	});
-	// Handler, um je nach Event die inputs zu Aktivieren / Deaktivieren reagiert auf die Änderung des Pulldown Menüs
-	$.mobile.activePage.find('#uzsuEvent' + numberOfRow).on('change', function (){
-		uzsuSetTextInputState(numberOfRow);
+	// Handler, um je nach Event die inputs zu Aktivieren / Deaktivieren reagiert auf die Änderung Active
+	$.mobile.activePage.find('#uzsuSunActive' + numberOfRow).on('change', function (){
+		uzsuSetSunActiveState(numberOfRow);
+		uzsuSetExpertColor(numberOfRow);
+	});
+	// Handler, um den expertebutton Status zu setzen
+	$.mobile.activePage.find('#uzsuConditionActive' + numberOfRow).on('change', function (){
+		uzsuSetExpertColor(numberOfRow);
+	});
+	// Handler, um den expertebutton Status zu setzen
+	$.mobile.activePage.find('#uzsuDelayedExecActive' + numberOfRow).on('change', function (){
+		uzsuSetExpertColor(numberOfRow);
 	});
 }
 
@@ -927,11 +956,11 @@ function uzsuDomClick(event) {
 			for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
 				// test, ob die einträge für conditions vorhanden sind
 				if (response.list[numberOfRow].condition === undefined){
-					response.list[numberOfRow].condition = {devicePerl:'',type:'Perl',value:'',active:false};
+					response.list[numberOfRow].condition = {deviceString:'',type:'String',value:'',active:false};
 				}
 				// test, ob die einträge für delayed exec vorhanden sind
 				if (response.list[numberOfRow].delayedExec === undefined){
-					response.list[numberOfRow].delayedExec = {devicePerl:'',type:'Perl',value:'',active:false};
+					response.list[numberOfRow].delayedExec = {deviceString:'',type:'String',value:'',active:false};
 				}
 				// test, ob die einträge für holiday gesetzt sind
 				if (response.list[numberOfRow].holiday === undefined){

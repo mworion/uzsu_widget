@@ -3,7 +3,7 @@
 ###JAVA Script Widget for use in smartvisu environment in combination with uzsu plugin for smarthome or FHEM environment
 (C) Michael Würtenberger 2014,2015,2016
 
-Stand: v4.5
+Stand: v4.6
 Erweitert um das Setzen von Conditions und Holiday Funktion im FHEM Umfeld
 Für FHEM wird künftig der designType = '2' verwendet. Darstellung entspicht default, erweitert um die Funktionen für FHEM
 Der DesignType = 1 (Expert Mode) ist entfallen (kein Bedarf)
