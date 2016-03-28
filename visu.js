@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v4.6
+// Release responsive v4.7
 // notwendig smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
@@ -283,7 +283,7 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 	tt += "</div>";
 	// und jetzt noch die unsichbare Expertenzeile
 	tt += 	"<div class='uzsuRowExpert' id='uzsuExpertLine" + numberOfRow + "' style='display:none;'>" +
-				"<div class='uzsuRowExpertText'>SUN</div>" +
+				"<div class='uzsuRowExpertText'>Sun/Holiday</div>" +
 				"<div class='uzsuCell'>" +
 					"<div class='uzsuCellText'>earliest</div>" +
 					"<input type='time' data-clear-btn='false' class='uzsuTimeMaxMinInput' id='uzsuTimeMin" + numberOfRow + "'>" +
@@ -322,8 +322,8 @@ function uzsuBuildTableRow(numberOfRow, designType, valueType, valueParameterLis
 					"<div class='uzsuCellText'>Holiday</div>" +
 					"<form>" +
 						"<fieldset data-role='controlgroup' data-type='horizontal' data-mini='true'>" +
-							"<input type='checkbox' id='holidayWork" + numberOfRow + "'> <label for='holidayWork" + numberOfRow + "'>!WE</label>" +
-		 					"<input type='checkbox' id='holidayWeekend" + numberOfRow + "'> <label for='holidayWeekend" + numberOfRow + "'>WE</label>" +
+							"<input type='checkbox' id='uzsuHolidayWork" + numberOfRow + "'> <label for='uzsuHolidayWork" + numberOfRow + "'>!WE</label>" +
+		 					"<input type='checkbox' id='uzsuHolidayWeekend" + numberOfRow + "'> <label for='uzsuHolidayWeekend" + numberOfRow + "'>WE</label>" +
 						"</fieldset>" +
 					"</form>" +
 				"</div>";
@@ -416,7 +416,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v4.6</div>" +
+    				"<div class='uzsuCellText'>v4.7</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -447,9 +447,9 @@ function uzsuBuildTableFooter(designType) {
 // Funktionen für das dynamische Handling der Seiteninhalte des Popups
 //----------------------------------------------------------------------------
 
-// Setzt die Farbe des Expertenbuttons, je nach dem, ob eine der Optionen aktive geschaltet wurde
+// Setzt die Farbe des Expertenbuttons, je nach dem, ob eine der Optionen aktiv geschaltet wurde
 function uzsuSetExpertColor(numberOfRow){
-	if ($('#uzsuSunActive' + numberOfRow).is(':checked') || $('#uzsuConditionActive' + numberOfRow).is(':checked') || $('#uzsuDelayedExecActive' + numberOfRow).is(':checked')){
+	if ($('#uzsuSunActive' + numberOfRow).is(':checked') || $('#uzsuConditionActive' + numberOfRow).is(':checked') || $('#uzsuDelayedExecActive' + numberOfRow).is(':checked') || $('#uzsuHolidayWork' + numberOfRow).is(':checked') || $('#uzsuHolidayWeekend' + numberOfRow).is(':checked')){
 		$('#uzsuExpert' + numberOfRow).closest('div').addClass('ui-checkbox-on');
 	}
 	else{
@@ -597,8 +597,8 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		}
 		// jetzt die holiday themem für fhem
 		if(designType === '2'){
-			$('#holidayWork' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.work).checkboxradio("refresh");			
-			$('#holidayWeekend' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.weekend).checkboxradio("refresh");			
+			$('#uzsuHolidayWork' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.work).checkboxradio("refresh");			
+			$('#uzsuHolidayWeekend' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.weekend).checkboxradio("refresh");			
 		}
 	}
 }
@@ -655,8 +655,8 @@ function uzsuSaveTable(item, response, designType, valueType, valueParameterList
 		response.list[numberOfRow].rrule = rrule;
 		// jetzt die holiday themem für fhem
 		if(designType === '2'){
-			response.list[numberOfRow].holiday.work = $('#holidayWork' + numberOfRow).is(':checked');
-			response.list[numberOfRow].holiday.weekend = $('#holidayWeekend' + numberOfRow).is(':checked');
+			response.list[numberOfRow].holiday.work = $('#uzsuHolidayWork' + numberOfRow).is(':checked');
+			response.list[numberOfRow].holiday.weekend = $('#uzsuHolidayWeekend' + numberOfRow).is(':checked');
 		}
 	}
 	// über json Interface / Treiber herausschreiben
@@ -745,6 +745,14 @@ function uzsuShowExpertLine(e) {
 	// Handler, um je nach Event die inputs zu Aktivieren / Deaktivieren reagiert auf die Änderung Active
 	$.mobile.activePage.find('#uzsuSunActive' + numberOfRow).on('change', function (){
 		uzsuSetSunActiveState(numberOfRow);
+		uzsuSetExpertColor(numberOfRow);
+	});
+	// Handler, um je nach Event die inputs zu Aktivieren / Deaktivieren reagiert auf die Änderung des Buttons
+	$.mobile.activePage.find('#uzsuHolidayWeekend' + numberOfRow).on('change', function (){
+		uzsuSetExpertColor(numberOfRow);
+	});
+	// Handler, um je nach Event die inputs zu Aktivieren / Deaktivieren reagiert auf die Änderung des Buttons
+	$.mobile.activePage.find('#uzsuHolidayWork' + numberOfRow).on('change', function (){
 		uzsuSetExpertColor(numberOfRow);
 	});
 	// Handler, um je nach Active State der Condition die inputs zu Aktivieren / Deaktivieren
