@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v4.8
+// Release responsive v 4.81
 // notwendig smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
@@ -34,20 +34,11 @@
 //						"rrule"		:'',			Wochen / Tag Programmstring
 //						"time"		:'00:00',		Uhrzeitstring des Schaltpunktes / configuration
 //						"value"		:0,				Wert, der gesetzt wird
-//
-//						nachfolgende werden im Struct aufgelöst :
-//						"event":	'time',			Erweiterung zur Laufzeit: Zeitevent oder SUN
+//						"event":	'time',			Zeitevent (time) oder SUN (sunrise oder sunset)
 //						"timeMin"	:'',			Untere Schranke SUN
 //						"timeMax"	:'',			Oberere Schranke SUN
 //						"timeCron"	:'00:00',		Schaltzeitpunkt
 //						"timeOffset":''				Offset für Schaltzeitpunkt
-//
-//						"sun" :			{	timeMin :	text	Untere Schranke SUN
-//											timeMax :	text	Oberere Schranke SUN
-//											timeOffset:	text	Offset für Schaltzeitpunkt
-//											event :		text	Event (ist sunrise oder sunset)
-//											active :	bool	Aktiviert ja/nein
-//										}
 //						"condition"	: 	{	Ein Struct für die Verwendung mit conditions (aktuell nur FHEM), weil dort einige Option mehr angeboten werden
 //											"deviceString"	: text	Bezeichnung des Devices oder Auswertestring
 //											"type"			: text	Auswertetype (logische Verknüpfung oder Auswahl String)
@@ -104,83 +95,6 @@ function uzsuCollapseTimestring(response, designType){
 	}
 }
 
-function uzsuExpandTimestring(response){
-	// ist aus cron von schedule.py aus sh.py übernommen und nach js portiert
-	var timeCron = '';
-	var timeMin = '';
-	var timeMax = '';
-	var timeOffset = '';
-	var event = '';
-	var tabsTime = '';
-	for (var numberOfEntry = 0; numberOfEntry < response.list.length; numberOfEntry++) {
-		timeCron = '';
-	    tabsTime = response.list[numberOfEntry].time.split('<');
-	    if(tabsTime.length == 1){
-	    	timeMin = '';
-	        timeMax = '';
-	        if (tabsTime[0].trim().indexOf('sunrise')===0){
-	        	event = 'sunrise';
-	        }
-	        else if (tabsTime[0].trim().indexOf('sunset')===0){
-	        	event = 'sunset';
-	        }
-	        else{
-	        	event = 'time';
-	            timeCron = tabsTime[0].trim();
-	        }
-	    }
-	    else if(tabsTime.length == 2){
-	        if(tabsTime[0].indexOf('sunrise')===0){
-	        	timeMin = '';
-	        	event = 'sunrise';
-	        	timeMax = tabsTime[1].trim();
-	        }
-	        else if(tabsTime[0].indexOf('sunset')===0){
-	        	timeMin = '';
-	        	event = 'sunset';
-	        	timeMax = tabsTime[1].trim();
-	        }
-	        else{
-	        	timeMin = tabsTime[0].trim();
-	        	timeMax = '';
-		    	event = tabsTime[1].trim();
-	            if(event.indexOf('sunrise')===0) event = 'sunrise'; else event = 'sunset';
-	        }
-	    }
-	    else if(tabsTime.length == 3){
-	    	timeMin = tabsTime[0].trim();
-	    	timeMax = tabsTime[2].trim();
-	    	event = tabsTime[1].trim();
-	        if(event.indexOf('sunrise')===0) event = 'sunrise'; else event = 'sunset';
-	    }
-	    else{
-	    	// Formatfehler ! ich nehme dann Defaulteinstellung an
-	    	timeMin = '';
-	    	event = 'time';
-	    	timeMax = '';
-	    }
-	    // nun noch der Offset herausnehmen
-	    var tabsOffset = response.list[numberOfEntry].time.split('+');
-	    if(tabsOffset.length == 2){
-	    	// dann steht ein plus drin
-	    	tabsOffset = tabsOffset[1].split('m');
-	    	timeOffset = '+' + tabsOffset[0].trim();
-	    }
-	    tabsOffset = response.list[numberOfEntry].time.split('-');
-	    if(tabsOffset.length == 2){
-	    	// dann steht ein minus drin
-	    	tabsOffset = tabsOffset[1].split('m');
-	    	timeOffset = '-' + tabsOffset[0].trim();
-	    }
-	    // zuweisung der neuen Werte im dict
-		response.list[numberOfEntry].timeMin = timeMin;
-		response.list[numberOfEntry].timeMax = timeMax;
-		response.list[numberOfEntry].timeCron = timeCron;
-		response.list[numberOfEntry].timeOffset = timeOffset;
-		response.list[numberOfEntry].event = event;
-		if(event != 'time') response.list[numberOfEntry].timeCron = event;
-	}
-}
 //----------------------------------------------------------------------------
 // Funktionen für den Seitenaufbau
 //----------------------------------------------------------------------------
@@ -430,7 +344,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v4.8</div>" +
+    				"<div class='uzsuCellText'>v4.81</div>" +
     				"<form>" +
     					"<fieldset data-mini='true'>" +
     						"<input type='checkbox' id='uzsuGeneralActive'>" +
@@ -477,49 +391,11 @@ function uzsuSetSunActiveState(numberOfRow){
 	if ($('#uzsuSunActive' + numberOfRow).is(':checked')){
 		$('#uzsuTimeCron' + numberOfRow).val($('#uzsuEvent' + numberOfRow).val());
 		$('#uzsuTimeCron' + numberOfRow).textinput('disable');
-		$('#uzsuTimeMin' + numberOfRow).textinput('enable');
-		$('#uzsuTimeOffset' + numberOfRow).textinput('enable');
-		$('#uzsuTimeMax' + numberOfRow).textinput('enable');
-		$('#uzsuEvent' + numberOfRow).selectmenu("enable");
 	}
 	else{
 		if($('#uzsuTimeCron' + numberOfRow).val().indexOf('sun')===0)
 			$('#uzsuTimeCron' + numberOfRow).val('00:00');
 		$('#uzsuTimeCron' + numberOfRow).textinput('enable');
-		$('#uzsuTimeMin' + numberOfRow).textinput('disable');
-		$('#uzsuTimeOffset' + numberOfRow).textinput('disable');
-		$('#uzsuTimeMax' + numberOfRow).textinput('disable');
-		$('#uzsuEvent' + numberOfRow).selectmenu("disable");
-	}
-}
-
-//Toggelt die eingabemöglichkeit für Condition Elemente in Abhängigkeit der Aktivschaltung 
-function uzsuSetConditionActiveState(numberOfRow){
-	// status der eingaben setzen, das brauchen wir an mehreren stellen
-	if ($('#uzsuConditionActive' + numberOfRow).is(':checked')){
-		$('#uzsuConditionDeviceString' + numberOfRow).textinput('enable');
-		$('#uzsuConditionValue' + numberOfRow).textinput('enable');
-		$('#uzsuConditionType' + numberOfRow).selectmenu("enable");
-	}
-	else{	
-		$('#uzsuConditionDeviceString' + numberOfRow).textinput('disable');
-		$('#uzsuConditionValue' + numberOfRow).textinput('disable');
-		$('#uzsuConditionType' + numberOfRow).selectmenu("disable");
-	}
-}
-
-//Toggelt die eingabemöglichkeit für Delayed Exec Elemente in Abhängigkeit der Aktivschaltung 
-function uzsuSetDelayedExecActiveState(numberOfRow){
-	// status der eingaben setzen, das brauchen wir an mehreren stellen
-	if ($('#uzsuDelayedExecActive' + numberOfRow).is(':checked')){
-		$('#uzsuDelayedExecDeviceString' + numberOfRow).textinput('enable');
-		$('#uzsuDelayedExecValue' + numberOfRow).textinput('enable');
-		$('#uzsuDelayedExecType' + numberOfRow).selectmenu("enable");
-	}
-	else{	
-		$('#uzsuDelayedExecDeviceString' + numberOfRow).textinput('disable');
-		$('#uzsuDelayedExecValue' + numberOfRow).textinput('disable');
-		$('#uzsuDelayedExecType' + numberOfRow).selectmenu("disable");
 	}
 }
 
@@ -593,8 +469,6 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 		$('#uzsuEvent'+numberOfRow).selectmenu('refresh', true);
 		// Fallunterscheidung für den Expertenmodus
 		uzsuSetSunActiveState(numberOfRow);
-		uzsuSetConditionActiveState(numberOfRow);
-		uzsuSetDelayedExecActiveState(numberOfRow);
 		uzsuSetExpertColor(numberOfRow);
 		// in der Tabelle die Werte der rrule, dabei gehe ich von dem Standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU aus und setze für jeden Eintrag den Button.
 		var rrule = response.list[numberOfRow].rrule;
@@ -772,14 +646,6 @@ function uzsuShowExpertLine(e) {
 	// Handler, um je nach Event die inputs zu Aktivieren / Deaktivieren reagiert auf die Änderung des Buttons
 	$.mobile.activePage.find('#uzsuHolidayWorkday' + numberOfRow).on('change', function (){
 		uzsuSetExpertColor(numberOfRow);
-	});
-	// Handler, um je nach Active State der Condition die inputs zu Aktivieren / Deaktivieren
-	$.mobile.activePage.find('#uzsuConditionActive' + numberOfRow).on('change', function (){
-		uzsuSetConditionActiveState(numberOfRow);
-	});
-	// Handler, um je nach Active State der DelayedExec die inputs zu Aktivieren / Deaktivieren
-	$.mobile.activePage.find('#uzsuDelayedExecActive' + numberOfRow).on('change', function (){
-		uzsuSetDelayedExecActiveState(numberOfRow);
 	});
 	// Handler, um den expert button Status zu setzen
 	$.mobile.activePage.find('#uzsuConditionActive' + numberOfRow).on('change', function (){
@@ -984,9 +850,7 @@ function uzsuDomClick(event) {
 		alert('DOM Daten für UZSU nicht vorhanden! Item-ID auf HTML Seite falsch konfiguriert oder nicht vorhanden ! (click-event)');
 	}
 	else{
-		// jetzt erweitern wir die dicts pro Eintrag, um dem dort einhaltenen Timestring die enthaltenen Einzelteile zu bekommen
-		uzsuExpandTimestring(response);
-	 	// Auswertung der Übergabeparameter
+	 	// Auswertung der Übergabeparameter aus dem HTML Widget
 		var headline = $(this).attr('data-headline');
 		var designType = $(this).attr('data-designType');
 		var valueType = $(this).attr('data-valueType');
@@ -998,6 +862,16 @@ function uzsuDomClick(event) {
 			else if (valueType === 'num') valueParameterList = [''];
 			else if (valueType === 'text') valueParameterList = [''];
 			else if (valueType === 'list') valueParameterList = [''];
+		}
+		//
+		// Umsetzung des time parameters in die Struktur, die wir hinterher nutzen wollen
+		//
+		for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
+			// test, ob die einträge für holiday gesetzt sind
+			if (response.list[numberOfRow].event === 'time')
+				response.list[numberOfRow].timeCron = response.list[numberOfRow].time;
+			else
+				response.list[numberOfRow].timeCron = '00:00';
 		}
 		// data-item ist der sh.py item, in dem alle Attribute lagern, die für die Steuerung notwendig ist ist ja vom typ dict. das item, was tatsächlich per
 		// Schaltuhr verwendet wird ist nur als attribut (child) enthalten und wird ausschliesslich vom Plugin verwendet. wird für das rückschreiben der Daten an smarthome.py benötigt
@@ -1036,7 +910,7 @@ function uzsuDomClick(event) {
 		}
 		// wenn designType = '2' und damit fhem auslegung ist muss der JSON String auf die entsprechenden eintäge erwietert werden (falls nichts vorhanden)
 		if (designType == '2') {
-			for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++) {
+			for (var numberOfRow = 0; numberOfRow < response.list.length; numberOfRow++){
 				// test, ob die einträge für conditions vorhanden sind
 				if (response.list[numberOfRow].condition === undefined){
 					response.list[numberOfRow].condition = {deviceString:'',type:'String',value:'',active:false};
