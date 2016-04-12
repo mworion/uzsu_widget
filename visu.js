@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v 4.81
+// Release responsive v 4.9
 // notwendig smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
@@ -102,7 +102,7 @@ function uzsuBuildTableHeader(headline, designType, valueType, valueParameterLis
 	// Kopf und überschrift des Popups
 	var tt = "";
 	// hier kommt der Popup Container mit der Beschreibung ein Eigenschaften
-	tt += 	"<div data-role='popup' data-overlay-theme='b' data-theme='a' class='messagePopup' id='uzsuPopupContent' data-dismissible = 'false'>" +
+	tt += 	"<div data-role='popup' data-overlay-theme='b' data-theme='a' class='messagePopup' id='uzsuPopupContent' data-dismissible = 'false' data-history='false' data-position-to='window'>" +
 				"<div data-rel='back' data-role='button' data-icon='delete' data-iconpos='notext' class='ui-btn-right' id='uzsuClose'></div>" +
 				"<div class='uzsuClear'>" +
 					"<div class='uzsuPopupHeader'>" + headline + "</div>" +
@@ -343,29 +343,30 @@ function uzsuBuildTableFooter(designType) {
 	// Aufbau des Footers
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
-    			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'>v4.81</div>" +
-    				"<form>" +
-    					"<fieldset data-mini='true'>" +
-    						"<input type='checkbox' id='uzsuGeneralActive'>" +
-    							"<label for='uzsuGeneralActive'>Active</label>" +
-    					"</fieldset>" +
-    				"</form>" +
-    			"</div><div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'></div>" +
-    					"<div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>" +
-    						"<div data-role = 'button' id='uzsuAddTableRow'>New</div>" +
-    						"<div data-role = 'button' id='uzsuSortTime'>Sort</div>" +
-    					"</div>" +
-    				"</div>" +
-    			"<div class='uzsuCell'>" +
-    				"<div class='uzsuCellText'></div>" +
-    					"<div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>" +
-    						"<div data-role = 'button' id='uzsuCancel'>Cancel</div>" +
-    						"<div data-role = 'button' id='uzsuSaveQuit'>OK</div>" +
-    					"</div>" +
-    				"</div>" +
-    			"</div>" +
+    			"<span style='float:right'>" +
+    				"<div class='uzsuCellText'>v4.9</div>" +
+    				"<div class='uzsuCell'>" +
+	    				"<form>" +
+	    					"<fieldset data-mini='true'>" +
+	    						"<input type='checkbox' id='uzsuGeneralActive'>" +
+	    							"<label for='uzsuGeneralActive'>Active</label>" +
+	    					"</fieldset>" +
+	    				"</form>" +
+	    			"</div>" +
+	    			"<div class='uzsuCell'>" +
+						"<div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>" +
+							"<div data-role = 'button' id='uzsuAddTableRow'>New</div>" +
+							"<div data-role = 'button' id='uzsuSortTime'>Sort</div>" +
+						"</div>" +
+					"</div>" +
+	    			"<div class='uzsuCell'>" +
+	    					"<div data-role='controlgroup' data-type='horizontal' data-inline='true' data-mini='true'>" +
+	    						"<div data-role = 'button' id='uzsuCancel'>Cancel</div>" +
+	    						"<div data-role = 'button' id='uzsuSaveQuit'>OK</div>" +
+	    					"</div>" +
+	    				"</div>" +
+	    			"</div>" +
+	    		"</span>" +
     		"</div>";
 	// und der Abschluss des uzsuClear als Rahmen für den float:left und des uzsuPopup divs
 	tt += "</div></div>";

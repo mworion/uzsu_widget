@@ -4,6 +4,13 @@
 (C) Michael Würtenberger 2014,2015,2016
 
 changelog
+
+v 4.9
+- bugfixing
+- leichte Design Überarbeitung
+- evt. iOS9 Themen beseitigt (?)
+- fertigstellung der FHEM Features
+ 
 v 4.8
 - design überarbeitung
 - bugfixes
