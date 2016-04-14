@@ -4,6 +4,8 @@
 (C) Michael Würtenberger 2014,2015,2016
 
 changelog
+v 4.91
+- bugfix expert color
 
 v 4.9
 - bugfixing

@@ -2,7 +2,7 @@
 // 
 // Neugestaltetes UZSU Widget zur Bedienung UZSU Plugin
 //
-// Release responsive v 4.9
+// Release responsive v 4.91
 // notwendig smartvisu ab v2.8 (svg umstellung)
 //
 // Darstellung der UZSU Einträge und Darstellung Widget in Form eine Liste mit den Einträgen
@@ -344,7 +344,7 @@ function uzsuBuildTableFooter(designType) {
     tt += "<div class='uzsuTableFooter'>" +
     		"<div class='uzsuRowFooter'>" +
     			"<span style='float:right'>" +
-    				"<div class='uzsuCellText'>v4.9</div>" +
+    				"<div class='uzsuCellText'>v4.91</div>" +
     				"<div class='uzsuCell'>" +
 	    				"<form>" +
 	    					"<fieldset data-mini='true'>" +
