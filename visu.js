@@ -468,9 +468,6 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 	    }
 	    // und der Refresh, damit es angezeigt wird
 		$('#uzsuEvent'+numberOfRow).selectmenu('refresh', true);
-		// Fallunterscheidung für den Expertenmodus
-		uzsuSetSunActiveState(numberOfRow);
-		uzsuSetExpertColor(numberOfRow);
 		// in der Tabelle die Werte der rrule, dabei gehe ich von dem Standardformat FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU aus und setze für jeden Eintrag den Button.
 		var rrule = response.list[numberOfRow].rrule;
 		if (typeof rrule === "undefined") {
@@ -490,6 +487,9 @@ function uzsuFillTable(response, designType, valueType, valueParameterList) {
 			$('#uzsuHolidayWorkday' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.workday).checkboxradio("refresh");			
 			$('#uzsuHolidayWeekend' + numberOfRow).prop('checked', response.list[numberOfRow].holiday.weekend).checkboxradio("refresh");			
 		}
+		// Fallunterscheidung für den Expertenmodus
+		uzsuSetSunActiveState(numberOfRow);
+		uzsuSetExpertColor(numberOfRow);
 	}
 }
 
