@@ -4,7 +4,10 @@
 (C) Michael Würtenberger 2014,2015
 
 changelog
-v 4 rc 1
+v 4.0
+- release
+
+v 4 rc1
 - umstellung auf svg zu smartvisu 2.8
 
 v 3.99
