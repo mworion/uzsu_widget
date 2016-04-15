@@ -2,16 +2,16 @@
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015, 2016
 *
-* responsive v4.0
+* responsive v5.0
 *
-* läuft zusammen mit visu.js (responsive) ab v4.0
+* läuft zusammen mit dem visu.js (responsive) ab v5.0
 * läuft zusammen mit smartvisu ab v2.8
 *
 * @param unique id for this widget
 * @param a gad/item
 * @param headline for popup (optional), default UZSZ
 * @param designType for popup design (optional), default = '0', 
-*												 expert mode = '1'  (value, time, rrule direct input)
+*												 FHEM = '2', like default
 * @param pic on (optional), default icon is a clock
 * @param pic off (optional), default icon is a clock
 * @param valueType (optional), default = bool, supported types are 'bool', 'num', 'text', 'list'
@@ -34,16 +34,30 @@
     margin-bottom:20px;
 }
 .uzsuRow{
-    clear:both;
+	clear: both;
     height:60px;
 }
-.uzsuRowExpert, .uzsuRowCondition{
-    clear:both;
+.uzsuRowExpert, .uzsuRowHoliday, .uzsuRowCondition, .uzsuRowDelayedExec{
     height:60px;
     border:1px dotted;
     margin-bottom:20px;
     margin-left:20px;
-    margin-right:20px;
+    margin-right:10px;
+}
+.uzsuRowExpHoli:after{
+	clear: both;
+	content: " ";
+   	display: block; 
+   	height: 0;
+}
+.uzsuRowExpertText, .uzsuRowHolidayText, .uzsuRowConditionText, .uzsuRowDelayedExecText{
+	height: 0em;
+    font-size: 0.7em;
+    position: relative; 
+    top: 5em; 
+    left: -1.5em; 
+    transform: rotate(270deg);  
+	transform-origin:0em 0em; 
 }
 .uzsuRowFooter{
     clear:both;
@@ -73,6 +87,14 @@
     width: 50px !important;
     padding: 0.1em !important;
 }
+.uzsuConditionValueInput, .uzsuDelayedExecValueInput{
+    width: 70px !important;
+    padding: 0.1em !important;
+}
+.uzsuConditionDeviceStringInput, .uzsuDelayedExecDeviceStringInput{
+    width: 250px !important;
+    padding: 0.1em !important;
+}
 div.ui-input-text{
 	height: 30px;
   	margin: .25em 0;
@@ -83,13 +105,10 @@ div.ui-slider-switch{
 .uzsuCellExpert div.ui-btn{
 	top:3px !important;
 }
-.uzsuTimeCronExpert .ui-icon{
-  	background-color: #ff0000 !important;
-}
 .ui-disable{
 	opacity: 0.7 !important;
 }
-.uzsuEvent, .uzsuConditionActive, .uzsuListInput{
+.uzsuEvent, .uzsuConditionActive, .uzsuDelayedExecActive, .uzsuListInput{
 	margin: .25em 0 !important;
 	width: 100px;
 	padding: 0 !important;
@@ -98,7 +117,7 @@ div.ui-slider-switch{
 	width: 350px !important;
 }
 @media screen and (max-width: 625px){
-    .uzsuRowExpert, .uzsuRowCondition, .uzsuCellExpert{
+    .uzsuRowExpert, .uzsuRowHoliday, .uzsuRowCondition, .uzsuRowDelayedExec, .uzsuCellExpert{
         display: none;    
     }
 }

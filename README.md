@@ -3,10 +3,10 @@
 ###JAVA Script Widget for use in smartvisu environment in combination with uzsu plugin for smarthome or FHEM environment
 (C) Michael Würtenberger 2014,2015,2016
 
-Stand: v4.0 
-Umstellung auf smartvisu v2.8 und damit svg. Spielt nicht mehr mit Versionen darunter !
-Anlehnung an Umsetzung von aschwith
-Erweitert um das Setzen von Conditions im FHEM Umfeld
+Stand: v 5.0
+Erweitert um das Setzen von Conditions und Holiday Funktion im FHEM Umfeld
+Für FHEM wird künftig der designType = '2' verwendet. Darstellung entspicht default, erweitert um die Funktionen für FHEM
+Der DesignType = 1 (Expert Mode) ist entfallen (kein Bedarf)
 
 Installation:
 1. Download von visu.js und widget_uzsu.html aus Github
@@ -49,7 +49,7 @@ Parametersatz für UZSU.UZSU_ICON:
 
 Optionen Erscheinungsbild Popup:
 0: Standard. Es wird Wert, Zeit HH:MM, Wochentage zur Auswahl, Zeile Aktiv behandelt.
-1: Profimodus. Zeit kann als Textstring (volle Funktion des Plugins inkl. surise usw.), und Wochentag als rrule String angegeben werden.
+2: FHEM Modus. Wie Standard, jedoch werden zusätzliche Eingaben für FHEM ermöglich in der Expertenzeile.
  
 Optionen Werte Typ wählt die Werteingabe im Popup aus:
 bool:   Slideranzeige. 
@@ -77,22 +77,23 @@ Nochmal die Parameter im Widget:
 * Widget for usage of uzsu plugin
 * (c) Michael Würtenberger 2014, 2015, 2016
 *
-* responsive v4.0
+* responsive v 5.0
 *
-* läuft zusammen mit dem visu.js (responsive) ab v4.0
+* läuft zusammen mit dem visu.js (responsive) ab v5.0
 * umstellung auf smartvisu v2.8
 *
 * @param unique id for this widget
 * @param a gad/item
 * @param headline for popup (optional), default UZSZ
 * @param designType for popup design (optional), default = '0', 
-*												 expert mode = '1'  (value, time, rrule direct input)
+*												 FHEM = '2', like default
 * @param pic on (optional), default icon is a clock
 * @param pic off (optional), default icon is a clock
 * @param valueType (optional), default = bool, supported types are 'bool', 'num', 'text', 'list'
 * @param valueParameterList (optional), default set in js depending on valueType
 * @param optional color
 */
+
 
 {% macro uzsu_icon(id, gad_uzsu, gad_headline, gad_designType, pic_on, pic_off, gad_valueType, gad_valueParameterList, gad_color) %}
 </pre>
